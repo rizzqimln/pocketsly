@@ -29,7 +29,7 @@
   
   <!-- Bundled styling: one file, zero render-blocking fan-out over HTTP/1.1.
        Sources stay modular under static/css; regenerate via scripts/build.py. -->
-  <link href="/css/bundle.css?v=8.6" rel="stylesheet" />
+  <link href="/css/bundle.css?v=8.7" rel="stylesheet" />
 </head>
 
 <body>
@@ -2410,197 +2410,25 @@
               </div>
             </div>
           </div>
-          <!-- Middle forms & Donut section -->
-          <div class="budget-layout">
-            <div class="card">
-              <div class="card-body">
-                <!-- Action Tab Buttons -->
-                <div class="budget-action-tabs d-flex gap-sm">
-                  <button class="btn btn-sm btn-primary active d-flex items-center"
-                    id="tab-btn-income" onclick="Budget.switchFormTab('income')" type="button">
-                    <svg fill="none" height="13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                      stroke-width="2.5" viewBox="0 0 24 24" width="13">
-                      <line x1="12" x2="12" y1="19" y2="5"></line>
-                      <polyline points="5 12 12 5 19 12"></polyline>
-                    </svg>
-                    Income
-                  </button>
-                  <button class="btn btn-sm btn-secondary d-flex items-center"
-                    id="tab-btn-expense" onclick="Budget.switchFormTab('expense')" type="button">
-                    <svg fill="none" height="13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                      stroke-width="2.5" viewBox="0 0 24 24" width="13">
-                      <line x1="12" x2="12" y1="5" y2="19"></line>
-                      <polyline points="19 12 12 19 5 12"></polyline>
-                    </svg>
-                    Expense
-                  </button>
-                  <button class="btn btn-sm btn-secondary d-flex items-center" id="tab-btn-budget"
-                    onclick="Budget.switchFormTab('budget')" type="button">
-                    <svg fill="none" height="13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                      stroke-width="2.5" viewBox="0 0 24 24" width="13">
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <line x1="12" x2="12" y1="8" y2="16"></line>
-                      <line x1="8" x2="16" y1="12" y2="12"></line>
-                    </svg>
-                    Target
-                  </button>
-                </div>
-                <!-- 1. Log Income Form -->
-                <form class="auth-form budget-form-container d-flex flex-col"
-                  id="add-income-form">
-                  <!-- Category Combobox & Presets -->
-                  <div class="form-group">
-                    <label class="d-flex justify-between items-center" for="income-source">
-                      <span>Income Category</span>
-                      <span class="text-muted text-xs">Searchable dropdown combobox</span>
-                    </label>
-                    <div class="d-flex items-center w-full">
-                      <input class="w-full" id="income-source" list="income-categories-list"
-                        placeholder="Select or search category (e.g. Salary, Allowance...)" required="" type="text"
-                        value="Allowance" />
-                      <span class="text-muted text-xs">▼</span>
-                    </div>
-                    <datalist id="income-categories-list">
-                      <option value="Salary"></option>
-                      <option value="Allowance"></option>
-                      <option value="Freelance"></option>
-                      <option value="Scholarship"></option>
-                      <option value="Investment"></option>
-                      <option value="Part-time Job"></option>
-                      <option value="Gift / Bonus"></option>
-                    </datalist>
-                  </div>
-                  <!-- Amount Field -->
-                  <div class="form-group">
-                    <label for="income-amount">Income Amount</label>
-                    <input class="currency-formatted-input w-full font-bold" id="income-amount"
-                      inputmode="numeric" placeholder="e.g. 1,500,000" required="" type="text" />
-                  </div>
-                  <!-- Date, Wallet & Recurring Responsive Grid -->
-                  <div class="budget-form-row-grid gap-md">
-                    <div class="form-group">
-                      <label for="income-date">Date Received</label>
-                      <input class="w-full" id="income-date" required="" type="date" />
-                    </div>
-                    <div class="form-group">
-                      <label for="income-wallet">Account / Wallet</label>
-                      <select class="w-full text-xs p-md" id="income-wallet">
-                        <option selected="" value="Cash">Cash in Hand</option>
-                        <option value="Bank Transfer">Bank Account</option>
-                        <option value="E-Wallet">E-Wallet (GoPay/OVO/Dana)</option>
-                        <option value="Card">Debit / Credit Card</option>
-                      </select>
-                    </div>
-                    <div class="form-group">
-                      <label for="income-recurring">Recurrence</label>
-                      <select class="w-full text-xs p-md" id="income-recurring">
-                        <option selected="" value="none">One-time</option>
-                        <option value="weekly">Weekly</option>
-                        <option value="monthly">Monthly</option>
-                      </select>
-                    </div>
-                  </div>
-                  <!-- Full-Width Notes Field -->
-                  <div class="form-group w-full">
-                    <label for="income-desc">Notes / Description (Optional)</label>
-                    <input class="w-full" id="income-desc" placeholder="e.g. Semester allowance from family"
-                      type="text" />
-                  </div>
-                  <button class="btn btn-primary font-bold d-flex items-center justify-center gap-sm mt-md p-md bento-icon-emerald"
-                    type="submit">
-                    <span>+</span> Log Income
-                  </button>
-                </form>
-                <!-- 2. Log Expense Form -->
-                <form class="auth-form budget-form-container hidden d-flex flex-col"
-                  id="add-expense-form">
-                  <!-- Quick Scan Receipt Helper Banner -->
-                  <button
-                    class="btn btn-outline btn-sm receipt-autofill-btn text-brand d-flex items-center justify-center gap-xs font-bold text-sm p-md"
-                    onclick="Budget.openReceiptScanner()" type="button">
-                    <svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                      stroke-width="2.2" viewBox="0 0 24 24" width="15">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                      <polyline points="14 2 14 8 20 8"></polyline>
-                      <line x1="16" x2="8" y1="13" y2="13"></line>
-                      <line x1="16" x2="8" y1="17" y2="17"></line>
-                      <polyline points="10 9 9 9 8 9"></polyline>
-                    </svg>
-                    Auto-fill from Receipt (Scan / Upload / Camera)
-                  </button>
-                  <!-- Expense Category Combobox & Presets -->
-                  <div class="form-group">
-                    <label class="d-flex justify-between items-center" for="expense-category">
-                      <span>Expense Category</span>
-                      <span class="text-muted text-xs">Searchable dropdown combobox</span>
-                    </label>
-                    <div class="d-flex items-center w-full">
-                      <input class="w-full" id="expense-category" list="expense-categories-list"
-                        placeholder="Select or search category (e.g. Food, Bills...)" required="" type="text"
-                        value="Food &amp; Dining" />
-                      <span class="text-muted text-xs">▼</span>
-                    </div>
-                    <datalist id="expense-categories-list">
-                      <option value="Food &amp; Dining"></option>
-                      <option value="Transportation"></option>
-                      <option value="Books &amp; Study"></option>
-                      <option value="Bills &amp; Wifi"></option>
-                      <option value="Coffee &amp; Snacks"></option>
-                      <option value="Housing / Rent"></option>
-                      <option value="Health &amp; Medical"></option>
-                      <option value="Entertainment"></option>
-                    </datalist>
-                  </div>
-                  <!-- Amount Field -->
-                  <div class="form-group">
-                    <label for="expense-amount">Expense Amount</label>
-                    <input class="currency-formatted-input w-full font-bold" id="expense-amount"
-                      inputmode="numeric" placeholder="e.g. 35,000" required="" type="text" />
-                  </div>
-                  <!-- Date & Wallet Grid -->
-                  <div class="budget-form-row-grid grid-2col">
-                    <div class="form-group">
-                      <label for="expense-date">Date Spent</label>
-                      <input class="w-full" id="expense-date" required="" type="date" />
-                    </div>
-                    <div class="form-group">
-                      <label for="expense-wallet">Account / Wallet</label>
-                      <select class="w-full text-xs p-md" id="expense-wallet">
-                        <option selected="" value="Cash">Cash in Hand</option>
-                        <option value="Bank Transfer">Bank Account</option>
-                        <option value="E-Wallet">E-Wallet (GoPay/OVO/Dana)</option>
-                        <option value="Card">Debit / Credit Card</option>
-                      </select>
-                    </div>
-                  </div>
-                  <!-- Full-Width Notes Field -->
-                  <div class="form-group w-full">
-                    <label for="expense-desc">Description / Notes (Optional)</label>
-                    <input class="w-full" id="expense-desc" placeholder="e.g. Lunch with classmates at food court"
-                      type="text" />
-                  </div>
-                  <button class="btn btn-primary font-bold d-flex items-center justify-center gap-sm mt-md p-md"
-                    type="submit">
-                    <span>-</span> Log Expense
-                  </button>
-                </form>
-                <!-- 3. Setup Budget Limit Form -->
-                <form class="auth-form budget-form-container hidden d-flex flex-col"
-                  id="add-budget-form">
-                  <div class="form-group">
-                    <label for="budget-category">Category / Allocation</label>
-                    <input class="w-full" id="budget-category" placeholder="e.g. Food, Transportation, Textbooks"
-                      required="" type="text" />
-                  </div>
-                  <div class="form-group">
-                    <label for="budget-amount">Monthly Limit Amount</label>
-                    <input class="currency-formatted-input w-full font-bold" id="budget-amount"
-                      inputmode="numeric" placeholder="e.g. 500,000" required="" type="text" />
-                  </div>
-                  <button class="btn btn-primary font-bold mt-md p-md" type="submit">Allocate Limit Target</button>
-                </form>
-              </div>
-            </div>
+          <!-- Quick Action Buttons Bar (Mobile-First) -->
+          <div class="budget-quick-action-bar mb-lg">
+            <button class="btn btn-action-expense font-bold text-sm" onclick="Budget.openEntryModal('expense')" type="button">
+              <svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="15"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+              <span>- Log Expense</span>
+            </button>
+            <button class="btn btn-action-income font-bold text-sm" onclick="Budget.openEntryModal('income')" type="button">
+              <svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="15"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+              <span>+ Log Income</span>
+            </button>
+            <button class="btn btn-action-budget font-bold text-sm" onclick="Budget.openEntryModal('budget')" type="button">
+              <svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="15"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" x2="16" y1="12" y2="12"></line></svg>
+              <span>🎯 Set Target</span>
+            </button>
+          </div>
+
+          <!-- Main Dashboard: Cash Flow Ratio & Recent Transactions -->
+          <div class="budget-dashboard-grid mb-lg">
+            <!-- 1. Monthly Cash Flow Donut Card -->
             <div class="card">
               <div class="card-body">
                 <div class="d-flex justify-between items-center mb-lg">
@@ -2653,32 +2481,16 @@
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            <!-- 2. Recent Cash Flow Ledger Card -->
+            <div class="card">
+              <div class="card-body">
                 <!-- Transaction List Header & Filter Tabs -->
-                <div class="d-flex flex-wrap justify-between items-center gap-sm">
-                  <div class="d-flex items-center gap-md">
-                    <h4 class="m-0 text-base">Recent Cash Flow</h4>
-                    <div class="d-flex gap-xs">
-                      <button class="btn btn-outline btn-sm d-flex items-center gap-xs text-xs p-sm"
-                        onclick="Budget.exportCSV()" title="Download CSV Spreadsheet" type="button">
-                        <svg fill="none" height="12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                          stroke-width="2.2" viewBox="0 0 24 24" width="12">
-                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                          <polyline points="7 10 12 15 17 10"></polyline>
-                          <line x1="12" x2="12" y1="15" y2="3"></line>
-                        </svg>
-                        CSV
-                      </button>
-                      <button class="btn btn-outline btn-sm d-flex items-center gap-xs text-xs p-sm"
-                        onclick="Budget.printReport()" title="Print Financial Report" type="button">
-                        <svg fill="none" height="12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                          stroke-width="2.2" viewBox="0 0 24 24" width="12">
-                          <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                          <rect height="8" width="12" x="6" y="14"></rect>
-                        </svg>
-                        Print
-                      </button>
-                    </div>
+                <div class="d-flex flex-wrap justify-between items-center gap-sm mb-md">
+                  <div class="d-flex items-center gap-sm">
+                    <h4 class="m-0 text-base font-bold">Recent Cash Flow</h4>
                   </div>
                   <div class="transaction-filter-tabs d-flex gap-xs">
                     <button class="btn-sm day-pill-btn active text-xs p-md" id="tx-filter-all"
@@ -2701,7 +2513,7 @@
                       </svg>
                     </div>
                     <div class="empty-state-title">No transactions yet</div>
-                    <div class="empty-state-desc">Log your first income or expense using the form on the left.</div>
+                    <div class="empty-state-desc">Log your first income or expense using the buttons above.</div>
                   </div>
                 </div>
               </div>
@@ -3182,6 +2994,188 @@
     </div>
   </div>
   <!-- ===================================================================== -->
+  <!-- BUDGET CASH FLOW & TARGET ENTRY MODAL (Mobile-First Bottom Sheet)    -->
+  <!-- ===================================================================== -->
+  <div class="modal-overlay hidden" id="budget-entry-modal"
+    onclick="if(event.target === this) Budget.closeEntryModal()">
+    <div class="modal-card budget-modal-card">
+      <div class="modal-drag-indicator-bar" onclick="Budget.closeEntryModal()" title="Click or pull down to close">
+        <span class="modal-drag-pill"></span>
+      </div>
+      <div class="modal-header">
+        <div class="d-flex items-center gap-sm">
+          <svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+            stroke-width="2.2" viewBox="0 0 24 24" width="18">
+            <rect height="16" rx="2" width="22" x="1" y="4"></rect>
+            <line x1="1" x2="23" y1="10" y2="10"></line>
+          </svg>
+          <h3 id="budget-modal-title">Log Cash Flow</h3>
+        </div>
+        <button aria-label="Close modal" class="btn-icon" onclick="Budget.closeEntryModal()" type="button">×</button>
+      </div>
+      <div class="modal-body">
+        <!-- Action Tab Switchers inside Modal -->
+        <div class="budget-modal-tabs mb-lg">
+          <button class="budget-modal-tab-btn active-expense" id="modal-tab-expense"
+            onclick="Budget.switchModalTab('expense')" type="button">
+            - Expense
+          </button>
+          <button class="budget-modal-tab-btn" id="modal-tab-income"
+            onclick="Budget.switchModalTab('income')" type="button">
+            + Income
+          </button>
+          <button class="budget-modal-tab-btn" id="modal-tab-budget"
+            onclick="Budget.switchModalTab('budget')" type="button">
+            🎯 Target
+          </button>
+        </div>
+
+        <!-- 1. Log Expense Form -->
+        <form class="auth-form budget-form-container d-flex flex-col" id="add-expense-form">
+          <!-- Quick Scan Helper -->
+          <button class="btn btn-outline btn-sm receipt-autofill-btn text-brand d-flex items-center justify-center gap-xs font-bold text-xs p-sm mb-sm"
+            onclick="Budget.openReceiptScanner()" type="button">
+            <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+              stroke-width="2.2" viewBox="0 0 24 24" width="14">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" x2="8" y1="13" y2="13"></line>
+              <line x1="16" x2="8" y1="17" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            Auto-fill from Receipt (Camera / Gallery OCR)
+          </button>
+          
+          <div class="form-group mb-sm">
+            <label for="expense-amount">Amount Spent</label>
+            <input class="currency-formatted-input font-bold text-lg w-full" id="expense-amount"
+              inputmode="numeric" placeholder="e.g. 35,000" required="" type="text" />
+          </div>
+
+          <div class="form-group mb-sm">
+            <label for="expense-category">Category</label>
+            <input class="w-full" id="expense-category" list="expense-categories-list"
+              placeholder="Select or search category (e.g. Food, Bills...)" required="" type="text"
+              value="Food &amp; Dining" />
+            <datalist id="expense-categories-list">
+              <option value="Food &amp; Dining"></option>
+              <option value="Transportation"></option>
+              <option value="Books &amp; Study"></option>
+              <option value="Bills &amp; Wifi"></option>
+              <option value="Coffee &amp; Snacks"></option>
+              <option value="Housing / Rent"></option>
+              <option value="Health &amp; Medical"></option>
+              <option value="Entertainment"></option>
+              <option value="Shopping"></option>
+            </datalist>
+          </div>
+
+          <div class="budget-form-row-grid grid-2col gap-sm mb-sm">
+            <div class="form-group m-0">
+              <label for="expense-date">Date</label>
+              <input class="w-full" id="expense-date" required="" type="date" />
+            </div>
+            <div class="form-group m-0">
+              <label for="expense-wallet">Account / Wallet</label>
+              <select class="w-full" id="expense-wallet">
+                <option selected="" value="Cash">Cash in Hand</option>
+                <option value="Bank Transfer">Bank Account</option>
+                <option value="E-Wallet">E-Wallet (GoPay/OVO/Dana)</option>
+                <option value="Card">Debit / Credit Card</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group mb-md">
+            <label for="expense-desc">Description / Notes (Optional)</label>
+            <input class="w-full" id="expense-desc" placeholder="e.g. Lunch with classmates at cafeteria" type="text" />
+          </div>
+
+          <button class="btn btn-action-expense font-bold w-full p-md" type="submit">
+            <span>-</span> Log Expense
+          </button>
+        </form>
+
+        <!-- 2. Log Income Form -->
+        <form class="auth-form budget-form-container hidden d-flex flex-col" id="add-income-form">
+          <div class="form-group mb-sm">
+            <label for="income-amount">Income Amount</label>
+            <input class="currency-formatted-input font-bold text-lg w-full" id="income-amount"
+              inputmode="numeric" placeholder="e.g. 1,500,000" required="" type="text" />
+          </div>
+
+          <div class="form-group mb-sm">
+            <label for="income-source">Category / Source</label>
+            <input class="w-full" id="income-source" list="income-categories-list"
+              placeholder="Select or search category (e.g. Salary, Allowance...)" required="" type="text"
+              value="Allowance" />
+            <datalist id="income-categories-list">
+              <option value="Salary"></option>
+              <option value="Allowance"></option>
+              <option value="Freelance"></option>
+              <option value="Scholarship"></option>
+              <option value="Investment"></option>
+              <option value="Part-time Job"></option>
+              <option value="Gift / Bonus"></option>
+            </datalist>
+          </div>
+
+          <div class="budget-form-row-grid grid-2col gap-sm mb-sm">
+            <div class="form-group m-0">
+              <label for="income-date">Date Received</label>
+              <input class="w-full" id="income-date" required="" type="date" />
+            </div>
+            <div class="form-group m-0">
+              <label for="income-wallet">Account / Wallet</label>
+              <select class="w-full" id="income-wallet">
+                <option selected="" value="Cash">Cash in Hand</option>
+                <option value="Bank Transfer">Bank Account</option>
+                <option value="E-Wallet">E-Wallet (GoPay/OVO/Dana)</option>
+                <option value="Card">Debit / Credit Card</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group mb-sm">
+            <label for="income-recurring">Recurrence</label>
+            <select class="w-full" id="income-recurring">
+              <option selected="" value="none">One-time</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+            </select>
+          </div>
+
+          <div class="form-group mb-md">
+            <label for="income-desc">Notes (Optional)</label>
+            <input class="w-full" id="income-desc" placeholder="e.g. Semester allowance from parents" type="text" />
+          </div>
+
+          <button class="btn btn-action-income font-bold w-full p-md" type="submit">
+            <span>+</span> Log Income
+          </button>
+        </form>
+
+        <!-- 3. Setup Budget Limit Target Form -->
+        <form class="auth-form budget-form-container hidden d-flex flex-col" id="add-budget-form">
+          <div class="form-group mb-sm">
+            <label for="budget-category">Category / Allocation</label>
+            <input class="w-full" id="budget-category" list="expense-categories-list" placeholder="e.g. Food &amp; Dining, Transport, Books"
+              required="" type="text" />
+          </div>
+          <div class="form-group mb-md">
+            <label for="budget-amount">Monthly Limit Amount</label>
+            <input class="currency-formatted-input font-bold text-lg w-full" id="budget-amount"
+              inputmode="numeric" placeholder="e.g. 500,000" required="" type="text" />
+          </div>
+          <button class="btn btn-action-budget font-bold w-full p-md" type="submit">
+            🎯 Allocate Limit Target
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
   <!-- SMART RECEIPT SCANNER MODAL (OCR / Auto-Fill)                         -->
   <!-- ===================================================================== -->
   <div class="modal-overlay hidden" id="receipt-scanner-modal"
@@ -3490,7 +3484,7 @@
   <!-- ===================================================================== -->
   <!-- Bundled scripts: one deferred file (parses in parallel, executes in
        dependency order after HTML parse). Regenerate via scripts/build.py. -->
-  <script defer src="/js/bundle.js?v=8.6"></script>
+  <script defer src="/js/bundle.js?v=8.7"></script>
 </body>
 
 </html>

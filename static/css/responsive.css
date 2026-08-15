@@ -932,7 +932,9 @@ body.modal-open .budget-fab {
   .task-item,
   .note-item,
   .resource-card,
-  .event-card {
+  .event-card,
+  .transaction-item,
+  .category-card {
     content-visibility: auto;
     contain-intrinsic-size: 1px 65px;
     transform: translateZ(0);

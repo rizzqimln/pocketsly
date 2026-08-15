@@ -4531,11 +4531,26 @@ window.Budget = {
     if (expDate && !expDate.value) expDate.value = today;
   },
 
-  switchFormTab(tab) {
+  openEntryModal(tab = 'expense') {
+    const modal = document.getElementById('budget-entry-modal');
+    if (!modal) return;
+    modal.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+    this.switchModalTab(tab);
+  },
+
+  closeEntryModal() {
+    const modal = document.getElementById('budget-entry-modal');
+    if (modal) modal.classList.add('hidden');
+    document.body.classList.remove('modal-open');
+  },
+
+  switchModalTab(tab) {
     this.activeFormTab = tab;
-    const tabIncomeBtn = document.getElementById('tab-btn-income');
-    const tabExpenseBtn = document.getElementById('tab-btn-expense');
-    const tabBudgetBtn = document.getElementById('tab-btn-budget');
+    const titleEl = document.getElementById('budget-modal-title');
+    const tabIncomeBtn = document.getElementById('modal-tab-income');
+    const tabExpenseBtn = document.getElementById('modal-tab-expense');
+    const tabBudgetBtn = document.getElementById('modal-tab-budget');
 
     const formIncome = document.getElementById('add-income-form');
     const formExpense = document.getElementById('add-expense-form');
@@ -4543,8 +4558,7 @@ window.Budget = {
 
     // Reset button states
     [tabIncomeBtn, tabExpenseBtn, tabBudgetBtn].forEach(btn => {
-      btn?.classList.remove('btn-primary', 'active');
-      btn?.classList.add('btn-secondary');
+      btn?.classList.remove('active-expense', 'active-income', 'active-budget');
     });
 
     // Hide all forms
@@ -4553,21 +4567,25 @@ window.Budget = {
     formBudget?.classList.add('hidden');
 
     if (tab === 'income') {
-      tabIncomeBtn?.classList.remove('btn-secondary');
-      tabIncomeBtn?.classList.add('btn-primary', 'active');
+      tabIncomeBtn?.classList.add('active-income');
       formIncome?.classList.remove('hidden');
-      document.getElementById('income-amount')?.focus();
+      if (titleEl) titleEl.textContent = 'Log Income';
+      setTimeout(() => document.getElementById('income-amount')?.focus(), 50);
     } else if (tab === 'expense') {
-      tabExpenseBtn?.classList.remove('btn-secondary');
-      tabExpenseBtn?.classList.add('btn-primary', 'active');
+      tabExpenseBtn?.classList.add('active-expense');
       formExpense?.classList.remove('hidden');
-      document.getElementById('expense-amount')?.focus();
+      if (titleEl) titleEl.textContent = 'Log Expense';
+      setTimeout(() => document.getElementById('expense-amount')?.focus(), 50);
     } else if (tab === 'budget') {
-      tabBudgetBtn?.classList.remove('btn-secondary');
-      tabBudgetBtn?.classList.add('btn-primary', 'active');
+      tabBudgetBtn?.classList.add('active-budget');
       formBudget?.classList.remove('hidden');
-      document.getElementById('budget-amount')?.focus();
+      if (titleEl) titleEl.textContent = 'Set Budget Target';
+      setTimeout(() => document.getElementById('budget-amount')?.focus(), 50);
     }
+  },
+
+  switchFormTab(tab) {
+    this.openEntryModal(tab);
   },
 
   filterTransactions(filter) {
@@ -4932,8 +4950,8 @@ window.Budget = {
           incomeForm.reset();
           document.getElementById('income-source').value = 'Allowance';
           this.setDefaultDates();
+          this.closeEntryModal();
           this.load();
-          // Release focus so the mobile FAB re-enables (blur clears :focus-within)
           document.activeElement?.blur();
         } catch (err) {
           UI.toast(err.message, 'danger');
@@ -4964,8 +4982,8 @@ window.Budget = {
           expenseForm.reset();
           document.getElementById('expense-category').value = 'Food & Dining';
           this.setDefaultDates();
+          this.closeEntryModal();
           this.load();
-          // Release focus so the mobile FAB re-enables (blur clears :focus-within)
           document.activeElement?.blur();
         } catch (err) {
           UI.toast(err.message, 'danger');
@@ -4991,8 +5009,8 @@ window.Budget = {
           if (res.error) { UI.toast(res.error, 'danger'); return; }
           UI.toast('Budget target allocated.', 'success');
           budgetForm.reset();
+          this.closeEntryModal();
           this.load();
-          // Release focus so the mobile FAB re-enables (blur clears :focus-within)
           document.activeElement?.blur();
         } catch (err) {
           UI.toast(err.message, 'danger');
@@ -5225,41 +5243,10 @@ window.Budget = {
   },
 
   openLogModal(tab = null) {
-    if (tab) {
-      if (window.App && window.App.currentView !== 'budget') {
-        window.App.navigateTo('budget');
-      }
-      this.switchFormTab(tab);
-      setTimeout(() => {
-        if (tab === 'income') document.getElementById('income-source')?.focus();
-        else if (tab === 'expense') document.getElementById('expense-category')?.focus();
-      }, 100);
-      return;
+    if (window.App && window.App.currentView !== 'budget') {
+      window.App.navigateTo('budget');
     }
-
-    const html = `
-      <div style="display: flex; flex-direction: column; gap: 0.75rem; padding: 0.25rem 0;">
-        <button type="button" class="modal-option-card" onclick="UI.closeModal(); Budget.openLogModal('income');">
-          <div style="width: 44px; height: 44px; border-radius: var(--radius-md); background: rgba(16, 185, 129, 0.15); color: #10B981; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
-          </div>
-          <div>
-            <div style="color: var(--text-primary); font-size: 0.95rem; font-weight: 700;">Log Income (+)</div>
-            <div style="font-size: 0.78rem; color: var(--text-muted); font-weight: 500; margin-top: 0.1rem;">Allowance, freelance, salary, payouts</div>
-          </div>
-        </button>
-        <button type="button" class="modal-option-card" onclick="UI.closeModal(); Budget.openLogModal('expense');">
-          <div style="width: 44px; height: 44px; border-radius: var(--radius-md); background: rgba(239, 68, 68, 0.15); color: var(--accent-danger); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
-          </div>
-          <div>
-            <div style="color: var(--text-primary); font-size: 0.95rem; font-weight: 700;">Log Expense (-)</div>
-            <div style="font-size: 0.78rem; color: var(--text-muted); font-weight: 500; margin-top: 0.1rem;">Food, transport, bills, subscriptions</div>
-          </div>
-        </button>
-      </div>
-    `;
-    UI.openModal('Log Cash Flow', html);
+    this.openEntryModal(tab || 'expense');
   },
 
   // ── MOBILE QUICK ACTIONS (FAB bottom sheet) ──────────────────────────────
@@ -5281,10 +5268,7 @@ window.Budget = {
       this.openReceiptScanner();
       return;
     }
-    this.switchFormTab(kind);
-    const formId = { income: 'add-income-form', expense: 'add-expense-form', budget: 'add-budget-form' }[kind];
-    const form = document.getElementById(formId);
-    if (form) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    this.openEntryModal(kind);
   },
 
   // ── RECEIPT SCANNER & SMART OCR ENGINE ───────────────────────────────────
