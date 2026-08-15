@@ -902,35 +902,134 @@ window.Budget = {
   },
 
   // ── RECEIPT SCANNER & SMART OCR ENGINE ───────────────────────────────────
+  _activeCameraStream: null,
+  _cameraFacing: 'environment', // 'environment' (back) or 'user' (front)
+
   openReceiptScanner() {
     const modal = document.getElementById('receipt-scanner-modal');
     if (!modal) return;
     modal.classList.remove('hidden');
     this.resetReceiptScanner();
+    this.switchScannerSource('upload');
     document.addEventListener('paste', this._handlePasteBound);
   },
 
   closeReceiptScanner() {
     const modal = document.getElementById('receipt-scanner-modal');
     if (modal) modal.classList.add('hidden');
+    this.stopCameraStream();
     document.removeEventListener('paste', this._handlePasteBound);
+  },
+
+  switchScannerSource(source) {
+    const uploadBtn = document.getElementById('btn-src-upload');
+    const cameraBtn = document.getElementById('btn-src-camera');
+    const dropzone = document.getElementById('receipt-dropzone');
+    const cameraContainer = document.getElementById('receipt-camera-container');
+
+    if (source === 'camera') {
+      uploadBtn?.classList.remove('active');
+      cameraBtn?.classList.add('active');
+      dropzone?.classList.add('hidden');
+      cameraContainer?.classList.remove('hidden');
+      this.startCameraStream();
+    } else {
+      cameraBtn?.classList.remove('active');
+      uploadBtn?.classList.add('active');
+      cameraContainer?.classList.add('hidden');
+      dropzone?.classList.remove('hidden');
+      this.stopCameraStream();
+    }
+  },
+
+  async startCameraStream() {
+    this.stopCameraStream();
+    const video = document.getElementById('receipt-camera-video');
+    if (!video) return;
+
+    try {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        throw new Error('Camera stream not supported in this browser.');
+      }
+      const constraints = {
+        video: {
+          facingMode: this._cameraFacing,
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        },
+        audio: false
+      };
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      this._activeCameraStream = stream;
+      video.srcObject = stream;
+      await video.play();
+    } catch (err) {
+      console.warn('Live camera stream unavailable:', err);
+      UI.toast('Camera preview unavailable — using photo picker instead.', 'info');
+      // Fallback: trigger native camera input
+      document.getElementById('receipt-camera-input')?.click();
+      this.switchScannerSource('upload');
+    }
+  },
+
+  stopCameraStream() {
+    if (this._activeCameraStream) {
+      this._activeCameraStream.getTracks().forEach(track => track.stop());
+      this._activeCameraStream = null;
+    }
+    const video = document.getElementById('receipt-camera-video');
+    if (video) video.srcObject = null;
+  },
+
+  toggleCameraFacing() {
+    this._cameraFacing = this._cameraFacing === 'environment' ? 'user' : 'environment';
+    this.startCameraStream();
+  },
+
+  captureCameraSnapshot() {
+    const video = document.getElementById('receipt-camera-video');
+    if (!video || !video.videoWidth) {
+      document.getElementById('receipt-camera-input')?.click();
+      return;
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    this.stopCameraStream();
+
+    canvas.toBlob((blob) => {
+      if (!blob) return;
+      const file = new File([blob], 'camera_receipt.jpg', { type: 'image/jpeg' });
+      this.processReceiptImage(file);
+    }, 'image/jpeg', 0.92);
   },
 
   resetReceiptScanner() {
     const dropzone = document.getElementById('receipt-dropzone');
+    const cameraContainer = document.getElementById('receipt-camera-container');
     const scanningState = document.getElementById('receipt-scanning-state');
     const resultsView = document.getElementById('receipt-results-view');
-    const fileInput = document.getElementById('receipt-file-input');
+    const uploadInput = document.getElementById('receipt-upload-input');
+    const cameraInput = document.getElementById('receipt-camera-input');
+
+    this.stopCameraStream();
 
     if (dropzone) dropzone.classList.remove('hidden');
+    if (cameraContainer) cameraContainer.classList.add('hidden');
     if (scanningState) scanningState.classList.add('hidden');
     if (resultsView) resultsView.classList.add('hidden');
-    if (fileInput) fileInput.value = '';
+    if (uploadInput) uploadInput.value = '';
+    if (cameraInput) cameraInput.value = '';
   },
 
   handleReceiptUpload(e) {
     const file = e.target?.files?.[0] || e.dataTransfer?.files?.[0];
     if (!file) return;
+    this.stopCameraStream();
     this.processReceiptImage(file);
   },
 

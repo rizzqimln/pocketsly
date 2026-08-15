@@ -273,6 +273,7 @@
   letter-spacing: 0.04em;
 }
 
+.receipt-source-seg,
 .receipt-scan-mode-seg {
   display: flex;
   gap: 0.25rem;
@@ -282,7 +283,11 @@
   border: 1px solid var(--border-color);
 }
 
+.receipt-source-btn,
 .receipt-scan-mode-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   border: none;
   background: transparent;
   color: var(--text-secondary);
@@ -294,9 +299,98 @@
   transition: all 0.2s ease;
 }
 
+.receipt-source-btn.active,
 .receipt-scan-mode-btn.active {
   background: var(--primary);
   color: #fff;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.25);
+}
+
+/* ── Live Camera Viewfinder ─────────────────────────────────────────────────── */
+.receipt-camera-container {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: #000;
+  border: 2px solid var(--border-color);
+  margin-bottom: 0.75rem;
+}
+
+.receipt-camera-viewfinder {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  max-height: 360px;
+  background: #09090b;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.receipt-camera-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.receipt-camera-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.receipt-viewfinder-box {
+  position: relative;
+  width: 75%;
+  height: 75%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.4);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.viewfinder-corner {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-color: var(--primary);
+  border-style: solid;
+}
+
+.viewfinder-corner.top-left { top: 0; left: 0; border-width: 3px 0 0 3px; }
+.viewfinder-corner.top-right { top: 0; right: 0; border-width: 3px 3px 0 0; }
+.viewfinder-corner.bottom-left { bottom: 0; left: 0; border-width: 0 0 3px 3px; }
+.viewfinder-corner.bottom-right { bottom: 0; right: 0; border-width: 0 3px 3px 0; }
+
+.viewfinder-laser-line {
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #a855f7, #38bdf8, transparent);
+  box-shadow: 0 0 10px #a855f7;
+  animation: laserScan 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+}
+
+@keyframes laserScan {
+  0% { top: 5%; opacity: 0.4; }
+  50% { opacity: 1; }
+  100% { top: 95%; opacity: 0.4; }
+}
+
+.viewfinder-hint {
+  margin-top: 0.75rem;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+  background: rgba(0, 0, 0, 0.5);
+  padding: 4px 12px;
+  border-radius: 20px;
 }
 
 .receipt-dropzone:hover,

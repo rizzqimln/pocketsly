@@ -29,7 +29,7 @@
   
   <!-- Bundled styling: one file, zero render-blocking fan-out over HTTP/1.1.
        Sources stay modular under static/css; regenerate via scripts/build.py. -->
-  <link href="/css/bundle.css?v=8.4" rel="stylesheet" />
+  <link href="/css/bundle.css?v=8.5" rel="stylesheet" />
 </head>
 
 <body>
@@ -2926,20 +2926,62 @@
           type="button">×</button>
       </div>
       <div class="modal-body">
-        <!-- Scan Mode Toggle: Server OCR (default) vs On-device OCR (no upload) -->
+        <!-- Scan Mode & Input Source Toggles -->
         <div class="receipt-scan-mode-row">
-          <span class="receipt-scan-mode-label">Scan mode</span>
+          <div class="receipt-source-seg" role="group" aria-label="Input source">
+            <button class="receipt-source-btn active" id="btn-src-upload" onclick="Budget.switchScannerSource('upload')" type="button">
+              <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewBox="0 0 24 24" width="14"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+              Upload / Drop
+            </button>
+            <button class="receipt-source-btn" id="btn-src-camera" onclick="Budget.switchScannerSource('camera')" type="button">
+              <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewBox="0 0 24 24" width="14"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+              Live Camera
+            </button>
+          </div>
           <div class="receipt-scan-mode-seg" role="group" aria-label="Receipt scan mode">
             <button class="receipt-scan-mode-btn active" data-mode="server" type="button">Server scan</button>
-            <button class="receipt-scan-mode-btn" data-mode="on-device" type="button">On-device (no upload)</button>
+            <button class="receipt-scan-mode-btn" data-mode="on-device" type="button">On-device</button>
           </div>
         </div>
         <input class="hidden" id="receipt-scan-mode" value="server" />
-        <!-- Scanner Dropzone & File Input -->
+
+        <!-- 1. LIVE CAMERA VIEWFINDER -->
+        <div class="receipt-camera-container hidden" id="receipt-camera-container">
+          <div class="receipt-camera-viewfinder">
+            <video autoplay playsinline muted class="receipt-camera-video" id="receipt-camera-video"></video>
+            <div class="receipt-camera-overlay">
+              <div class="receipt-viewfinder-box">
+                <span class="viewfinder-corner top-left"></span>
+                <span class="viewfinder-corner top-right"></span>
+                <span class="viewfinder-corner bottom-left"></span>
+                <span class="viewfinder-corner bottom-right"></span>
+                <div class="viewfinder-laser-line"></div>
+              </div>
+              <p class="viewfinder-hint">Align receipt within the frame</p>
+            </div>
+          </div>
+          <div class="receipt-camera-controls d-flex gap-sm justify-center items-center p-sm">
+            <button class="btn btn-primary btn-lg d-flex items-center gap-xs font-bold" onclick="Budget.captureCameraSnapshot()" type="button">
+              <svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewBox="0 0 24 24" width="18"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle></svg>
+              Capture &amp; Scan
+            </button>
+            <button class="btn btn-outline btn-sm d-flex items-center gap-xs" onclick="Budget.toggleCameraFacing()" type="button" title="Flip Camera">
+              <svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="15"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+              Flip
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. DROPZONE & SEPARATE FILE / CAMERA INPUTS -->
         <div class="receipt-dropzone" id="receipt-dropzone"
-          onclick="document.getElementById('receipt-file-input').click()">
-          <input accept="image/*" capture="environment" class="hidden" id="receipt-file-input"
+          onclick="document.getElementById('receipt-upload-input').click()">
+          <!-- Input 1: Pure file upload / photo gallery (NO capture constraint) -->
+          <input accept="image/*,application/pdf" class="hidden" id="receipt-upload-input"
             onchange="Budget.handleReceiptUpload(event)" type="file" />
+          <!-- Input 2: Direct mobile device camera snapshot -->
+          <input accept="image/*" capture="environment" class="hidden" id="receipt-camera-input"
+            onchange="Budget.handleReceiptUpload(event)" type="file" />
+          
           <div class="receipt-dropzone-inner">
             <div class="receipt-dropzone-icon">
               <svg fill="none" height="36" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
@@ -2948,26 +2990,37 @@
                 <circle cx="12" cy="13" r="4"></circle>
               </svg>
             </div>
-            <div class="receipt-dropzone-title">Upload or Capture Receipt Photo</div>
-            <p class="receipt-dropzone-desc">Drop receipt image here, take a phone photo, or press <kbd
+            <div class="receipt-dropzone-title">Upload File or Scan Receipt</div>
+            <p class="receipt-dropzone-desc">Choose an image from files/gallery, take a live photo, or press <kbd
                 class="receipt-dropzone-kbd">Ctrl+V</kbd> to paste</p>
             <div class="d-flex gap-sm justify-center flex-wrap">
               <button class="btn btn-primary btn-sm d-flex items-center gap-xs"
-                onclick="event.stopPropagation(); document.getElementById('receipt-file-input').click()" type="button">
-                <svg fill="none" height="13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                  stroke-width="2.2" viewBox="0 0 24 24" width="13">
-                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                onclick="event.stopPropagation(); document.getElementById('receipt-upload-input').click()" type="button">
+                <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                  stroke-width="2.2" viewBox="0 0 24 24" width="14">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
                 </svg>
-                Choose Image
+                Upload File / Gallery
               </button>
               <button class="btn btn-outline btn-sm d-flex items-center gap-xs"
-                onclick="event.stopPropagation(); document.getElementById('receipt-file-input').click()" type="button">
-                <svg fill="none" height="13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                  stroke-width="2.2" viewBox="0 0 24 24" width="13">
+                onclick="event.stopPropagation(); Budget.switchScannerSource('camera')" type="button">
+                <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                  stroke-width="2.2" viewBox="0 0 24 24" width="14">
                   <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
                   <circle cx="12" cy="13" r="4"></circle>
                 </svg>
-                Camera
+                Live Camera
+              </button>
+              <button class="btn btn-ghost btn-sm d-flex items-center gap-xs"
+                onclick="event.stopPropagation(); document.getElementById('receipt-camera-input').click()" type="button">
+                <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                  stroke-width="2" viewBox="0 0 24 24" width="14">
+                  <circle cx="12" cy="12" r="3"></circle>
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+                Device Camera
               </button>
             </div>
           </div>
@@ -3157,7 +3210,7 @@
   <!-- ===================================================================== -->
   <!-- Bundled scripts: one deferred file (parses in parallel, executes in
        dependency order after HTML parse). Regenerate via scripts/build.py. -->
-  <script defer src="/js/bundle.js?v=8.4"></script>
+  <script defer src="/js/bundle.js?v=8.5"></script>
 </body>
 
 </html>
