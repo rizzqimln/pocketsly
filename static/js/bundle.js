@@ -1874,6 +1874,27 @@ window.Notes = {
     }
   },
 
+  librarySearchQuery: '',
+
+  openAddResourceModal() {
+    const modal = document.getElementById('academic-resource-modal');
+    if (!modal) return;
+    modal.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+    setTimeout(() => document.getElementById('notes-resource-title')?.focus(), 60);
+  },
+
+  closeAddResourceModal() {
+    const modal = document.getElementById('academic-resource-modal');
+    if (modal) modal.classList.add('hidden');
+    document.body.classList.remove('modal-open');
+  },
+
+  handleLibrarySearch(e) {
+    this.librarySearchQuery = (e?.target?.value || '').toLowerCase().trim();
+    this.renderResources();
+  },
+
   async loadResources() {
     try {
       this.resourcesList = await API.get('/api/resources');
@@ -1897,18 +1918,34 @@ window.Notes = {
 
     let items = this.resourcesList || [];
     if (this.resourceFilterCat !== 'all') {
-      items = items.filter(r => (r.category || 'general').toLowerCase() === this.resourceFilterCat.toLowerCase());
+      const targetCat = this.resourceFilterCat.toLowerCase();
+      items = items.filter(r => {
+        const cat = (r.category || 'general').toLowerCase();
+        const type = (r.resource_type || 'book').toLowerCase();
+        return cat === targetCat || type === targetCat;
+      });
+    }
+
+    if (this.librarySearchQuery) {
+      const q = this.librarySearchQuery;
+      items = items.filter(r => {
+        return (r.title && r.title.toLowerCase().includes(q)) ||
+               (r.author && r.author.toLowerCase().includes(q)) ||
+               (r.publisher && r.publisher.toLowerCase().includes(q)) ||
+               (r.doi && r.doi.toLowerCase().includes(q)) ||
+               (r.notes && r.notes.toLowerCase().includes(q));
+      });
     }
 
     if (items.length === 0) {
       container.innerHTML = `
-        <div class="empty-state" style="padding: 2.5rem 1rem; text-align: center; border: 1px dashed var(--border-color); border-radius: var(--radius-md);">
+        <div class="empty-state" style="padding: 2.5rem 1rem; text-align: center; border: 1px dashed var(--border-color); border-radius: var(--radius-lg); background: var(--bg-surface);">
           <div style="margin-bottom: 0.5rem; color: var(--text-muted); display: flex; justify-content: center;">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
           </div>
           <div style="font-weight: 700; font-size: 0.95rem;">No Academic Resources Found</div>
           <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">
-            ${this.resourceFilterCat !== 'all' ? 'No items under this category filter.' : 'Add your first book, research paper, or lecture link using the form on the left.'}
+            ${this.librarySearchQuery ? 'No items match your search query.' : (this.resourceFilterCat !== 'all' ? 'No items under this category filter.' : 'Tap "+ Add Resource / Paper" above to catalog your first book, paper, or research journal.')}
           </div>
         </div>
       `;
@@ -1991,6 +2028,7 @@ window.Notes = {
       await API.post('/api/resources', { title, author, year, publisher, doi, resource_type, category, url_or_path, notes });
       UI.toast('Academic resource added to Library!', 'success');
       document.getElementById('notes-add-resource-form')?.reset();
+      this.closeAddResourceModal();
       this.loadResources();
     } catch (err) {
       UI.toast(err.message, 'danger');
@@ -4569,18 +4607,18 @@ window.Budget = {
     if (tab === 'income') {
       tabIncomeBtn?.classList.add('active-income');
       formIncome?.classList.remove('hidden');
-      if (titleEl) titleEl.textContent = 'Log Income';
-      setTimeout(() => document.getElementById('income-amount')?.focus(), 50);
+      if (titleEl) titleEl.innerHTML = '<span style="color:#10B981; font-weight:900;">+</span> Log Income';
+      setTimeout(() => document.getElementById('income-amount')?.focus(), 80);
     } else if (tab === 'expense') {
       tabExpenseBtn?.classList.add('active-expense');
       formExpense?.classList.remove('hidden');
-      if (titleEl) titleEl.textContent = 'Log Expense';
-      setTimeout(() => document.getElementById('expense-amount')?.focus(), 50);
+      if (titleEl) titleEl.innerHTML = '<span style="color:#EF4444; font-weight:900;">-</span> Log Expense';
+      setTimeout(() => document.getElementById('expense-amount')?.focus(), 80);
     } else if (tab === 'budget') {
       tabBudgetBtn?.classList.add('active-budget');
       formBudget?.classList.remove('hidden');
-      if (titleEl) titleEl.textContent = 'Set Budget Target';
-      setTimeout(() => document.getElementById('budget-amount')?.focus(), 50);
+      if (titleEl) titleEl.innerHTML = '<span>🎯</span> Set Budget Target';
+      setTimeout(() => document.getElementById('budget-amount')?.focus(), 80);
     }
   },
 

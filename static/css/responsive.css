@@ -850,6 +850,20 @@
   .curr-active-pill {
     display: none;
   }
+
+  .library-toolbar-card .card-body {
+    padding: 0.85rem !important;
+  }
+
+  .resource-card {
+    padding: 0.9rem !important;
+  }
+
+  .resource-card-actions {
+    width: 100%;
+    justify-content: flex-start;
+    margin-top: 0.5rem;
+  }
 }
 
 /* ── BREAKPOINT: 480PX (Extra Small Mobile) ────────────────────────────────── */

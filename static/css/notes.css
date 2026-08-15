@@ -409,3 +409,14 @@
   flex-wrap: wrap;
 }
 
+.library-toolbar-card {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+}
+
+.academic-resource-modal-card {
+  max-width: 540px;
+  width: 100%;
+}
+

@@ -2925,6 +2925,17 @@ option {
   flex-wrap: wrap;
 }
 
+.library-toolbar-card {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+}
+
+.academic-resource-modal-card {
+  max-width: 540px;
+  width: 100%;
+}
+
 
 
 /* ===== curriculum.css ===== */
@@ -3928,50 +3939,75 @@ option {
 /* ── FRONTEND LABS: FLEXBOX & GRID VISUALIZER ──────────────────────────────── */
 .flex-lab-layout {
   display: grid;
-  grid-template-columns: 280px 1fr;
+  grid-template-columns: 280px minmax(0, 1fr);
   gap: 1.25rem;
   align-items: start;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 @media (max-width: 900px) {
   .flex-lab-layout {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
 }
 
-.flex-controls-card {
+.flex-controls-card,
+.flex-stage-card,
+.flex-code-card {
   border-radius: var(--radius-lg);
-}
-
-.flex-stage-card {
-  border-radius: var(--radius-lg);
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .flex-interactive-stage {
   display: flex;
-  min-height: 260px;
+  min-height: 200px;
+  max-height: 360px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   background: var(--bg-surface-alt);
   border: 2px dashed var(--border-color);
   border-radius: var(--radius-lg);
   padding: 1rem;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .flex-stage-box {
-  min-width: 70px;
-  min-height: 70px;
-  padding: 0.75rem 1rem;
+  min-width: 60px;
+  min-height: 60px;
+  padding: 0.5rem 0.75rem;
   border-radius: var(--radius-md);
   color: #fff;
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), all 0.25s ease;
   user-select: none;
+  flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+  .flex-interactive-stage {
+    min-height: 170px;
+    padding: 0.75rem;
+  }
+  .flex-stage-box {
+    min-width: 52px;
+    min-height: 52px;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.75rem;
+  }
 }
 
 .flex-stage-box:hover {
@@ -5396,18 +5432,30 @@ body.modal-open {
 
 /* ── MOBILE MORE DRAWER SHEET ──────────────────────────────────────────────── */
 .more-sheet-card {
-  border-radius: 1.5rem 1.5rem 0 0 !important;
+  border-radius: 24px 24px 0 0 !important;
   border: 1px solid var(--border-color) !important;
   border-bottom: none !important;
   background: var(--bg-surface) !important;
   box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.45);
   overflow: hidden;
-  padding: 1.25rem 1.25rem 2.25rem 1.25rem;
+  padding: 1.15rem 1.25rem 2.25rem 1.25rem !important;
+}
+
+.more-sheet-card .modal-drag-indicator-bar {
+  background: transparent !important;
+  padding: 0 0 6px 0 !important;
+}
+
+.more-sheet-card .modal-header {
+  padding: 0 0 0.85rem 0 !important;
+  margin: 0 0 1rem 0 !important;
+  background: transparent !important;
+  border-bottom: 1px solid var(--border-color) !important;
 }
 
 .drawer-close-btn {
-  min-width: 44px !important;
-  min-height: 44px !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
   display: flex !important;
   align-items: center;
   justify-content: center;
@@ -5430,7 +5478,7 @@ body.modal-open {
   padding: 0.85rem 1rem;
   background: var(--bg-surface-alt);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-lg) !important;
   cursor: pointer;
   text-align: left;
   transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
@@ -6401,6 +6449,20 @@ body.modal-open {
 
   .curr-active-pill {
     display: none;
+  }
+
+  .library-toolbar-card .card-body {
+    padding: 0.85rem !important;
+  }
+
+  .resource-card {
+    padding: 0.9rem !important;
+  }
+
+  .resource-card-actions {
+    width: 100%;
+    justify-content: flex-start;
+    margin-top: 0.5rem;
   }
 }
 

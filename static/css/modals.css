@@ -480,18 +480,30 @@ body.modal-open {
 
 /* ── MOBILE MORE DRAWER SHEET ──────────────────────────────────────────────── */
 .more-sheet-card {
-  border-radius: 1.5rem 1.5rem 0 0 !important;
+  border-radius: 24px 24px 0 0 !important;
   border: 1px solid var(--border-color) !important;
   border-bottom: none !important;
   background: var(--bg-surface) !important;
   box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.45);
   overflow: hidden;
-  padding: 1.25rem 1.25rem 2.25rem 1.25rem;
+  padding: 1.15rem 1.25rem 2.25rem 1.25rem !important;
+}
+
+.more-sheet-card .modal-drag-indicator-bar {
+  background: transparent !important;
+  padding: 0 0 6px 0 !important;
+}
+
+.more-sheet-card .modal-header {
+  padding: 0 0 0.85rem 0 !important;
+  margin: 0 0 1rem 0 !important;
+  background: transparent !important;
+  border-bottom: 1px solid var(--border-color) !important;
 }
 
 .drawer-close-btn {
-  min-width: 44px !important;
-  min-height: 44px !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
   display: flex !important;
   align-items: center;
   justify-content: center;
@@ -514,7 +526,7 @@ body.modal-open {
   padding: 0.85rem 1rem;
   background: var(--bg-surface-alt);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-lg) !important;
   cursor: pointer;
   text-align: left;
   transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;

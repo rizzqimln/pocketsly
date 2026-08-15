@@ -29,7 +29,7 @@
   
   <!-- Bundled styling: one file, zero render-blocking fan-out over HTTP/1.1.
        Sources stay modular under static/css; regenerate via scripts/build.py. -->
-  <link href="/css/bundle.css?v=8.7" rel="stylesheet" />
+  <link href="/css/bundle.css?v=8.8" rel="stylesheet" />
 </head>
 
 <body>
@@ -870,94 +870,39 @@
           </div>
           <!-- TAB 2: LIBRARY & ACADEMIC JOURNALS PANE -->
           <div class="hidden" id="notes-tab-library-pane">
-            <div class="resources-grid">
-              <!-- Add Resource Card -->
-              <div class="card">
-                <div class="card-header">
-                  <h4 class="m-0 font-extrabold d-flex items-center gap-sm text-lg">
-                    <svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                      stroke-width="2.2" viewBox="0 0 24 24" width="18">
-                      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                    </svg>
-                    Add Academic Resource
-                  </h4>
+            <!-- Library Header Toolbar -->
+            <div class="library-toolbar-card card mb-lg">
+              <div class="card-body p-lg">
+                <div class="d-flex justify-between items-center flex-wrap gap-md mb-md">
+                  <div>
+                    <h3 class="m-0 font-extrabold d-flex items-center gap-sm text-lg">
+                      <svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                        stroke-width="2.2" viewBox="0 0 24 24" width="20">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                      </svg>
+                      Library &amp; Research Journals
+                    </h3>
+                    <p class="text-muted text-xs m-0 mt-xs">Catalog of research articles, online books, journals, and papers with instant citations.</p>
+                  </div>
+                  <button class="btn btn-primary btn-sm d-inline-flex items-center gap-sm font-bold p-lg"
+                    onclick="Notes.openAddResourceModal()" type="button">
+                    <svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="15"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    + Add Resource / Paper
+                  </button>
                 </div>
-                <div class="card-body">
-                  <p class="text-muted mb-lg text-sm">Catalog links to books, research journals, PDF papers, documentation, or
-                    lecture readings.</p>
-                  <form class="auth-form d-flex flex-col gap-md" id="notes-add-resource-form">
-                    <div class="form-group">
-                      <label>Resource Title</label>
-                      <input id="notes-resource-title"
-                        placeholder="e.g. Clean Code: Agile Software Craftsmanship / IEEE Paper" required=""
-                        type="text" />
-                    </div>
-                    <div class="grid-2col">
-                      <div class="form-group">
-                        <label>Author</label>
-                        <input id="notes-resource-author" placeholder="e.g. Robert C. Martin" type="text" />
-                      </div>
-                      <div class="form-group">
-                        <label>Year Published</label>
-                        <input id="notes-resource-year" maxlength="4" placeholder="e.g. 2024" type="text" />
-                      </div>
-                    </div>
-                    <div class="grid-2col">
-                      <div class="form-group">
-                        <label>Publisher / Journal</label>
-                        <input id="notes-resource-publisher" placeholder="e.g. MIT Press / IEEE Transactions"
-                          type="text" />
-                      </div>
-                      <div class="form-group">
-                        <label>DOI / ISBN / Ref ID</label>
-                        <input id="notes-resource-doi" placeholder="e.g. 10.1109/TSE.2023.123" type="text" />
-                      </div>
-                    </div>
-                    <div class="grid-2col">
-                      <div class="form-group">
-                        <label>Resource Type</label>
-                        <select id="notes-resource-type">
-                          <option value="book">Online Book</option>
-                          <option value="journal">Research Journal</option>
-                          <option value="pdf">PDF Document</option>
-                          <option value="docx">DOCX File</option>
-                          <option value="article">Web Article / Guide</option>
-                        </select>
-                      </div>
-                      <div class="form-group">
-                        <label>Category</label>
-                        <select id="notes-resource-category">
-                          <option selected="" value="general">General Reference</option>
-                          <option value="frontend">Frontend Dev</option>
-                          <option value="backend">Backend &amp; Database</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <label>URL Link / File Reference Path</label>
-                      <input id="notes-resource-url" placeholder="https://example.com/paper.pdf" type="url" />
-                    </div>
-                    <div class="form-group">
-                      <label>Notes / Key Insights Summary</label>
-                      <textarea  id="notes-resource-notes"
-                        placeholder="Key insights, study highlights, or summary..."></textarea>
-                    </div>
-                    <button class="btn btn-primary font-bold justify-center" type="submit">+ Add to Library</button>
-                  </form>
-                </div>
-              </div>
-              <!-- Collected Resources Card -->
-              <div class="card">
-                <div class="card-header d-flex justify-between items-center flex-wrap gap-sm p-md">
-                  <h4 class="m-0 font-extrabold d-flex items-center gap-sm text-lg">
-                    <svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                      stroke-width="2.2" viewBox="0 0 24 24" width="18">
-                      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+
+                <!-- Search & Filter Controls Row -->
+                <div class="d-flex flex-wrap gap-sm justify-between items-center">
+                  <div class="notes-search-wrapper flex-1" style="min-width: 200px;">
+                    <input class="w-full text-sm" id="library-search-input" oninput="Notes.handleLibrarySearch(event)"
+                      placeholder="Search title, author, journal, DOI..." type="text" />
+                    <svg class="icon-svg text-muted" viewBox="0 0 24 24">
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <line x1="21" x2="16.65" y1="21" y2="16.65"></line>
                     </svg>
-                    Collected Library &amp; Journals
-                  </h4>
-                  <div class="resource-filter-pills d-flex">
+                  </div>
+                  <div class="resource-filter-pills d-flex gap-xs flex-wrap">
                     <button class="day-pill-btn resource-filter-btn active" data-cat="all"
                       onclick="Notes.filterResources('all')" type="button">All</button>
                     <button class="day-pill-btn resource-filter-btn" data-cat="general"
@@ -966,15 +911,18 @@
                       onclick="Notes.filterResources('frontend')" type="button">Frontend</button>
                     <button class="day-pill-btn resource-filter-btn" data-cat="backend"
                       onclick="Notes.filterResources('backend')" type="button">Backend</button>
-                  </div>
-                </div>
-                <div class="card-body">
-                  <div class="d-flex flex-col"
-                    id="notes-resources-list-container">
-                    <!-- Injected by JS -->
+                    <button class="day-pill-btn resource-filter-btn" data-cat="book"
+                      onclick="Notes.filterResources('book')" type="button">Books</button>
+                    <button class="day-pill-btn resource-filter-btn" data-cat="journal"
+                      onclick="Notes.filterResources('journal')" type="button">Journals</button>
                   </div>
                 </div>
               </div>
+            </div>
+
+            <!-- Collected Resources List -->
+            <div class="d-flex flex-col gap-md" id="notes-resources-list-container">
+              <!-- Injected by JS -->
             </div>
           </div>
         </section>
@@ -3379,6 +3327,89 @@
     </div>
   </div>
   <!-- ===================================================================== -->
+  <!-- ADD ACADEMIC RESOURCE MODAL (Mobile-First Bottom Sheet)                 -->
+  <!-- ===================================================================== -->
+  <div class="modal-overlay hidden" id="academic-resource-modal"
+    onclick="if(event.target === this) Notes.closeAddResourceModal()">
+    <div class="modal-card academic-resource-modal-card">
+      <div class="modal-drag-indicator-bar" onclick="Notes.closeAddResourceModal()" title="Click or pull down to close">
+        <span class="modal-drag-pill"></span>
+      </div>
+      <div class="modal-header">
+        <div class="d-flex items-center gap-sm">
+          <svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+            stroke-width="2.2" viewBox="0 0 24 24" width="18">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+          </svg>
+          <h3>Add Academic Resource</h3>
+        </div>
+        <button aria-label="Close modal" class="btn-icon" onclick="Notes.closeAddResourceModal()" type="button">×</button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted mb-md text-xs">Catalog links to books, research journals, PDF papers, documentation, or lecture readings.</p>
+        <form class="auth-form d-flex flex-col gap-md" id="notes-add-resource-form">
+          <div class="form-group mb-xs">
+            <label>Resource Title</label>
+            <input id="notes-resource-title"
+              placeholder="e.g. Clean Code: Agile Software Craftsmanship / IEEE Paper" required=""
+              type="text" />
+          </div>
+          <div class="grid-2col gap-sm mb-xs">
+            <div class="form-group m-0">
+              <label>Author</label>
+              <input id="notes-resource-author" placeholder="e.g. Robert C. Martin" type="text" />
+            </div>
+            <div class="form-group m-0">
+              <label>Year Published</label>
+              <input id="notes-resource-year" maxlength="4" placeholder="e.g. 2024" type="text" />
+            </div>
+          </div>
+          <div class="grid-2col gap-sm mb-xs">
+            <div class="form-group m-0">
+              <label>Publisher / Journal</label>
+              <input id="notes-resource-publisher" placeholder="e.g. MIT Press / IEEE Transactions"
+                type="text" />
+            </div>
+            <div class="form-group m-0">
+              <label>DOI / ISBN / Ref ID</label>
+              <input id="notes-resource-doi" placeholder="e.g. 10.1109/TSE.2023.123" type="text" />
+            </div>
+          </div>
+          <div class="grid-2col gap-sm mb-xs">
+            <div class="form-group m-0">
+              <label>Resource Type</label>
+              <select id="notes-resource-type">
+                <option value="book">Online Book</option>
+                <option value="journal">Research Journal</option>
+                <option value="pdf">PDF Document</option>
+                <option value="docx">DOCX File</option>
+                <option value="article">Web Article / Guide</option>
+              </select>
+            </div>
+            <div class="form-group m-0">
+              <label>Category</label>
+              <select id="notes-resource-category">
+                <option selected="" value="general">General Reference</option>
+                <option value="frontend">Frontend Dev</option>
+                <option value="backend">Backend &amp; Database</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group mb-xs">
+            <label>URL Link / File Reference Path</label>
+            <input id="notes-resource-url" placeholder="https://example.com/paper.pdf" type="url" />
+          </div>
+          <div class="form-group mb-sm">
+            <label>Notes / Key Insights Summary</label>
+            <textarea id="notes-resource-notes" rows="2" placeholder="Key insights, study highlights, or summary..."></textarea>
+          </div>
+          <button class="btn btn-primary font-bold justify-center p-md" type="submit">+ Save to Library</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- ===================================================================== -->
   <!-- ACADEMIC CITATION GENERATOR MODAL (APA, IEEE, MLA, BibTeX, Chicago)     -->
   <!-- ===================================================================== -->
   <div class="modal-overlay hidden" id="citation-modal" onclick="if(event.target === this) Notes.closeCitationModal()">
@@ -3484,7 +3515,7 @@
   <!-- ===================================================================== -->
   <!-- Bundled scripts: one deferred file (parses in parallel, executes in
        dependency order after HTML parse). Regenerate via scripts/build.py. -->
-  <script defer src="/js/bundle.js?v=8.7"></script>
+  <script defer src="/js/bundle.js?v=8.8"></script>
 </body>
 
 </html>

@@ -183,18 +183,18 @@ window.Budget = {
     if (tab === 'income') {
       tabIncomeBtn?.classList.add('active-income');
       formIncome?.classList.remove('hidden');
-      if (titleEl) titleEl.textContent = 'Log Income';
-      setTimeout(() => document.getElementById('income-amount')?.focus(), 50);
+      if (titleEl) titleEl.innerHTML = '<span style="color:#10B981; font-weight:900;">+</span> Log Income';
+      setTimeout(() => document.getElementById('income-amount')?.focus(), 80);
     } else if (tab === 'expense') {
       tabExpenseBtn?.classList.add('active-expense');
       formExpense?.classList.remove('hidden');
-      if (titleEl) titleEl.textContent = 'Log Expense';
-      setTimeout(() => document.getElementById('expense-amount')?.focus(), 50);
+      if (titleEl) titleEl.innerHTML = '<span style="color:#EF4444; font-weight:900;">-</span> Log Expense';
+      setTimeout(() => document.getElementById('expense-amount')?.focus(), 80);
     } else if (tab === 'budget') {
       tabBudgetBtn?.classList.add('active-budget');
       formBudget?.classList.remove('hidden');
-      if (titleEl) titleEl.textContent = 'Set Budget Target';
-      setTimeout(() => document.getElementById('budget-amount')?.focus(), 50);
+      if (titleEl) titleEl.innerHTML = '<span>🎯</span> Set Budget Target';
+      setTimeout(() => document.getElementById('budget-amount')?.focus(), 80);
     }
   },
 
