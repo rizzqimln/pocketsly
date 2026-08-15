@@ -112,19 +112,29 @@ The Python server serves both the API and the frontend, so one process = whole a
 
 **Free-tier caveats:** Render free services sleep after ~15 min idle (first request takes ~30s to wake); Supabase free projects pause after 7 days of inactivity. Both restore with one click. See [`docs/DEPLOY_SUPABASE_RENDER_NETLIFY.md`](docs/DEPLOY_SUPABASE_RENDER_NETLIFY.md) for the full walkthrough.
 
-### Option B — Netlify frontend + backend proxy
+### Option B — Everything on Netlify: API as a serverless function (recommended)
 
-Get the CDN, PWA, and landing page from Netlify while the API runs on a Python host.
+The API runs as a **Netlify Function** (`netlify/functions/api.py`) — no separate
+backend host, no card, no sleeping. The frontend and API are served from the
+same origin, so cookies and sessions just work.
 
-1. Deploy the backend with Option A and note its URL, e.g. `https://pocketsly-api.onrender.com`.
-2. On Netlify: *Add new site → Import from GitHub → pick the repo*. The root [`netlify.toml`](netlify.toml) already sets `publish = "static"` and immutable-cache headers; no build step needed (bundles are committed).
-3. Uncomment and edit the proxy line at the top of [`static/_redirects`](static/_redirects):
+1. On Netlify: *Add new site → Import from GitHub → pick the repo*.
+   [`netlify.toml`](netlify.toml) already sets `publish = "static"` + the
+   functions directory; no build step needed (bundles are committed).
+2. Set one environment variable in the Netlify dashboard (**Site settings →
+   Environment variables**): `DATABASE_URL` = your Supabase connection string.
+3. Done — [`static/_redirects`](static/_redirects) routes every `/api/*`
+   request to the function. Deploy and sign in.
 
-   ```
-   /api/*  https://pocketsly-api.onrender.com/api/:splat  200
-   ```
+**Serverless caveats:** ~2–4s cold start after idle, 10s request limit (free
+plan) — every endpoint finishes in milliseconds — and the in-memory rate
+limiter resets per request. All real state (accounts, sessions, data) lives in
+PostgreSQL, so nothing is lost.
 
-   Because the frontend calls relative `/api/*` paths, the proxy keeps everything same-origin — no CORS work, and HttpOnly session cookies keep working.
+> **Alternative (Option B′):** if you prefer a long-running backend host
+> instead, edit `static/_redirects` to proxy `/api/*` to an external URL
+> (HF Spaces / Render) — the frontend calls relative paths, so the proxy keeps
+> everything same-origin with no CORS work.
 
 ### Local preview without GitHub
 

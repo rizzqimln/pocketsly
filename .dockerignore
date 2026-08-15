@@ -1,0 +1,9 @@
+.git
+.freebuff
+__pycache__
+.pytest_cache
+*.db
+docs
+tests
+Dockerfile
+.dockerignore

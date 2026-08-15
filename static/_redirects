@@ -1,10 +1,11 @@
+# Netlify-native backend: every /api/* request is served by the Python
+# function in netlify/functions/api.py — no separate backend host needed.
+# Keep this ABOVE the /* SPA fallback — Netlify matches rules in order.
+/api/*  /.netlify/functions/api  200
+
+# Alternative: proxy to an external backend host (HF Spaces / Render) instead.
+# Uncomment this and delete the function line above — order still matters:
+# /api/*  https://<your-backend>/api/:splat  200
+
 # SPA fallback: every unknown path serves the app shell (index.html).
 /*    /index.html   200
-
-# Optional: proxy the Python backend (Setup B in README.md). The frontend
-# already calls relative /api/* paths, so this one line makes Netlify forward
-# them to your backend host — no CORS changes needed and HttpOnly session
-# cookies keep working. Uncomment and replace the URL after deploying the
-# backend, and keep it ABOVE the /* rule:
-#
-# /api/*  https://your-backend.onrender.com/api/:splat  200

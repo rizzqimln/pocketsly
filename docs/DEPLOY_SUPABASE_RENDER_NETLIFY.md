@@ -76,6 +76,28 @@ Supabase (managed PostgreSQL — your real data, survives restarts)
 
 ---
 
+## Option: skip the backend host — run the API as a Netlify Function
+
+The cleanest no-extra-host path: the API runs serverlessly **on Netlify itself**
+via [`netlify/functions/api.py`](../netlify/functions/api.py) (an adapter that
+reuses all of `server.py`'s route handlers). No Render, no HF Space, no proxy.
+
+1. Deploy the repo to Netlify as usual (the [`netlify.toml`](../netlify.toml)
+   already configures the functions directory and bundles `schema.sql`).
+2. Set `DATABASE_URL` (your Supabase URI) under **Site settings → Environment
+   variables** in the Netlify dashboard.
+3. [`static/_redirects`](../static/_redirects) already routes `/api/*` to the
+   function — deploy and sign in.
+
+Trade-offs vs. a long-running host: ~2–4s cold start after idle, 10s request
+limit (free plan — every endpoint finishes in ms), and the in-memory rate
+limiter resets per request. Data lives in Supabase, so nothing is lost.
+
+> To switch back to an external backend later, edit `static/_redirects` to the
+> proxy form (`/api/*  https://<backend>/api/:splat  200`) and redeploy.
+
+---
+
 ## Free-tier caveats (read these!)
 
 | Host | Caveat | Fix |
@@ -108,3 +130,35 @@ There is no automated importer (the old `daily_app.db` was a local file). If you
 used the app locally, use **Settings → Backup → Export** in the old version to get a
 JSON backup, then **Import** it in the deployed app after logging in — the
 backup/restore endpoints are database-agnostic.
+
+---
+
+## No credit card? Backend on Hugging Face Spaces instead of Render
+
+If you can't add a card to Render, run the API on **Hugging Face Spaces** —
+free, **no credit card**, no limits beyond the free CPU tier. The repo already
+ships a [`Dockerfile`](../Dockerfile) for exactly this.
+
+1. Push the repo (including `Dockerfile`) to GitHub.
+2. Sign up at [huggingface.co](https://huggingface.co) (free, email only).
+3. **New Space** → name `pocketsly` → SDK: **Docker** → Hardware: **CPU basic** (free).
+4. Connect it to your GitHub repo: Space **Settings → Repository → link the
+   GitHub repo** (or upload the files directly). Hugging Face auto-builds the
+   Docker image from the `Dockerfile`.
+5. **Settings → Variables and secrets** → add `DATABASE_URL` = your Supabase URI
+   (same string as the Render path).
+6. Wait for the build (~2–4 min), then open `https://<username>-pocketsly.hf.space`
+   and verify `…/api/session` returns `{"authenticated": false, "user": null}`.
+7. Point Netlify at it — in `static/_redirects`, above the `/*` rule:
+
+   ```
+   /api/*  https://<username>-pocketsly.hf.space/api/:splat  200
+   ```
+
+**Free-tier caveats:** Spaces sleep after a couple of days of inactivity (wake
+on first request, ~30–60s), and the disk resets on rebuild — irrelevant here
+because all data lives in Supabase.
+
+> **Student?** Azure for Students is the other zero-card path — a real VM with
+> permanent disk using only your `.edu` email (no card). Ask the maintainer for
+> that guide if it applies to you.

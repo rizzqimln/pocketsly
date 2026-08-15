@@ -1,0 +1,3 @@
+# Dependencies Netlify bundles into the Python function (netlify/functions/api.py).
+# The app is otherwise pure stdlib — psycopg is the PostgreSQL driver used by db.py.
+psycopg[binary]

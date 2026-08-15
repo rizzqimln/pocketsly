@@ -2,13 +2,23 @@
 # base directory, so this must live here, not inside static/).
 #
 # This deploys the STATIC FRONTEND (landing page + PWA shell). The Python API
-# in server.py (auth, SQLite) cannot run on Netlify — see the Deployment
+# in server.py (auth, PostgreSQL) cannot run on Netlify — see the Deployment
 # section of README.md for the two supported setups:
-#   A) full app on a Python host (Render/Railway/VPS), or
-#   B) this static site + a proxy to a separately hosted backend.
+#   A) full app on a Python host (Render/HF Spaces/VPS), or
+#   B) this static site + a proxy to a separately hosted backend (see
+#      static/_redirects — the /api/* proxy line).
 
 [build]
   publish = "static"
+
+# Netlify Functions: the Python adapter in netlify/functions/api.py serves the
+# whole REST API serverlessly (see static/_redirects — /api/* routes here).
+# included_files bundles schema.sql so db.init_db() can create tables on first
+# request. Remember to set the DATABASE_URL environment variable in the
+# Netlify dashboard (Site settings → Environment variables).
+[functions]
+  directory = "netlify/functions"
+  included_files = ["schema.sql"]
 
 [[headers]]
   for = "/*"
