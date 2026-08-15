@@ -204,4 +204,4 @@ def handler(event, context):
             json.dumps({"error": "Internal server error"}).encode("utf-8"),
         )
 
-    return _respond(shim._status, shim._headers, shim.wfile.getvalue())
+    return _respond(shim._status, shim._headers, shim.wfile.getvalue()) 
