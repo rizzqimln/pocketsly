@@ -740,30 +740,81 @@ export async function handlePostBackupRestore(db, userId, body) {
 // ── Receipt Scan Heuristic ───────────────────────────────────────────────────
 
 export async function handlePostReceiptScan(body) {
-  const text = (body.text || body.ocr_text || '').toString();
+  const text = (body.text || body.ocr_text || body.image || '').toString();
   let total = 0;
   let merchant = 'Store / Merchant';
   let date = getTodayString();
+  let category = 'Food & Dining';
 
-  // Simple heuristic extractor
-  const totalMatch = text.match(/(?:total|amount|subtotal|tagihan|rp\.?|usd|\$)\s*[:=]?\s*([\d,.]+)/i);
-  if (totalMatch) {
-    const rawNum = totalMatch[1].replace(/,/g, '');
-    total = parseFloat(rawNum) || 0;
+  // Smart regex extractor for total
+  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+  const totalKeywords = ['total', 'grand total', 'subtotal', 'jumlah', 'tagihan', 'bayar', 'amount', 'total bayar', 'total belanja', 'net total', 'debit', 'cash', 'tunai'];
+
+  for (const line of lines) {
+    if (totalKeywords.some(k => line.toLowerCase().includes(k))) {
+      const cleanLine = line.replace(/(?:rp\.?|idr|usd|\$|€|£|¥)/gi, ' ').trim();
+      const numMatch = cleanLine.match(/([0-9]+(?:[.,][0-9]{3})*(?:[.,][0-9]{1,2})?|[0-9]+)/);
+      if (numMatch) {
+        let valStr = numMatch[1].trim();
+        if (/^\d{1,3}(?:[.]\d{3})+(?:,\d{2})$/.test(valStr)) {
+          valStr = valStr.replace(/\./g, '').replace(',', '.');
+        } else if (/^\d{1,3}(?:,\d{3})+(?:\.\d{2})$/.test(valStr)) {
+          valStr = valStr.replace(/,/g, '');
+        } else if (/^\d{1,3}(?:[.]\d{3})+$/.test(valStr)) {
+          valStr = valStr.replace(/\./g, '');
+        } else if (/^\d{1,3}(?:,\d{3})+$/.test(valStr)) {
+          valStr = valStr.replace(/,/g, '');
+        } else if (/^\d+,\d{2}$/.test(valStr)) {
+          valStr = valStr.replace(',', '.');
+        }
+        const parsedNum = parseFloat(valStr);
+        if (!isNaN(parsedNum) && parsedNum > 0) {
+          total = parsedNum;
+          break;
+        }
+      }
+    }
   }
 
-  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+  // Fallback if no total keyword line matched
+  if (total === 0 && lines.length > 0) {
+    for (let i = lines.length - 1; i >= 0; i--) {
+      const line = lines[i];
+      const cleanLine = line.replace(/(?:rp\.?|idr|usd|\$|€|£|¥)/gi, ' ').trim();
+      const numMatch = cleanLine.match(/([0-9]+(?:[.,][0-9]{3})*(?:[.,][0-9]{1,2})?|[0-9]+)/);
+      if (numMatch) {
+        let valStr = numMatch[1].trim();
+        if (/^\d{1,3}(?:[.]\d{3})+$/.test(valStr)) valStr = valStr.replace(/\./g, '');
+        else if (/^\d{1,3}(?:,\d{3})+$/.test(valStr)) valStr = valStr.replace(/,/g, '');
+        const parsedNum = parseFloat(valStr);
+        if (!isNaN(parsedNum) && parsedNum > 0) {
+          total = parsedNum;
+          break;
+        }
+      }
+    }
+  }
+
   if (lines.length > 0) {
-    merchant = lines[0].substring(0, 40);
+    for (const l of lines) {
+      if (l.length > 2 && !/\d{4,}/.test(l) && !totalKeywords.some(k => l.toLowerCase().includes(k))) {
+        merchant = l.substring(0, 40).replace(/[^a-zA-Z0-9\s&.-]/g, '').trim();
+        break;
+      }
+    }
   }
 
   return {
     success: true,
+    merchant,
+    amount: total,
+    date,
+    category,
     data: {
       merchant,
       amount: total,
       date,
-      category: 'Food & Dining'
+      category
     }
   };
 }

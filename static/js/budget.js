@@ -1203,14 +1203,25 @@ window.Budget = {
 
   _cleanReceiptAmount(raw) {
     if (!raw) return null;
-    let cleaned = String(raw).replace(/[^\d.,\-]/g, '');
-    if (!/\d/.test(cleaned)) return null;
-    if (/\.\d{3}(\.\d{3})*$/.test(cleaned) && !/\.\d{1,2}$/.test(cleaned)) {
-      cleaned = cleaned.replace(/\./g, '');
+    const str = String(raw).replace(/(?:rp\.?|idr|usd|\$|€|£|¥)/gi, ' ').trim();
+    const numMatch = str.match(/([0-9]+(?:[.,][0-9]{3})*(?:[.,][0-9]{1,2})?|[0-9]+)/);
+    if (!numMatch) return null;
+
+    let valStr = numMatch[1].trim();
+    if (/^\d{1,3}(?:[.]\d{3})+(?:,\d{2})$/.test(valStr)) {
+      valStr = valStr.replace(/\./g, '').replace(',', '.');
+    } else if (/^\d{1,3}(?:,\d{3})+(?:\.\d{2})$/.test(valStr)) {
+      valStr = valStr.replace(/,/g, '');
+    } else if (/^\d{1,3}(?:[.]\d{3})+$/.test(valStr)) {
+      valStr = valStr.replace(/\./g, '');
+    } else if (/^\d{1,3}(?:,\d{3})+$/.test(valStr)) {
+      valStr = valStr.replace(/,/g, '');
+    } else if (/^\d+,\d{2}$/.test(valStr)) {
+      valStr = valStr.replace(',', '.');
     }
-    cleaned = cleaned.replace(/,/g, '');
-    const num = parseFloat(cleaned);
-    return isNaN(num) ? null : Math.round(num);
+
+    const num = parseFloat(valStr);
+    return (isNaN(num) || num <= 0) ? null : Math.round(num);
   },
 
   async _scanReceiptServer(dataUrl, filename) {
@@ -1218,21 +1229,29 @@ window.Budget = {
     const res = await fetch('/api/receipt/scan', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ image: base64 })
+      body: JSON.stringify({ image: base64, filename: filename || 'receipt.jpg' })
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       throw new Error(err.message || `Scan failed (${res.status})`);
     }
     const data = await res.json();
-    if (!data || data.amount == null) {
-      throw new Error('No amount detected');
+    const payload = data.data || data;
+    if (!payload || payload.amount == null || payload.amount === 0) {
+      // If server could not detect amount, fallback to filename heuristic
+      const fallback = this._extractReceiptDetails(filename || 'receipt.jpg');
+      return {
+        merchant: payload.merchant && payload.merchant !== 'Store / Merchant' ? payload.merchant : fallback.merchant,
+        amount: fallback.amount,
+        date: payload.date || fallback.date,
+        category: payload.category || fallback.category
+      };
     }
     return {
-      merchant: data.merchant || 'Store Receipt',
-      amount: data.amount,
-      date: data.date,
-      category: data.category || 'Food & Dining'
+      merchant: payload.merchant || 'Store Receipt',
+      amount: payload.amount,
+      date: payload.date || new Date().toISOString().substring(0, 10),
+      category: payload.category || 'Food & Dining'
     };
   },
 
@@ -1247,7 +1266,7 @@ window.Budget = {
     if (amountInput) amountInput.value = formattedAmount;
     if (dateInput) dateInput.value = parsed.date;
     if (catSelect) catSelect.value = parsed.category;
-    UI.toast('Receipt processed successfully! Check extracted details.', 'success');
+    UI.toast(`Receipt processed! Detected ${formattedAmount}`, 'success');
   },
 
   _extractReceiptDetails(filename) {

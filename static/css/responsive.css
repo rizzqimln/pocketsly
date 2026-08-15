@@ -920,6 +920,34 @@ body.modal-open .budget-fab {
   display: none !important;
 }
 
+/* ── Mobile Scroll & Render Performance ───────────────────────────────────── */
+@media (max-width: 768px) {
+  .main-content,
+  .view-panel,
+  .modal-body,
+  .notes-sidebar,
+  .timetable-grid {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+  }
+
+  .habit-card,
+  .task-item,
+  .note-item,
+  .resource-card,
+  .event-card {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 65px;
+    transform: translateZ(0);
+  }
+
+  .mobile-bottom-dock {
+    padding-bottom: calc(0.6rem + env(safe-area-inset-bottom, 0px)) !important;
+    transform: translateZ(0);
+    will-change: transform;
+  }
+}
+
 /* ── PRINT STYLESHEET ──────────────────────────────────────────────────────── */
 @media print {
   body > *:not(#financial-print-statement),

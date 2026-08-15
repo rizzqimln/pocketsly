@@ -695,6 +695,7 @@ html {
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
   scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
 * {
@@ -717,16 +718,29 @@ html {
 body {
   font-family: var(--font-family);
   background-color: var(--bg-main);
-  background-image: radial-gradient(circle at 10% 20%, rgba(124, 58, 237, 0.04) 0%, transparent 40%),
-    radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.03) 0%, transparent 40%);
-  background-attachment: fixed;
   color: var(--text-primary);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
   min-height: 100dvh;
+  overflow-x: hidden;
+  position: relative;
+  -webkit-overflow-scrolling: touch;
   transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* GPU-composited fixed background (zero scroll repaints) */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background-image: radial-gradient(circle at 10% 20%, rgba(124, 58, 237, 0.04) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.03) 0%, transparent 40%);
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 a {
@@ -6165,6 +6179,34 @@ body.modal-open .planner-fab,
 body.modal-open .schedule-fab,
 body.modal-open .budget-fab {
   display: none !important;
+}
+
+/* ── Mobile Scroll & Render Performance ───────────────────────────────────── */
+@media (max-width: 768px) {
+  .main-content,
+  .view-panel,
+  .modal-body,
+  .notes-sidebar,
+  .timetable-grid {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+  }
+
+  .habit-card,
+  .task-item,
+  .note-item,
+  .resource-card,
+  .event-card {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 65px;
+    transform: translateZ(0);
+  }
+
+  .mobile-bottom-dock {
+    padding-bottom: calc(0.6rem + env(safe-area-inset-bottom, 0px)) !important;
+    transform: translateZ(0);
+    will-change: transform;
+  }
 }
 
 /* ── PRINT STYLESHEET ──────────────────────────────────────────────────────── */
