@@ -1,0 +1,12 @@
+# Normalize line endings — everything stays LF, even on Windows
+* text=auto eol=lf
+
+# Binary / data assets — never treat as text
+*.gz   binary
+*.png  binary
+*.ico  binary
+
+# Vendored third-party files: keep out of GitHub's language statistics
+# (tesseract.js + trained data are bundled libraries, not our code)
+static/vendor/** linguist-vendored
+static/img/**    linguist-vendored

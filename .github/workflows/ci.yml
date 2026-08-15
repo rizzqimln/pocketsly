@@ -1,0 +1,109 @@
+# GitHub Actions CI for Pocketsly
+#
+# Runs the full test suite on every push and pull request:
+#   1. Backend REST API tests (stdlib only, no server required)
+#   2. Performance & security checks (boots the real server first)
+#   3. End-to-end browser tests (Playwright + headless Chromium, boots the server)
+#
+# No external app dependencies exist (zero-pip philosophy), so the only pip
+# installs here are the *test tooling itself*: pytest and Playwright.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint-js:
+    name: JS static analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run JS linter (stdlib + node --check)
+        run: python3 scripts/lint_js.py
+
+  test-api:
+    name: Backend API tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install test tooling
+        run: python -m pip install --upgrade pip pytest
+
+      - name: Run REST API test suite
+        run: pytest tests/test_api.py -v
+
+  test-perf-security:
+    name: Performance & security checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install test tooling
+        run: python -m pip install --upgrade pip pytest
+
+      - name: Boot the application server
+        run: |
+          nohup python3 server.py > server.log 2>&1 &
+          sleep 3
+          curl -sf http://localhost:8000/ > /dev/null && echo "server is up"
+
+      - name: Run performance & security tests
+        run: pytest tests/test_perf_security.py -v
+
+      - name: Show server log on failure
+        if: failure()
+        run: cat server.log
+
+  test-e2e:
+    name: End-to-end browser tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install test tooling (pytest + Playwright)
+        run: |
+          python -m pip install --upgrade pip pytest playwright
+          python -m playwright install --with-deps chromium
+
+      - name: Boot the application server
+        run: |
+          nohup python3 server.py > server.log 2>&1 &
+          sleep 3
+          curl -sf http://localhost:8000/ > /dev/null && echo "server is up"
+
+      - name: Run pytest-style E2E suites
+        run: pytest tests/test_e2e_quiz.py tests/test_e2e_budget_mobile.py -v
+
+      - name: Run script-style E2E suites
+        run: |
+          python3 tests/test_e2e_budget.py
+          python3 tests/test_e2e_reset.py
+          python3 tests/test_e2e_features.py
+          python3 tests/test_e2e_mobile_profile_dashboard.py
+          python3 tests/test_e2e_mobile_redesign.py
+          python3 tests/test_e2e_new_features.py
+
+      - name: Show server log on failure
+        if: failure()
+        run: cat server.log

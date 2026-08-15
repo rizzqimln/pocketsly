@@ -1,0 +1,20 @@
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__
+*.py[cod]
+.pytest_cache
+
+# ── Local databases ──────────────────────────────────────────────────────────
+# Recreated from schema.sql on every server start (db.init_db), so the data
+# files must never be committed — they contain real user data too.
+*.db
+*.db-wal
+*.db-shm
+
+# ── Local tooling / agent state (not app code) ───────────────────────────────
+.build_tools/
+.freebuff/
+ponytail/
+opencode.json
+.env
+.env.*
+.DS_Store

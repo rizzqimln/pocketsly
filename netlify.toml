@@ -1,0 +1,41 @@
+# Netlify configuration (repo root — Netlify only reads netlify.toml from the
+# base directory, so this must live here, not inside static/).
+#
+# This deploys the STATIC FRONTEND (landing page + PWA shell). The Python API
+# in server.py (auth, SQLite) cannot run on Netlify — see the Deployment
+# section of README.md for the two supported setups:
+#   A) full app on a Python host (Render/Railway/VPS), or
+#   B) this static site + a proxy to a separately hosted backend.
+
+[build]
+  publish = "static"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+# Bundled assets are versioned via ?v= in index.html/sw.js, so a 1-year
+# immutable cache is safe and keeps repeat visits fast.
+[[headers]]
+  for = "/css/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/js/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/vendor/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/img/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

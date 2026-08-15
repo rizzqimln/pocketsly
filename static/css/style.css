@@ -1,0 +1,13 @@
+/* =============================================================================
+   DAILY RHYTHM — MODULAR DESIGN SYSTEM & UI/UX FRAMEWORK (style.css)
+   =============================================================================
+   Adheres to Software Engineering Principles:
+   1. Separation of Concerns (SoC) - Decoupled CSS modules by functional domain.
+   2. Single Responsibility Principle (SRP) - Each stylesheet governs one area.
+   3. Don't Repeat Yourself (DRY) - Centralized variables & utility classes.
+   4. High Cohesion & Low Coupling - Clean modular architecture for maintainability.
+   ============================================================================= */
+
+/* All CSS modules are loaded directly in index.html via <link> tags so the
+   browser can fetch them in parallel. This file no longer uses @import chains,
+   which serialize and block rendering. */

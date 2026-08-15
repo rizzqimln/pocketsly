@@ -1,0 +1,113 @@
+/**
+ * DESIGN TOKENS & COLOR PALETTES (variables.css)
+ * ===============================================
+ * Principle: Single Responsibility Principle (SRP) & Centralized Source of Truth
+ * 
+ * Defines all global custom properties (CSS variables) for Light and Dark themes,
+ * typography scales, spacing units, elevation/shadows, border radii, and transitions.
+ */
+
+:root {
+  color-scheme: light;
+
+  /* Color Palette - Light Mode (Minimalist Indigo & Slate) */
+  --bg-main: #F4F7FB;
+  --bg-surface: #FFFFFF;
+  --bg-surface-elevated: #FFFFFF;
+  --bg-surface-alt: #F8FAFC;
+  --bg-hover: #EEF2F6;
+
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #5F7188;
+
+  --primary: #7C3AED;
+  --primary-400: #A78BFA;
+  --primary-500: #8B5CF6;
+  --primary-600: #7C3AED;
+  --primary-700: #6D28D9;
+  --primary-text: #7C3AED;
+  --primary-text-soft: #6D28D9;
+  --primary-hover: #6D28D9;
+  --primary-light: #F5F3FF;
+  --primary-border: #DDD6FE;
+  --primary-glow: rgba(124, 58, 237, 0.25);
+
+  --accent-success: #10B981;
+  --accent-success-strong: #047857;
+  --accent-success-light: #ECFDF5;
+  --accent-warning: #F59E0B;
+  --accent-warning-strong: #92400E;
+  --accent-warning-light: #FFFBEB;
+  --accent-danger: #EF4444;
+  --accent-danger-strong: #B91C1C;
+  --accent-danger-light: #FEF2F2;
+
+  --border-color: #E2E8F0;
+  --border-focus: #7C3AED;
+
+  /* Elevation & Depth */
+  --shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 2px 4px 0 rgba(15, 23, 42, 0.05), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 6px 12px -2px rgba(15, 23, 42, 0.07), 0 3px 6px -3px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 14px 28px -4px rgba(15, 23, 42, 0.08), 0 6px 10px -4px rgba(15, 23, 42, 0.04);
+  --card-inner-glow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+
+  /* Radii & Transitions */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+
+  --font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* Dark Mode Variables - Modern Fintech Slate */
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg-main: #0B0F19;
+  --bg-surface: #151D30;
+  --bg-surface-elevated: #1C263F;
+  --bg-surface-alt: #1E2943;
+  --bg-hover: #263354;
+
+  --text-primary: #F8FAFC;
+  --text-secondary: #A1A1AA;
+  --text-muted: #94A3B8;
+
+  --primary: #7C3AED;
+  --primary-400: #A78BFA;
+  --primary-500: #8B5CF6;
+  --primary-600: #7C3AED;
+  --primary-700: #6D28D9;
+  --primary-text: #A78BFA;
+  --primary-text-soft: #A78BFA;
+  --primary-hover: #6D28D9;
+  --primary-light: rgba(124, 58, 237, 0.15);
+  --primary-border: rgba(124, 58, 237, 0.35);
+  --primary-glow: rgba(124, 58, 237, 0.35);
+
+  --accent-success: #10B981;
+  --accent-success-strong: #34D399;
+  --accent-success-light: rgba(16, 185, 129, 0.15);
+  --accent-warning: #F59E0B;
+  --accent-warning-strong: #FBBF24;
+  --accent-warning-light: rgba(245, 158, 11, 0.15);
+  --accent-danger: #EF4444;
+  --accent-danger-strong: #F87171;
+  --accent-danger-light: rgba(239, 68, 68, 0.15);
+
+  --border-color: #1E2943;
+  --border-focus: #7C3AED;
+
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+  --shadow-sm: 0 2px 5px 0 rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.55);
+  --card-inner-glow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}

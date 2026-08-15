@@ -1,0 +1,411 @@
+/**
+ * JOURNAL & NOTES MODULE (notes.css)
+ * ===================================
+ * Principle: Single Responsibility Principle (SRP) & High Cohesion
+ *
+ * Defines the master-detail notes layout, note list items, mood accent colors,
+ * note editor toolbar, textarea, academic library collection, and citation preview.
+ */
+
+.notes-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 1.25rem;
+  height: calc(100vh - 160px);
+  min-height: 560px;
+}
+
+.notes-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+/* ── SUB-NAVIGATION TABS (Notes vs Library) ────────────────────────────────── */
+.notes-view-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.65rem;
+  overflow-x: auto;
+}
+
+/* ── SEARCH BAR WITH INLINE LEFT ICON ─────────────────────────────────────── */
+.notes-search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.notes-search-wrapper input {
+  width: 100%;
+  padding: 0.65rem 1rem 0.65rem 2.5rem !important;
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.notes-search-wrapper input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+}
+
+.notes-search-wrapper .icon-svg {
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.notes-main-tab {
+  cursor: pointer;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  transition: var(--transition-fast);
+}
+
+.notes-main-tab:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.notes-main-tab.active {
+  background: var(--primary);
+  color: #FFFFFF;
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+}
+
+.resource-filter-btn {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface-alt);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-weight: 600;
+  transition: var(--transition-fast);
+}
+
+.resource-filter-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.resource-filter-btn.active {
+  background: var(--primary);
+  color: #FFFFFF;
+  border-color: var(--primary);
+}
+
+/* ── NOTE LIST ITEM ───────────────────────────────────────────────────────── */
+.note-item {
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  box-shadow: var(--shadow-xs);
+  position: relative;
+  overflow: hidden;
+}
+
+.note-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--border-color);
+  border-radius: var(--radius-full) 0 0 var(--radius-full);
+  transition: background 0.2s ease;
+}
+
+.note-item:hover {
+  border-color: var(--primary-border);
+  background: var(--bg-surface-alt);
+  transform: translateX(2px);
+}
+
+.note-item:hover::before {
+  background: var(--primary);
+}
+
+.note-item.active {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.note-item.active::before {
+  background: var(--primary);
+}
+
+/* Mood-specific accents */
+.note-item[data-mood="productive"]::before { background: #10B981; }
+.note-item.active[data-mood="productive"] { border-color: #10B981; background: rgba(16, 185, 129, 0.08); }
+
+.note-item[data-mood="stressed"]::before { background: var(--accent-danger); }
+.note-item.active[data-mood="stressed"] { border-color: var(--accent-danger); background: rgba(239, 68, 68, 0.07); }
+
+.note-item[data-mood="tired"]::before { background: var(--accent-warning); }
+.note-item.active[data-mood="tired"] { border-color: var(--accent-warning); background: rgba(245, 158, 11, 0.07); }
+
+.note-item-title {
+  font-weight: 700;
+  font-size: 0.875rem;
+  margin-bottom: 0.2rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.note-item-snippet {
+  font-size: 0.775rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.4;
+}
+
+.note-item-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+}
+
+.note-item-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.1rem 0.4rem;
+  border-radius: var(--radius-full);
+  background: var(--primary-light);
+  color: var(--primary);
+  text-transform: capitalize;
+}
+
+.note-item-date {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* ── NOTE EDITOR ───────────────────────────────────────────────────────────── */
+.note-editor-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-radius: var(--radius-lg);
+}
+
+.notes-mobile-back-btn {
+  display: none;
+}
+
+.note-title-input {
+  width: 100%;
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  outline: none;
+  margin-bottom: 0.75rem;
+  font-family: var(--font-family);
+}
+
+.note-title-input::placeholder {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+#note-mood-select {
+  appearance: none;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-surface-alt);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237C3AED' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+  background-size: 1em;
+  color: var(--text-primary);
+  cursor: pointer;
+  padding-right: 2.25rem;
+  min-height: 40px;
+}
+
+#note-mood-select:focus {
+  border-color: var(--primary);
+  background-color: var(--bg-surface);
+  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.12);
+  outline: none;
+}
+
+.note-body-textarea {
+  width: 100%;
+  flex: 1;
+  min-height: 300px;
+  border: none;
+  background: transparent;
+  resize: none;
+  outline: none;
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: var(--text-primary);
+  font-family: var(--font-family);
+}
+
+.note-body-textarea::placeholder {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.editor-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--border-color);
+}
+
+/* ── ACADEMIC CITATION GENERATOR STYLES ────────────────────────────────────── */
+.citation-modal-card {
+  max-width: 600px;
+  width: 100%;
+}
+
+.citation-resource-summary {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  background: var(--bg-surface-alt);
+  border: 1px solid var(--border-color);
+  margin-bottom: 1rem;
+}
+
+.citation-resource-title {
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.citation-resource-meta {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+}
+
+.citation-style-tabs {
+  display: flex;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.citation-tab-btn {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+}
+
+.citation-tab-btn.active {
+  background: var(--primary);
+  color: #FFFFFF !important;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.35);
+}
+
+.citation-preview-container {
+  position: relative;
+}
+
+#citation-preview-box {
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius-md);
+  background: var(--bg-main);
+  border: 1px solid var(--border-color);
+  font-family: var(--font-family);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+  min-height: 90px;
+  user-select: all;
+  white-space: pre-wrap;
+  word-break: break-word;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+#citation-preview-box:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.citation-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+/* ── ACADEMIC RESOURCES COLLECTION & CARD LAYOUT ───────────────────────────── */
+.resources-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+#notes-resources-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  width: 100%;
+}
+
+.resource-card {
+  padding: 1.15rem 1.25rem !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-lg) !important;
+  background: var(--bg-surface-alt) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease !important;
+  box-shadow: var(--shadow-xs);
+  margin-bottom: 0 !important;
+  overflow: visible !important;
+  height: auto !important;
+}
+
+.resource-card:hover {
+  border-color: var(--primary-border) !important;
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.resource-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+

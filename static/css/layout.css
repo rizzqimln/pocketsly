@@ -1,0 +1,365 @@
+/**
+ * APP LAYOUT & SHELL (layout.css)
+ * ================================
+ * Principle: Single Responsibility Principle (SRP) & High Cohesion
+ *
+ * Defines the application shell, desktop sidebar, collapsible sidebar states,
+ * top header, main content layout, user profile panel, and mobile floating action buttons.
+ */
+
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ── SIDEBAR NAVIGATION ─────────────────────────────────────────────────────── */
+.sidebar {
+  width: 260px;
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  padding: 1.75rem 1.25rem;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 10;
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), padding 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  padding: 0.25rem 0.5rem;
+  margin-bottom: 2rem;
+  color: var(--text-primary);
+}
+
+.brand-icon-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--primary), var(--accent-success));
+  box-shadow: 0 0 10px rgba(124, 58, 237, 0.5);
+}
+
+.nav-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 1;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.88rem;
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nav-item:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  transform: translateX(3px);
+}
+
+.nav-item.active {
+  background: linear-gradient(90deg, var(--primary-light) 0%, rgba(124, 58, 237, 0.04) 100%);
+  color: var(--primary-text);
+  font-weight: 700;
+  border: 1px solid var(--primary-border);
+  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.12);
+  transform: translateX(3px);
+}
+
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 20%;
+  bottom: 20%;
+  width: 3.5px;
+  border-radius: 0 4px 4px 0;
+  background: var(--primary);
+  box-shadow: 0 0 10px var(--primary);
+}
+
+.nav-counter {
+  background: var(--primary);
+  color: #FFFFFF;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+  min-width: 18px;
+  text-align: center;
+  margin-left: auto;
+  box-shadow: 0 2px 6px rgba(124, 58, 237, 0.4);
+}
+
+/* ── SIDEBAR COLLAPSED STATE ───────────────────────────────────────────────── */
+@media (min-width: 769px) {
+  .sidebar.collapsed {
+    width: 72px;
+    padding: 1.75rem 0.5rem;
+    align-items: center;
+  }
+  
+  .sidebar.collapsed + .main-content {
+    margin-left: 72px;
+    width: calc(100% - 72px);
+  }
+  
+  .sidebar.collapsed .brand-name,
+  .sidebar.collapsed .nav-label,
+  .sidebar.collapsed .user-info {
+    display: none;
+  }
+  
+  .sidebar.collapsed .nav-item {
+    justify-content: center;
+    padding: 0.75rem;
+    width: 44px;
+    height: 44px;
+    margin: 0.2rem auto;
+  }
+  
+  .sidebar.collapsed .nav-icon {
+    margin: 0;
+  }
+
+  .sidebar.collapsed .user-profile {
+    justify-content: center;
+    padding: 0.5rem 0;
+  }
+  
+  .sidebar.collapsed .user-profile > div:last-child {
+    display: none !important;
+  }
+
+  .sidebar.collapsed #sidebar-toggle-btn {
+    margin: 0 auto;
+    transform: rotate(180deg);
+  }
+
+  .sidebar.collapsed .nav-counter {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    margin-left: 0;
+    min-width: 8px;
+    height: 8px;
+    padding: 0;
+    border: 1px solid var(--bg-surface);
+    text-indent: -9999px;
+    overflow: hidden;
+  }
+}
+
+/* ── USER PROFILE PANEL (Sidebar Footer) ──────────────────────────────────── */
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.65rem 0.75rem;
+  background: var(--bg-surface-alt);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  margin-top: auto;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-400) 100%);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  box-shadow: var(--shadow-xs);
+  flex-shrink: 0;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.username {
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-role {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── MAIN CONTENT & TOP HEADER ────────────────────────────────────────────── */
+.main-content {
+  margin-left: 260px;
+  flex: 1;
+  padding: 2rem 2.5rem;
+  width: calc(100% - 260px);
+  min-height: 100vh;
+  transition: margin-left 0.3s cubic-bezier(0.16, 1, 0.3, 1), width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.top-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  gap: 1rem;
+}
+
+.header-title h1 {
+  font-size: 1.85rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+}
+
+.header-title p {
+  font-size: 0.9rem;
+  margin-top: 0.2rem;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* Profile pill card */
+.dash-profile-card {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0.75rem 0.4rem 0.4rem;
+  border-radius: var(--radius-full);
+  background: var(--bg-surface-alt);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dash-profile-card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.dash-profile-card:active {
+  transform: scale(0.97);
+}
+
+.dash-profile-meta {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.dash-profile-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  max-width: 130px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dash-profile-sub {
+  font-size: 0.68rem;
+  color: var(--primary-text);
+  font-weight: 600;
+}
+
+/* ── MOBILE FLOATING ACTION BUTTON (FAB) ───────────────────────────────────── */
+.mobile-fab {
+  display: none;
+  position: fixed;
+  bottom: 84px;
+  right: 1.25rem;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-700) 100%);
+  color: #FFFFFF;
+  border: none;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  z-index: 900;
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.45);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-fab:hover {
+  transform: scale(1.06);
+  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.55);
+}
+
+.mobile-fab:active {
+  transform: scale(0.92);
+}
+
+.mobile-fab svg {
+  width: 24px;
+  height: 24px;
+  stroke: #FFFFFF;
+}
+
+.planner-fab {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-700) 100%);
+  box-shadow: 0 6px 20px var(--primary-glow);
+}
+
+.schedule-fab {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-700) 100%);
+  box-shadow: 0 6px 20px var(--primary-glow);
+}
+
+.schedule-fab:hover {
+  box-shadow: 0 8px 24px var(--primary-glow);
+}
+
+.note-fab {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-700) 100%);
+  box-shadow: 0 6px 20px var(--primary-glow);
+}
+
+.budget-fab {
+  background: linear-gradient(135deg, #10B981 0%, #047857 100%);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
+}
+
+.budget-fab:hover {
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.55);
+}
