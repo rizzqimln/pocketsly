@@ -19,7 +19,7 @@ You are an expert Senior Full-Stack Software Engineer, Systems Architect, and Co
 - **Root Directory:** `pocketsly/`
 - **Tech Stack:**
   - **Backend:** Python 3 Standard Library (`http.server.BaseHTTPRequestHandler`) with zero external pip packages.
-  - **Database:** SQLite3 with Write-Ahead Logging (`PRAGMA journal_mode = WAL;`), 25 compound performance indexes, and parameterized queries.
+  - **Database:** PostgreSQL (Supabase managed Postgres in production, local Postgres for dev) with 21 compound performance indexes and parameterized queries.
   - **Security:** PBKDF2-HMAC-SHA256 (100k iterations, 16-byte random salt), constant-time verification (`secrets.compare_digest`), `HttpOnly; SameSite=Lax` cookies, Content-Security-Policy (CSP), Anti-Clickjacking (`X-Frame-Options: DENY`), sliding-window IP rate limiter (20 req/min).
   - **Frontend:** Pure HTML5 Single Page Application (SPA), Modular Vanilla JS ES6+ (Singleton Pattern attached to `window`), Pure Vanilla CSS Design System with light/dark theme variables.
   - **PWA & Offline:** Service Worker (`sw.js`) with Stale-While-Revalidate caching, Web App Manifest (`manifest.json`), high-res icons.
@@ -29,8 +29,8 @@ You are an expert Senior Full-Stack Software Engineer, Systems Architect, and Co
 ## 📁 2. File Manifest & Architecture Map
 - `server.py`: HTTP server, route-table REST routing (each endpoint is a `_get_*`/`_post_*`/`_patch_*`/`_delete_*` method registered in `_GET_ROUTES`/`_POST_ROUTES`/`_PATCH_ROUTES`/`_DELETE_PATTERNS`), Gzip compression middleware, IP rate limiter, security headers, static file server.
 - `auth.py`: Cryptographic salting/hashing, session token generation, OTP recovery workflow.
-- `db.py`: SQLite connection context manager (`with get_db() as conn:`), WAL mode, and schema migrations.
-- `schema.sql`: 14 relational tables (`users`, `sessions`, `habits`, `habit_logs`, `tasks`, `events`, `notes`, `courses`, `lecturers`, `budgets`, `expenses`, `incomes`, `resources`, `study_logs`) and 25 performance indexes.
+- `db.py`: PostgreSQL connection context manager (`with get_db() as conn:`), schema migrations, and a `db.insert()` helper for `RETURNING id`.
+- `schema.sql`: 14 relational tables (`users`, `sessions`, `habits`, `habit_logs`, `tasks`, `events`, `notes`, `courses`, `lecturers`, `budgets`, `expenses`, `incomes`, `resources`, `study_logs`) and 21 performance indexes.
 - `static/index.html`: Semantic SPA structure with `<section class="view-container hidden">`.
 - `static/sw.js`: PWA Service Worker caching engine.
 - `static/manifest.json`: Web App Manifest with app metadata and shortcuts.
@@ -123,9 +123,9 @@ graph TD
         Auth["PBKDF2 Password Hashing & Sessions (auth.py)"]
     end
 
-    subgraph Persistence["Persistence Layer (SQLite Database)"]
-        Engine["SQLite Engine (WAL Mode, 64MB Cache, Foreign Keys)"]
-        DB["14 Relational Tables & 25 Compound Indexes"]
+    subgraph Persistence["Persistence Layer (PostgreSQL)"]
+        Engine["PostgreSQL Engine (Supabase / local, Foreign Keys enforced)"]
+        DB["14 Relational Tables & 21 Compound Indexes"]
     end
 
     Client --> Router
@@ -177,15 +177,13 @@ Every response includes hardened HTTP headers:
 
 # PART 4: DATABASE SCHEMA & INDEXES (`db.py` & `schema.sql`)
 
-### 1. SQLite High-Performance PRAGMAs
+### 1. PostgreSQL Connection & Row Access
 ```python
-conn = sqlite3.connect(DB_PATH, timeout=20.0)
-conn.execute("PRAGMA foreign_keys = ON;")       # Enforces relational integrity (CASCADE delete)
-conn.execute("PRAGMA journal_mode = WAL;")       # Write-Ahead Logging: readers never block writers
-conn.execute("PRAGMA synchronous = NORMAL;")     # Drastic speedup while preserving transaction safety
-conn.execute("PRAGMA cache_size = -64000;")      # 64MB RAM query cache
-conn.execute("PRAGMA temp_store = MEMORY;")      # In-memory sorting and temporary tables
-conn.row_factory = sqlite3.Row                  # Dict-like row access
+conn = psycopg.connect(DATABASE_URL)   # Connection string from the environment
+conn.row_factory = dict_row            # Dict-like row access: row['column_name']
+# Every query goes through `with db.get_db() as db:` — the context manager
+# commits on success, rolls back on error, and always closes the connection.
+# Inserts that need the new id use db.insert(sql, params) -> 'RETURNING id'.
 ```
 
 ### 2. Relational Schema Summary (14 Tables)
@@ -338,7 +336,7 @@ conn.row_factory = sqlite3.Row                  # Dict-like row access
 |---|---|---|
 | **`HTTP 401 Unauthorized`** | Session cookie expired, cleared, or missing. | Sign in again or check `session_id` cookie in browser DevTools (`auth.py`). |
 | **`HTTP 429 Too Many Requests`** | IP exceeded 20 requests/minute on sensitive routes. | Wait 60s or adjust `RATE_LIMIT_MAX_ATTEMPTS` in `server.py`. |
-| **`database is locked`** | Concurrent transactions blocking in legacy journal mode. | Ensure WAL mode is active (`PRAGMA journal_mode = WAL;`) in `db.py`. |
+| **PostgreSQL not reachable** | No database answers at `DATABASE_URL` / `TEST_DATABASE_URL`. | Start a local Postgres, or point the env vars at your Supabase database. |
 | **CSS/JS updates not showing** | Service Worker or HTTP cache serving old files. | Bump version parameter (e.g. `?v=7.0`) in `index.html` and update `CACHE_NAME` in `sw.js`. |
 | **Colliding cards on mobile** | Missing flex/grid gap rule in container. | In `responsive.css`, add `display: flex !important; flex-direction: column !important; gap: 1rem !important;`. |
 | **`MyModule is not defined` error** | Module is not assigned to global `window` object. | Add `window.MyModule = MyModule;` at the end of the module file. |

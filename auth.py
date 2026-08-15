@@ -52,15 +52,15 @@ def register_user(username: str, password: str, email: str = None, phone: str = 
     security_pin = str(security_pin).strip() if security_pin else "123456"
 
     # Check if username exists
-    existing = db.query_one("SELECT id FROM users WHERE username = ?", (username,))
+    existing = db.query_one("SELECT id FROM users WHERE username = %s", (username,))
     if existing:
         raise ValueError("Username is already taken.")
 
     # Hash password with a fresh salt
     pwd_hash, salt_hex = hash_password(password)
 
-    user_id = db.execute(
-        "INSERT INTO users (username, password_hash, salt, email, phone, security_pin) VALUES (?, ?, ?, ?, ?, ?)",
+    user_id = db.insert(
+        "INSERT INTO users (username, password_hash, salt, email, phone, security_pin) VALUES (%s, %s, %s, %s, %s, %s)",
         (username, pwd_hash, salt_hex, email, phone, security_pin)
     )
 
@@ -73,7 +73,7 @@ def login_user(username: str, password: str) -> str:
     Raises ValueError on invalid credentials.
     """
     username = username.strip().lower()
-    user = db.query_one("SELECT * FROM users WHERE username = ?", (username,))
+    user = db.query_one("SELECT * FROM users WHERE username = %s", (username,))
     if not user:
         raise ValueError("Invalid username or password.")
 
@@ -90,7 +90,7 @@ def login_user(username: str, password: str) -> str:
     expires_at = (now_utc + timedelta(days=SESSION_DURATION_DAYS)).strftime("%Y-%m-%d %H:%M:%S")
 
     db.execute(
-        "INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, ?)",
+        "INSERT INTO sessions (token, user_id, expires_at) VALUES (%s, %s, %s)",
         (token, user["id"], expires_at)
     )
 
@@ -106,7 +106,7 @@ def request_password_otp(username_or_email: str) -> dict:
     if not query:
         raise ValueError("Username or Email is required to request OTP.")
 
-    user = db.query_one("SELECT * FROM users WHERE LOWER(username) = ? OR LOWER(email) = ?", (query, query))
+    user = db.query_one("SELECT * FROM users WHERE LOWER(username) = %s OR LOWER(email) = %s", (query, query))
     if not user:
         raise ValueError("No account found with provided Username or Email.")
 
@@ -116,7 +116,7 @@ def request_password_otp(username_or_email: str) -> dict:
     expires_at = (now_utc + timedelta(minutes=10)).strftime("%Y-%m-%d %H:%M:%S")
 
     db.execute(
-        "UPDATE users SET otp_code = ?, otp_expires_at = ? WHERE id = ?",
+        "UPDATE users SET otp_code = %s, otp_expires_at = %s WHERE id = %s",
         (otp_code, expires_at, user["id"])
     )
 
@@ -140,7 +140,7 @@ def reset_password(username: str, recovery_contact: str, new_password: str, otp_
     if not username:
         raise ValueError("Username or Email is required.")
 
-    user = db.query_one("SELECT * FROM users WHERE LOWER(username) = ? OR LOWER(email) = ?", (username, username))
+    user = db.query_one("SELECT * FROM users WHERE LOWER(username) = %s OR LOWER(email) = %s", (username, username))
     if not user:
         raise ValueError("Invalid account or recovery credentials.")
 
@@ -180,12 +180,12 @@ def reset_password(username: str, recovery_contact: str, new_password: str, otp_
 
     # Update credentials in database & clear OTP
     db.execute(
-        "UPDATE users SET password_hash = ?, salt = ?, otp_code = NULL, otp_expires_at = NULL WHERE id = ?",
+        "UPDATE users SET password_hash = %s, salt = %s, otp_code = NULL, otp_expires_at = NULL WHERE id = %s",
         (pwd_hash, salt_hex, user["id"])
     )
 
     # Invalidate all active sessions for security
-    db.execute("DELETE FROM sessions WHERE user_id = ?", (user["id"],))
+    db.execute("DELETE FROM sessions WHERE user_id = %s", (user["id"],))
 
     return True
 
@@ -199,10 +199,10 @@ def get_user_from_session(token: str) -> dict:
         return None
 
     sql = """
-        SELECT u.id, u.username, u.email, u.phone, u.currency, s.expires_at 
+        SELECT u.id, u.username, u.email, u.phone, u.currency, s.expires_at
         FROM sessions s
         JOIN users u ON s.user_id = u.id
-        WHERE s.token = ?
+        WHERE s.token = %s
     """
     session = db.query_one(sql, (token,))
     if not session:
@@ -213,7 +213,7 @@ def get_user_from_session(token: str) -> dict:
     now_utc = datetime.now(timezone.utc).replace(tzinfo=None)
     if now_utc > expires:
         # Session expired - delete it
-        db.execute("DELETE FROM sessions WHERE token = ?", (token,))
+        db.execute("DELETE FROM sessions WHERE token = %s", (token,))
         return None
 
     return {
@@ -228,4 +228,4 @@ def get_user_from_session(token: str) -> dict:
 def logout_session(token: str):
     """Deletes a session token from database on user logout."""
     if token:
-        db.execute("DELETE FROM sessions WHERE token = ?", (token,))
+        db.execute("DELETE FROM sessions WHERE token = %s", (token,))

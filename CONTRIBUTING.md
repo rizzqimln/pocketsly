@@ -1,36 +1,48 @@
 # Contributing to Pocketsly
 
-Thanks for wanting to contribute! This project is deliberately **zero-dependency**:
-the backend is Python 3 Standard Library only, and the frontend is pure HTML5,
-CSS3, and vanilla ES6+ JavaScript. Please keep it that way — no new pip packages,
-no npm packages, no frameworks.
+Thanks for wanting to contribute! This project is deliberately **minimal-dependency**:
+the backend is Python 3 Standard Library plus exactly one pip package (the
+PostgreSQL driver `psycopg`), and the frontend is pure HTML5, CSS3, and vanilla
+ES6+ JavaScript. Please keep it that way — no new pip packages unless truly
+necessary, no npm packages, no frameworks.
 
 ---
 
 ## 🚀 Getting started
 
 ```bash
-# 1. Clone and run (Python 3.10+ required, no pip install needed)
+# 1. Install the single backend dependency (psycopg — PostgreSQL driver)
+pip install -r requirements.txt
+
+# 2. Point at a database (local Postgres default; use your Supabase URL in prod)
+export DATABASE_URL="postgresql://postgres:postgres@localhost:5432/pocketsly"
+
+# 3. Run
 python3 server.py
 
-# 2. Open http://localhost:8000
+# 4. Open http://localhost:8000
 ```
 
-> Note: the server reads the `PORT` environment variable if set (used by Render,
-> Railway, Fly). Locally it defaults to `8000`.
+> The server reads the `PORT` environment variable if set (used by Render,
+> Railway, Fly). Locally it defaults to `8000`. The schema in `schema.sql` is
+> applied automatically on boot.
 
 ---
 
 ## 🧪 Running the tests
 
-The API and security suites only need Python's stdlib. The E2E suites additionally
-need Playwright (`pip install playwright && python -m playwright install chromium`).
+The **API suite needs a reachable PostgreSQL** — it uses `TEST_DATABASE_URL`
+(falls back to `DATABASE_URL`, then `localhost:5432`) and skips with a clear
+message if none is reachable. The security suite needs the server running; the
+E2E suites additionally need Playwright (`pip install playwright && python -m
+playwright install chromium`).
 
 ```bash
 # JS static analysis — dead code, unused globals, orphan DOM ids (stdlib only)
 python3 scripts/lint_js.py
 
-# Backend REST API tests (fast, no server needed)
+# Backend REST API tests (needs Postgres — TEST_DATABASE_URL or a local default)
+export TEST_DATABASE_URL="postgresql://postgres:postgres@localhost:5432/pocketsly_test"
 pytest tests/test_api.py
 
 # Performance & security checks — requires the server running
@@ -75,16 +87,20 @@ Follow the style already in the codebase — it's part of the project's identity
 - **Explain *why*, not just *what*.** Every module carries a docstring header and
   `LEARN:` comments that teach the underlying concept (security, performance,
   architecture). New code should keep that voice.
-- **Python:** standard library only. Type hints, `sqlite3` parameterized queries
-  (`?` placeholders — never string-concatenate SQL), context managers for DB access.
+- **Python:** standard library + `psycopg` only. Type hints, parameterized
+  queries (`%s` placeholders — never string-concatenate SQL), context managers
+  for DB access (`db.get_db()`), and the `db.insert()` helper for inserts that
+  need the new id back (`RETURNING id`).
 - **JavaScript:** ES6+, `const`/`let`, object-module pattern (`const API = {...}`),
   JSDoc-style comments, `UI.esc()` on any user-supplied string before
   `innerHTML` (XSS safety). Run `python3 scripts/lint_js.py` before opening a
   PR — it catches unused globals, dead methods, and orphan DOM ids.
 - **Security matters:** keep defense-in-depth (input validation, escaping, rate
   limits, HttpOnly session cookies). Don't weaken it to save a line.
-- **Don't commit generated/local files:** databases (`*.db`), caches,
-  `.build_tools/`, `.freebuff/`, `ponytail/`, `opencode.json` are gitignored.
+- **Don't commit generated/local files:** caches, `.build_tools/`, `.freebuff/`,
+  `ponytail/`, `opencode.json` are gitignored. Database connection strings go in
+  `DATABASE_URL` / `TEST_DATABASE_URL` environment variables, never in code or
+  committed files.
 
 ---
 
@@ -103,6 +119,8 @@ Small, focused PRs are much easier to review than large rewrites.
 
 - [`docs/LEARNING_GUIDE.md`](docs/LEARNING_GUIDE.md) — full architecture, REST API
   reference, security model, and bug-fixing protocol
+- [`docs/DEPLOY_SUPABASE_RENDER_NETLIFY.md`](docs/DEPLOY_SUPABASE_RENDER_NETLIFY.md)
+  — free production deployment (Netlify + Render + Supabase)
 - [`README.md`](README.md) — quick start and deployment options
 
 If anything in these docs is unclear or wrong, that's a valid bug — fix the docs

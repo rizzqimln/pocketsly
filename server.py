@@ -202,15 +202,15 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
     def _budget_summary(self, user_id, month_year):
         """Shared monthly cash-flow summary used by /api/dashboard and /api/budget/summary."""
         inc_row = db.query_one(
-            "SELECT COALESCE(SUM(amount), 0) as total FROM incomes WHERE user_id = ? AND strftime('%Y-%m', income_date) = ?",
+            "SELECT COALESCE(SUM(amount), 0) as total FROM incomes WHERE user_id = %s AND left(income_date, 7) = %s",
             (user_id, month_year)
         )
         exp_row = db.query_one(
-            "SELECT COALESCE(SUM(amount), 0) as total FROM expenses WHERE user_id = ? AND strftime('%Y-%m', expense_date) = ?",
+            "SELECT COALESCE(SUM(amount), 0) as total FROM expenses WHERE user_id = %s AND left(expense_date, 7) = %s",
             (user_id, month_year)
         )
         budget_row = db.query_one(
-            "SELECT COALESCE(SUM(amount), 0) as total FROM budgets WHERE user_id = ? AND month_year = ?",
+            "SELECT COALESCE(SUM(amount), 0) as total FROM budgets WHERE user_id = %s AND month_year = %s",
             (user_id, month_year)
         )
         tot_inc = float(inc_row["total"]) if inc_row else 0.0
@@ -269,7 +269,13 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
 
             # Cache Control: Long-lived caching for versioned static assets, revalidate HTML
             if ext in (".css", ".js", ".png", ".jpg", ".svg", ".ico"):
-                self.send_header("Cache-Control", "public, max-age=86400, stale-while-revalidate=3600")
+                # sw.js must never be cached: browsers check it on every navigation
+                # to pick up service-worker updates. A long cache here would serve
+                # a stale app shell for up to a day (see the ?v= cache-buster notes).
+                if os.path.basename(full_path) == "sw.js":
+                    self.send_header("Cache-Control", "no-cache")
+                else:
+                    self.send_header("Cache-Control", "public, max-age=86400, stale-while-revalidate=3600")
             elif ext == ".html":
                 self.send_header("Cache-Control", "no-cache, must-revalidate")
             else:
@@ -391,27 +397,27 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
         # Fetch today's habits with log state
         habits_sql = """
             SELECT h.*,
-                   (SELECT done FROM habit_logs WHERE habit_id = h.id AND log_date = ?) as today_done
+                   (SELECT done FROM habit_logs WHERE habit_id = h.id AND log_date = %s) as today_done
             FROM habits h
-            WHERE h.user_id = ?
+            WHERE h.user_id = %s
         """
         habits = db.query_all(habits_sql, (today_str, user_id))
 
         # Fetch tasks due today or pending
         tasks = db.query_all(
-            "SELECT * FROM tasks WHERE user_id = ? AND done = 0 ORDER BY priority DESC, due_date ASC LIMIT 5",
+            "SELECT * FROM tasks WHERE user_id = %s AND done = 0 ORDER BY priority DESC, due_date ASC LIMIT 5",
             (user_id,)
         )
 
         # Fetch today's schedule events
         events = db.query_all(
-            "SELECT * FROM events WHERE user_id = ? AND day_of_week = ? ORDER BY start_time ASC",
+            "SELECT * FROM events WHERE user_id = %s AND day_of_week = %s ORDER BY start_time ASC",
             (user_id, day_of_week)
         )
 
         # Recent note
         recent_note = db.query_one(
-            "SELECT * FROM notes WHERE user_id = ? ORDER BY updated_at DESC LIMIT 1",
+            "SELECT * FROM notes WHERE user_id = %s ORDER BY updated_at DESC LIMIT 1",
             (user_id,)
         )
 
@@ -432,11 +438,11 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
 
     def _get_habits(self, user_id, query_params):
         """GET /api/habits — all habits with today's completion state."""
-        habits = db.query_all("SELECT * FROM habits WHERE user_id = ? ORDER BY id DESC", (user_id,))
+        habits = db.query_all("SELECT * FROM habits WHERE user_id = %s ORDER BY id DESC", (user_id,))
         today_str = datetime.now().strftime("%Y-%m-%d")
         # Attach completion state for today
         for h in habits:
-            log = db.query_one("SELECT done FROM habit_logs WHERE habit_id = ? AND log_date = ?", (h["id"], today_str))
+            log = db.query_one("SELECT done FROM habit_logs WHERE habit_id = %s AND log_date = %s", (h["id"], today_str))
             h["today_done"] = bool(log and log["done"])
         return self.send_json(habits)
 
@@ -444,38 +450,58 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
         """GET /api/habits/<id>/logs — a habit's full completion history."""
         habit_id = int(match.group(1))
         # Verify habit belongs to user
-        h = db.query_one("SELECT id FROM habits WHERE id = ? AND user_id = ?", (habit_id, user_id))
+        h = db.query_one("SELECT id FROM habits WHERE id = %s AND user_id = %s", (habit_id, user_id))
         if not h:
             return self.send_error_json("Habit not found", 404)
-        logs = db.query_all("SELECT log_date, done FROM habit_logs WHERE habit_id = ? ORDER BY log_date ASC", (habit_id,))
+        logs = db.query_all("SELECT log_date, done FROM habit_logs WHERE habit_id = %s ORDER BY log_date ASC", (habit_id,))
         return self.send_json(logs)
 
     def _get_tasks(self, user_id, query_params):
         """GET /api/tasks — all tasks, pending first by priority."""
         tasks = db.query_all(
-            "SELECT * FROM tasks WHERE user_id = ? ORDER BY done ASC, priority DESC, due_date ASC",
+            "SELECT * FROM tasks WHERE user_id = %s ORDER BY done ASC, priority DESC, due_date ASC",
             (user_id,)
         )
         return self.send_json(tasks)
 
     def _get_events(self, user_id, query_params):
         """GET /api/events — all timetable events ordered by day and start time."""
-        events = db.query_all("SELECT * FROM events WHERE user_id = ? ORDER BY day_of_week ASC, start_time ASC", (user_id,))
+        events = db.query_all("SELECT * FROM events WHERE user_id = %s ORDER BY day_of_week ASC, start_time ASC", (user_id,))
         return self.send_json(events)
 
     def _get_notes(self, user_id, query_params):
         """GET /api/notes — all notes, most recently updated first."""
-        notes = db.query_all("SELECT * FROM notes WHERE user_id = ? ORDER BY updated_at DESC", (user_id,))
+        notes = db.query_all("SELECT * FROM notes WHERE user_id = %s ORDER BY updated_at DESC", (user_id,))
         return self.send_json(notes)
 
     def _get_curriculum_schema(self, user_id, query_params):
-        """GET /api/curriculum/schema — introspect the live SQLite schema."""
+        """GET /api/curriculum/schema — introspect the live PostgreSQL schema."""
         try:
-            tables = db.query_all("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")
+            tables = db.query_all(
+                "SELECT tablename AS name FROM pg_tables WHERE schemaname = 'public' ORDER BY tablename"
+            )
             schema = {}
             for t in tables:
                 table_name = t["name"]
-                columns_info = db.query_all(f"PRAGMA table_info({table_name})")
+                columns_info = db.query_all(
+                    """
+                    SELECT c.column_name AS name, c.data_type AS type,
+                           (tc.constraint_type = 'PRIMARY KEY') AS pk,
+                           (c.is_nullable = 'NO') AS notnull
+                    FROM information_schema.columns c
+                    LEFT JOIN information_schema.key_column_usage kcu
+                        ON c.table_schema = kcu.table_schema
+                       AND c.table_name = kcu.table_name
+                       AND c.column_name = kcu.column_name
+                    LEFT JOIN information_schema.table_constraints tc
+                        ON kcu.constraint_schema = tc.constraint_schema
+                       AND kcu.constraint_name = tc.constraint_name
+                       AND tc.constraint_type = 'PRIMARY KEY'
+                    WHERE c.table_schema = 'public' AND c.table_name = %s
+                    ORDER BY c.ordinal_position
+                    """,
+                    (table_name,),
+                )
                 schema[table_name] = [
                     {"name": c["name"], "type": c["type"], "pk": bool(c["pk"]), "notnull": bool(c["notnull"])}
                     for c in columns_info
@@ -486,20 +512,20 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
 
     def _get_courses(self, user_id, query_params):
         """GET /api/courses — all curriculum courses."""
-        courses = db.query_all("SELECT * FROM courses WHERE user_id = ? ORDER BY code ASC", (user_id,))
+        courses = db.query_all("SELECT * FROM courses WHERE user_id = %s ORDER BY code ASC", (user_id,))
         return self.send_json(courses)
 
     def _get_lecturers(self, user_id, query_params):
         """GET /api/lecturers — all lecturers."""
-        lecturers = db.query_all("SELECT * FROM lecturers WHERE user_id = ? ORDER BY name ASC", (user_id,))
+        lecturers = db.query_all("SELECT * FROM lecturers WHERE user_id = %s ORDER BY name ASC", (user_id,))
         return self.send_json(lecturers)
 
     def _get_budgets(self, user_id, query_params):
         """GET /api/budgets?month=YYYY-MM — budgets with actual spend per category."""
         month_year = query_params.get("month", [datetime.now().strftime("%Y-%m")])[0]
-        budgets = db.query_all("SELECT * FROM budgets WHERE user_id = ? AND month_year = ?", (user_id, month_year))
+        budgets = db.query_all("SELECT * FROM budgets WHERE user_id = %s AND month_year = %s", (user_id, month_year))
         expenses = db.query_all(
-            "SELECT category, SUM(amount) as spent FROM expenses WHERE user_id = ? AND strftime('%Y-%m', expense_date) = ? GROUP BY category",
+            "SELECT category, SUM(amount) as spent FROM expenses WHERE user_id = %s AND left(expense_date, 7) = %s GROUP BY category",
             (user_id, month_year)
         )
         exp_dict = {e["category"]: e["spent"] for e in expenses}
@@ -511,51 +537,51 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
 
     def _get_expenses(self, user_id, query_params):
         """GET /api/expenses — all expenses, newest first."""
-        expenses = db.query_all("SELECT * FROM expenses WHERE user_id = ? ORDER BY expense_date DESC", (user_id,))
+        expenses = db.query_all("SELECT * FROM expenses WHERE user_id = %s ORDER BY expense_date DESC", (user_id,))
         return self.send_json(expenses)
 
     def _get_incomes(self, user_id, query_params):
         """GET /api/incomes — all incomes, newest first."""
-        incomes = db.query_all("SELECT * FROM incomes WHERE user_id = ? ORDER BY income_date DESC, id DESC", (user_id,))
+        incomes = db.query_all("SELECT * FROM incomes WHERE user_id = %s ORDER BY income_date DESC, id DESC", (user_id,))
         return self.send_json(incomes)
 
     def _get_study_logs(self, user_id, query_params):
         """GET /api/study-logs — all study logs, newest first."""
-        logs = db.query_all("SELECT * FROM study_logs WHERE user_id = ? ORDER BY log_date DESC, id DESC", (user_id,))
+        logs = db.query_all("SELECT * FROM study_logs WHERE user_id = %s ORDER BY log_date DESC, id DESC", (user_id,))
         return self.send_json(logs)
 
     def _get_resources(self, user_id, query_params):
         """GET /api/resources — academic library, seeding defaults on first visit."""
-        resources = db.query_all("SELECT * FROM resources WHERE user_id = ? ORDER BY created_at DESC", (user_id,))
+        resources = db.query_all("SELECT * FROM resources WHERE user_id = %s ORDER BY created_at DESC", (user_id,))
         if not resources:
             for item in DEFAULT_RESOURCES:
                 db.execute(
-                    "INSERT INTO resources (user_id, title, author, resource_type, category, url_or_path, notes) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT INTO resources (user_id, title, author, resource_type, category, url_or_path, notes) VALUES (%s, %s, %s, %s, %s, %s, %s)",
                     (user_id, *item[1:])
                 )
-            resources = db.query_all("SELECT * FROM resources WHERE user_id = ? ORDER BY created_at DESC", (user_id,))
+            resources = db.query_all("SELECT * FROM resources WHERE user_id = %s ORDER BY created_at DESC", (user_id,))
         return self.send_json(resources)
 
     def _get_backup_export(self, user_id, query_params):
         """GET /api/backup/export — full JSON backup of every module's data."""
-        curr_user = db.query_one("SELECT id, username, email, phone, created_at FROM users WHERE id = ?", (user_id,))
-        habits = db.query_all("SELECT * FROM habits WHERE user_id = ?", (user_id,))
+        curr_user = db.query_one("SELECT id, username, email, phone, created_at FROM users WHERE id = %s", (user_id,))
+        habits = db.query_all("SELECT * FROM habits WHERE user_id = %s", (user_id,))
         habit_ids = [h["id"] for h in habits]
         habit_logs = []
         if habit_ids:
-            placeholders = ",".join("?" * len(habit_ids))
+            placeholders = ",".join(["%s"] * len(habit_ids))
             habit_logs = db.query_all(f"SELECT * FROM habit_logs WHERE habit_id IN ({placeholders})", habit_ids)
 
-        tasks = db.query_all("SELECT * FROM tasks WHERE user_id = ?", (user_id,))
-        events = db.query_all("SELECT * FROM events WHERE user_id = ?", (user_id,))
-        notes = db.query_all("SELECT * FROM notes WHERE user_id = ?", (user_id,))
-        courses = db.query_all("SELECT * FROM courses WHERE user_id = ?", (user_id,))
-        lecturers = db.query_all("SELECT * FROM lecturers WHERE user_id = ?", (user_id,))
-        budgets = db.query_all("SELECT * FROM budgets WHERE user_id = ?", (user_id,))
-        expenses = db.query_all("SELECT * FROM expenses WHERE user_id = ?", (user_id,))
-        incomes = db.query_all("SELECT * FROM incomes WHERE user_id = ?", (user_id,))
-        resources = db.query_all("SELECT * FROM resources WHERE user_id = ?", (user_id,))
-        study_logs = db.query_all("SELECT * FROM study_logs WHERE user_id = ?", (user_id,))
+        tasks = db.query_all("SELECT * FROM tasks WHERE user_id = %s", (user_id,))
+        events = db.query_all("SELECT * FROM events WHERE user_id = %s", (user_id,))
+        notes = db.query_all("SELECT * FROM notes WHERE user_id = %s", (user_id,))
+        courses = db.query_all("SELECT * FROM courses WHERE user_id = %s", (user_id,))
+        lecturers = db.query_all("SELECT * FROM lecturers WHERE user_id = %s", (user_id,))
+        budgets = db.query_all("SELECT * FROM budgets WHERE user_id = %s", (user_id,))
+        expenses = db.query_all("SELECT * FROM expenses WHERE user_id = %s", (user_id,))
+        incomes = db.query_all("SELECT * FROM incomes WHERE user_id = %s", (user_id,))
+        resources = db.query_all("SELECT * FROM resources WHERE user_id = %s", (user_id,))
+        study_logs = db.query_all("SELECT * FROM study_logs WHERE user_id = %s", (user_id,))
 
         payload = {
             "version": "1.0",
@@ -676,8 +702,8 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
         color = data.get("color", "#4F6DF5").strip()
         if not title:
             return self.send_error_json("Title is required")
-        hid = db.execute(
-            "INSERT INTO habits (user_id, title, icon, color) VALUES (?, ?, ?, ?)",
+        hid = db.insert(
+            "INSERT INTO habits (user_id, title, icon, color) VALUES (%s, %s, %s, %s)",
             (user_id, title, icon, color)
         )
         return self.send_json({"id": hid, "title": title, "icon": icon, "color": color}, status=201)
@@ -689,14 +715,14 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
         done = 1 if data.get("done", True) else 0
 
         # Verify ownership
-        h = db.query_one("SELECT id FROM habits WHERE id = ? AND user_id = ?", (habit_id, user_id))
+        h = db.query_one("SELECT id FROM habits WHERE id = %s AND user_id = %s", (habit_id, user_id))
         if not h:
             return self.send_error_json("Habit not found", 404)
 
-        # Insert or update habit_log using SQLite UPSERT logic
+        # Insert or update habit_log using PostgreSQL UPSERT logic
         sql = """
             INSERT INTO habit_logs (habit_id, log_date, done)
-            VALUES (?, ?, ?)
+            VALUES (%s, %s, %s)
             ON CONFLICT(habit_id, log_date) DO UPDATE SET done = excluded.done
         """
         db.execute(sql, (habit_id, date_str, done))
@@ -713,8 +739,8 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
         if priority not in ("low", "medium", "high"):
             priority = "medium"
 
-        tid = db.execute(
-            "INSERT INTO tasks (user_id, title, details, priority, due_date) VALUES (?, ?, ?, ?, ?)",
+        tid = db.insert(
+            "INSERT INTO tasks (user_id, title, details, priority, due_date) VALUES (%s, %s, %s, %s, %s)",
             (user_id, title, details, priority, due_date)
         )
         return self.send_json({"id": tid, "title": title, "priority": priority, "done": False}, status=201)
@@ -731,8 +757,8 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
         if not title:
             return self.send_error_json("Event title is required")
 
-        eid = db.execute(
-            "INSERT INTO events (user_id, title, day_of_week, start_time, end_time, location, color) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        eid = db.insert(
+            "INSERT INTO events (user_id, title, day_of_week, start_time, end_time, location, color) VALUES (%s, %s, %s, %s, %s, %s, %s)",
             (user_id, title, day_of_week, start_time, end_time, location, color)
         )
         return self.send_json({"id": eid, "title": title}, status=201)
@@ -743,8 +769,8 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
         body = data.get("body", "").strip()
         mood = data.get("mood", "neutral").strip()
 
-        nid = db.execute(
-            "INSERT INTO notes (user_id, title, body, mood) VALUES (?, ?, ?, ?)",
+        nid = db.insert(
+            "INSERT INTO notes (user_id, title, body, mood) VALUES (%s, %s, %s, %s)",
             (user_id, title, body, mood)
         )
         return self.send_json({"id": nid, "title": title, "body": body, "mood": mood}, status=201)
@@ -758,7 +784,10 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
         # Security precaution: block destructive or system-table operations,
         # but allow SELECT / INSERT / UPDATE / DELETE for sandbox learning.
         lower_q = query.lower()
-        forbidden = ["drop table", "alter table", "create table", "sqlite_master"]
+        forbidden = [
+            "drop table", "alter table", "create table", "truncate",
+            "pg_catalog", "information_schema", "grant", "revoke",
+        ]
         for f in forbidden:
             if f in lower_q:
                 return self.send_error_json(f"Operation '{f.upper()}' is blocked in the playground for safety.")
@@ -770,9 +799,8 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
 
                 if cursor.description:  # Read query
                     columns = [col[0] for col in cursor.description]
-                    rows = cursor.fetchall()
-                    results = [dict(zip(columns, row)) for row in rows]
-                    return self.send_json({"type": "select", "columns": columns, "rows": results})
+                    rows = cursor.fetchall()  # Already dicts (psycopg dict_row)
+                    return self.send_json({"type": "select", "columns": columns, "rows": rows})
                 else:  # Write query
                     conn.commit()
                     affected = cursor.rowcount
@@ -790,8 +818,8 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
         if not code or not name:
             return self.send_error_json("Course code and name are required")
 
-        cid = db.execute(
-            "INSERT INTO courses (user_id, code, name, credits, semester, progress) VALUES (?, ?, ?, ?, ?, ?)",
+        cid = db.insert(
+            "INSERT INTO courses (user_id, code, name, credits, semester, progress) VALUES (%s, %s, %s, %s, %s, %s)",
             (user_id, code, name, credits, semester, progress)
         )
         return self.send_json({"id": cid, "code": code, "name": name, "credits": credits, "progress": progress}, status=201)
@@ -806,8 +834,8 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
         if not course_name or hours <= 0:
             return self.send_error_json("Course name and positive hours are required")
 
-        lid = db.execute(
-            "INSERT INTO study_logs (user_id, course_name, hours, activity_type, log_date, notes) VALUES (?, ?, ?, ?, ?, ?)",
+        lid = db.insert(
+            "INSERT INTO study_logs (user_id, course_name, hours, activity_type, log_date, notes) VALUES (%s, %s, %s, %s, %s, %s)",
             (user_id, course_name, hours, activity_type, log_date, notes)
         )
         return self.send_json({"id": lid, "course_name": course_name, "hours": hours, "activity_type": activity_type, "log_date": log_date}, status=201)
@@ -821,8 +849,8 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
         if not name:
             return self.send_error_json("Lecturer name is required")
 
-        lid = db.execute(
-            "INSERT INTO lecturers (user_id, name, email, office, phone) VALUES (?, ?, ?, ?, ?)",
+        lid = db.insert(
+            "INSERT INTO lecturers (user_id, name, email, office, phone) VALUES (%s, %s, %s, %s, %s)",
             (user_id, name, email, office, phone)
         )
         return self.send_json({"id": lid, "name": name, "email": email, "office": office, "phone": phone}, status=201)
@@ -837,7 +865,7 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
 
         # Use UPSERT for budgets
         db.execute(
-            "INSERT INTO budgets (user_id, category, amount, month_year) VALUES (?, ?, ?, ?) ON CONFLICT(user_id, category, month_year) DO UPDATE SET amount = excluded.amount",
+            "INSERT INTO budgets (user_id, category, amount, month_year) VALUES (%s, %s, %s, %s) ON CONFLICT(user_id, category, month_year) DO UPDATE SET amount = excluded.amount",
             (user_id, category, amount, month_year)
         )
         return self.send_json({"success": True}, status=201)
@@ -852,8 +880,8 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
         if not category or amount <= 0:
             return self.send_error_json("Category and dynamic positive amount required")
 
-        eid = db.execute(
-            "INSERT INTO expenses (user_id, category, amount, description, expense_date, wallet) VALUES (?, ?, ?, ?, ?, ?)",
+        eid = db.insert(
+            "INSERT INTO expenses (user_id, category, amount, description, expense_date, wallet) VALUES (%s, %s, %s, %s, %s, %s)",
             (user_id, category, amount, description, expense_date, wallet)
         )
         return self.send_json({"id": eid, "category": category, "amount": amount, "wallet": wallet}, status=201)
@@ -869,8 +897,8 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
         if not source or amount <= 0:
             return self.send_error_json("Source and positive amount required")
 
-        iid = db.execute(
-            "INSERT INTO incomes (user_id, source, amount, description, income_date, wallet, recurring) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        iid = db.insert(
+            "INSERT INTO incomes (user_id, source, amount, description, income_date, wallet, recurring) VALUES (%s, %s, %s, %s, %s, %s, %s)",
             (user_id, source, amount, description, income_date, wallet, recurring)
         )
         return self.send_json({"id": iid, "source": source, "amount": amount, "description": description, "income_date": income_date, "wallet": wallet, "recurring": recurring}, status=201)
@@ -890,8 +918,8 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
         if not title or not resource_type:
             return self.send_error_json("Title and resource type are required")
 
-        rid = db.execute(
-            "INSERT INTO resources (user_id, title, author, resource_type, category, url_or_path, notes, year, publisher, doi) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        rid = db.insert(
+            "INSERT INTO resources (user_id, title, author, resource_type, category, url_or_path, notes, year, publisher, doi) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
             (user_id, title, author, resource_type, category, url_or_path, notes, year, publisher, doi)
         )
         return self.send_json({"id": rid, "title": title, "category": category, "year": year, "publisher": publisher, "doi": doi}, status=201)
@@ -905,41 +933,41 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
         try:
             with db.get_db() as conn:
                 # 1. Delete existing user domain data
-                conn.execute("DELETE FROM habits WHERE user_id = ?", (user_id,))
-                conn.execute("DELETE FROM tasks WHERE user_id = ?", (user_id,))
-                conn.execute("DELETE FROM events WHERE user_id = ?", (user_id,))
-                conn.execute("DELETE FROM notes WHERE user_id = ?", (user_id,))
-                conn.execute("DELETE FROM courses WHERE user_id = ?", (user_id,))
-                conn.execute("DELETE FROM lecturers WHERE user_id = ?", (user_id,))
-                conn.execute("DELETE FROM budgets WHERE user_id = ?", (user_id,))
-                conn.execute("DELETE FROM expenses WHERE user_id = ?", (user_id,))
-                conn.execute("DELETE FROM incomes WHERE user_id = ?", (user_id,))
-                conn.execute("DELETE FROM resources WHERE user_id = ?", (user_id,))
-                conn.execute("DELETE FROM study_logs WHERE user_id = ?", (user_id,))
+                conn.execute("DELETE FROM habits WHERE user_id = %s", (user_id,))
+                conn.execute("DELETE FROM tasks WHERE user_id = %s", (user_id,))
+                conn.execute("DELETE FROM events WHERE user_id = %s", (user_id,))
+                conn.execute("DELETE FROM notes WHERE user_id = %s", (user_id,))
+                conn.execute("DELETE FROM courses WHERE user_id = %s", (user_id,))
+                conn.execute("DELETE FROM lecturers WHERE user_id = %s", (user_id,))
+                conn.execute("DELETE FROM budgets WHERE user_id = %s", (user_id,))
+                conn.execute("DELETE FROM expenses WHERE user_id = %s", (user_id,))
+                conn.execute("DELETE FROM incomes WHERE user_id = %s", (user_id,))
+                conn.execute("DELETE FROM resources WHERE user_id = %s", (user_id,))
+                conn.execute("DELETE FROM study_logs WHERE user_id = %s", (user_id,))
 
                 # 2. Insert Habits & Habit Logs
                 habit_id_map = {}
                 for h in backup_data.get("habits", []):
                     old_hid = h.get("id")
                     cursor = conn.execute(
-                        "INSERT INTO habits (user_id, title, icon, color, created_at) VALUES (?, ?, ?, ?, ?)",
+                        "INSERT INTO habits (user_id, title, icon, color, created_at) VALUES (%s, %s, %s, %s, %s) RETURNING id",
                         (user_id, h.get("title", "Habit"), h.get("icon", "✨"), h.get("color", "#4F6DF5"), h.get("created_at", datetime.now().isoformat()))
                     )
                     if old_hid is not None:
-                        habit_id_map[old_hid] = cursor.lastrowid
+                        habit_id_map[old_hid] = cursor.fetchone()["id"]
 
                 for hl in backup_data.get("habit_logs", []):
                     mapped_hid = habit_id_map.get(hl.get("habit_id"))
                     if mapped_hid:
                         conn.execute(
-                            "INSERT OR IGNORE INTO habit_logs (habit_id, log_date, done, created_at) VALUES (?, ?, ?, ?)",
+                            "INSERT INTO habit_logs (habit_id, log_date, done, created_at) VALUES (%s, %s, %s, %s) ON CONFLICT(habit_id, log_date) DO NOTHING",
                             (mapped_hid, hl.get("log_date"), hl.get("done", 1), hl.get("created_at", datetime.now().isoformat()))
                         )
 
                 # 3. Tasks
                 for t in backup_data.get("tasks", []):
                     conn.execute(
-                        "INSERT INTO tasks (user_id, title, details, priority, due_date, done, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                        "INSERT INTO tasks (user_id, title, details, priority, due_date, done, created_at) VALUES (%s, %s, %s, %s, %s, %s, %s)",
                         (user_id, t.get("title", ""), t.get("details"), t.get("priority", "medium"), t.get("due_date"), t.get("done", 0), t.get("created_at", datetime.now().isoformat()))
                     )
 
@@ -948,71 +976,71 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
                 for c in backup_data.get("courses", []):
                     old_cid = c.get("id")
                     cursor = conn.execute(
-                        "INSERT INTO courses (user_id, code, name, credits, semester, progress) VALUES (?, ?, ?, ?, ?, ?)",
+                        "INSERT INTO courses (user_id, code, name, credits, semester, progress) VALUES (%s, %s, %s, %s, %s, %s) RETURNING id",
                         (user_id, c.get("code", ""), c.get("name", ""), c.get("credits", 3), c.get("semester", 1), c.get("progress", 0))
                     )
                     if old_cid is not None:
-                        course_id_map[old_cid] = cursor.lastrowid
+                        course_id_map[old_cid] = cursor.fetchone()["id"]
 
                 # 5. Lecturers
                 lecturer_id_map = {}
                 for l in backup_data.get("lecturers", []):
                     old_lid = l.get("id")
                     cursor = conn.execute(
-                        "INSERT INTO lecturers (user_id, name, email, office, phone) VALUES (?, ?, ?, ?, ?)",
+                        "INSERT INTO lecturers (user_id, name, email, office, phone) VALUES (%s, %s, %s, %s, %s) RETURNING id",
                         (user_id, l.get("name", ""), l.get("email"), l.get("office"), l.get("phone"))
                     )
                     if old_lid is not None:
-                        lecturer_id_map[old_lid] = cursor.lastrowid
+                        lecturer_id_map[old_lid] = cursor.fetchone()["id"]
 
                 # 6. Events
                 for e in backup_data.get("events", []):
                     mapped_cid = course_id_map.get(e.get("course_id"))
                     mapped_lid = lecturer_id_map.get(e.get("lecturer_id"))
                     conn.execute(
-                        "INSERT INTO events (user_id, title, day_of_week, start_time, end_time, location, color, course_id, lecturer_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        "INSERT INTO events (user_id, title, day_of_week, start_time, end_time, location, color, course_id, lecturer_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
                         (user_id, e.get("title", ""), e.get("day_of_week", 0), e.get("start_time", "09:00"), e.get("end_time", "10:00"), e.get("location"), e.get("color", "#4F6DF5"), mapped_cid, mapped_lid)
                     )
 
                 # 7. Notes
                 for n in backup_data.get("notes", []):
                     conn.execute(
-                        "INSERT INTO notes (user_id, title, body, mood, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
+                        "INSERT INTO notes (user_id, title, body, mood, created_at, updated_at) VALUES (%s, %s, %s, %s, %s, %s)",
                         (user_id, n.get("title", ""), n.get("body"), n.get("mood", "neutral"), n.get("created_at", datetime.now().isoformat()), n.get("updated_at", datetime.now().isoformat()))
                     )
 
-                # 8. Budgets
+                # 8. Budgets (UPSERT on the unique user+category+month constraint)
                 for b in backup_data.get("budgets", []):
                     conn.execute(
-                        "INSERT OR REPLACE INTO budgets (user_id, category, amount, month_year) VALUES (?, ?, ?, ?)",
+                        "INSERT INTO budgets (user_id, category, amount, month_year) VALUES (%s, %s, %s, %s) ON CONFLICT(user_id, category, month_year) DO UPDATE SET amount = excluded.amount",
                         (user_id, b.get("category", ""), b.get("amount", 0.0), b.get("month_year", datetime.now().strftime("%Y-%m")))
                     )
 
                 # 9. Expenses
                 for exp in backup_data.get("expenses", []):
                     conn.execute(
-                        "INSERT INTO expenses (user_id, category, amount, description, expense_date) VALUES (?, ?, ?, ?, ?)",
+                        "INSERT INTO expenses (user_id, category, amount, description, expense_date) VALUES (%s, %s, %s, %s, %s)",
                         (user_id, exp.get("category", ""), exp.get("amount", 0.0), exp.get("description"), exp.get("expense_date", datetime.now().strftime("%Y-%m-%d")))
                     )
 
                 # 10. Incomes
                 for inc in backup_data.get("incomes", []):
                     conn.execute(
-                        "INSERT INTO incomes (user_id, source, amount, description, income_date) VALUES (?, ?, ?, ?, ?)",
+                        "INSERT INTO incomes (user_id, source, amount, description, income_date) VALUES (%s, %s, %s, %s, %s)",
                         (user_id, inc.get("source", ""), inc.get("amount", 0.0), inc.get("description"), inc.get("income_date", datetime.now().strftime("%Y-%m-%d")))
                     )
 
                 # 11. Resources
                 for r in backup_data.get("resources", []):
                     conn.execute(
-                        "INSERT INTO resources (user_id, title, author, resource_type, category, url_or_path, status, notes, year, publisher, doi) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        "INSERT INTO resources (user_id, title, author, resource_type, category, url_or_path, status, notes, year, publisher, doi) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                         (user_id, r.get("title", ""), r.get("author"), r.get("resource_type", "article"), r.get("category", "general"), r.get("url_or_path"), r.get("status", "unread"), r.get("notes"), r.get("year"), r.get("publisher"), r.get("doi"))
                     )
 
                 # 12. Study Logs
                 for sl in backup_data.get("study_logs", []):
                     conn.execute(
-                        "INSERT INTO study_logs (user_id, course_name, hours, activity_type, log_date, notes) VALUES (?, ?, ?, ?, ?, ?)",
+                        "INSERT INTO study_logs (user_id, course_name, hours, activity_type, log_date, notes) VALUES (%s, %s, %s, %s, %s, %s)",
                         (user_id, sl.get("course_name", ""), sl.get("hours", 1.0), sl.get("activity_type", "practice"), sl.get("log_date", datetime.now().strftime("%Y-%m-%d")), sl.get("notes"))
                     )
 
@@ -1027,7 +1055,7 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
     def _patch_task(self, user_id, data, match):
         """PATCH /api/tasks/<id> — partially update a task."""
         task_id = int(match.group(1))
-        t = db.query_one("SELECT * FROM tasks WHERE id = ? AND user_id = ?", (task_id, user_id))
+        t = db.query_one("SELECT * FROM tasks WHERE id = %s AND user_id = %s", (task_id, user_id))
         if not t:
             return self.send_error_json("Task not found", 404)
 
@@ -1038,7 +1066,7 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
         done = 1 if data.get("done", t["done"]) else 0
 
         db.execute(
-            "UPDATE tasks SET title=?, details=?, priority=?, due_date=?, done=? WHERE id=?",
+            "UPDATE tasks SET title=%s, details=%s, priority=%s, due_date=%s, done=%s WHERE id=%s",
             (title, details, priority, due_date, done, task_id)
         )
         return self.send_json({"success": True, "id": task_id})
@@ -1046,7 +1074,7 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
     def _patch_note(self, user_id, data, match):
         """PATCH /api/notes/<id> — partially update a note."""
         note_id = int(match.group(1))
-        n = db.query_one("SELECT * FROM notes WHERE id = ? AND user_id = ?", (note_id, user_id))
+        n = db.query_one("SELECT * FROM notes WHERE id = %s AND user_id = %s", (note_id, user_id))
         if not n:
             return self.send_error_json("Note not found", 404)
 
@@ -1056,7 +1084,7 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
         updated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         db.execute(
-            "UPDATE notes SET title=?, body=?, mood=?, updated_at=? WHERE id=?",
+            "UPDATE notes SET title=%s, body=%s, mood=%s, updated_at=%s WHERE id=%s",
             (title, body, mood, updated_at, note_id)
         )
         return self.send_json({"success": True, "id": note_id})
@@ -1064,7 +1092,7 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
     def _patch_course(self, user_id, data, match):
         """PATCH /api/courses/<id> — partially update a course."""
         course_id = int(match.group(1))
-        c = db.query_one("SELECT * FROM courses WHERE id = ? AND user_id = ?", (course_id, user_id))
+        c = db.query_one("SELECT * FROM courses WHERE id = %s AND user_id = %s", (course_id, user_id))
         if not c:
             return self.send_error_json("Course not found", 404)
 
@@ -1075,7 +1103,7 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
         progress = max(0, min(100, int(data.get("progress", c.get("progress", 0) or 0))))
 
         db.execute(
-            "UPDATE courses SET code=?, name=?, credits=?, semester=?, progress=? WHERE id=?",
+            "UPDATE courses SET code=%s, name=%s, credits=%s, semester=%s, progress=%s WHERE id=%s",
             (code, name, credits, semester, progress, course_id)
         )
         return self.send_json({"success": True, "id": course_id, "progress": progress})
@@ -1089,7 +1117,7 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
         new_password = data.get("password", "").strip()
         new_currency = data.get("currency", "").strip().upper() if "currency" in data else None
 
-        curr_user = db.query_one("SELECT * FROM users WHERE id = ?", (user_id,))
+        curr_user = db.query_one("SELECT * FROM users WHERE id = %s", (user_id,))
         if not curr_user:
             return self.send_error_json("User not found", 404)
 
@@ -1097,35 +1125,35 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
         if new_username and new_username != curr_user["username"]:
             if len(new_username) < 3:
                 return self.send_error_json("Username must be at least 3 characters long", 400)
-            existing = db.query_one("SELECT id FROM users WHERE username = ?", (new_username,))
+            existing = db.query_one("SELECT id FROM users WHERE username = %s", (new_username,))
             if existing:
                 return self.send_error_json("Username is already taken", 400)
-            db.execute("UPDATE users SET username = ? WHERE id = ?", (new_username, user_id))
+            db.execute("UPDATE users SET username = %s WHERE id = %s", (new_username, user_id))
 
         # Update email if provided
         if new_email is not None:
-            db.execute("UPDATE users SET email = ? WHERE id = ?", (new_email or None, user_id))
+            db.execute("UPDATE users SET email = %s WHERE id = %s", (new_email or None, user_id))
 
         # Update phone if provided
         if new_phone is not None:
-            db.execute("UPDATE users SET phone = ? WHERE id = ?", (new_phone or None, user_id))
+            db.execute("UPDATE users SET phone = %s WHERE id = %s", (new_phone or None, user_id))
 
         # Update currency if provided
         if new_currency:
-            db.execute("UPDATE users SET currency = ? WHERE id = ?", (new_currency, user_id))
+            db.execute("UPDATE users SET currency = %s WHERE id = %s", (new_currency, user_id))
 
         # Validate and update security PIN
         if new_pin:
-            db.execute("UPDATE users SET security_pin = ? WHERE id = ?", (new_pin, user_id))
+            db.execute("UPDATE users SET security_pin = %s WHERE id = %s", (new_pin, user_id))
 
         # Validate and update password
         if new_password:
             if len(new_password) < 6:
                 return self.send_error_json("Password must be at least 6 characters long", 400)
             pwd_hash, salt_hex = auth.hash_password(new_password)
-            db.execute("UPDATE users SET password_hash = ?, salt = ? WHERE id = ?", (pwd_hash, salt_hex, user_id))
+            db.execute("UPDATE users SET password_hash = %s, salt = %s WHERE id = %s", (pwd_hash, salt_hex, user_id))
 
-        updated_user = db.query_one("SELECT id, username, email, phone, security_pin, currency FROM users WHERE id = ?", (user_id,))
+        updated_user = db.query_one("SELECT id, username, email, phone, security_pin, currency FROM users WHERE id = %s", (user_id,))
         return self.send_json({"success": True, "user": updated_user})
 
     # =========================================================================
@@ -1134,57 +1162,57 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
 
     def _delete_habit(self, user_id, match):
         hid = int(match.group(1))
-        db.execute("DELETE FROM habits WHERE id = ? AND user_id = ?", (hid, user_id))
+        db.execute("DELETE FROM habits WHERE id = %s AND user_id = %s", (hid, user_id))
         return self.send_json({"success": True})
 
     def _delete_task(self, user_id, match):
         tid = int(match.group(1))
-        db.execute("DELETE FROM tasks WHERE id = ? AND user_id = ?", (tid, user_id))
+        db.execute("DELETE FROM tasks WHERE id = %s AND user_id = %s", (tid, user_id))
         return self.send_json({"success": True})
 
     def _delete_event(self, user_id, match):
         eid = int(match.group(1))
-        db.execute("DELETE FROM events WHERE id = ? AND user_id = ?", (eid, user_id))
+        db.execute("DELETE FROM events WHERE id = %s AND user_id = %s", (eid, user_id))
         return self.send_json({"success": True})
 
     def _delete_note(self, user_id, match):
         nid = int(match.group(1))
-        db.execute("DELETE FROM notes WHERE id = ? AND user_id = ?", (nid, user_id))
+        db.execute("DELETE FROM notes WHERE id = %s AND user_id = %s", (nid, user_id))
         return self.send_json({"success": True})
 
     def _delete_resource(self, user_id, match):
         rid = int(match.group(1))
-        db.execute("DELETE FROM resources WHERE id = ? AND user_id = ?", (rid, user_id))
+        db.execute("DELETE FROM resources WHERE id = %s AND user_id = %s", (rid, user_id))
         return self.send_json({"success": True})
 
     def _delete_course(self, user_id, match):
         cid = int(match.group(1))
-        db.execute("DELETE FROM courses WHERE id = ? AND user_id = ?", (cid, user_id))
+        db.execute("DELETE FROM courses WHERE id = %s AND user_id = %s", (cid, user_id))
         return self.send_json({"success": True})
 
     def _delete_lecturer(self, user_id, match):
         lid = int(match.group(1))
-        db.execute("DELETE FROM lecturers WHERE id = ? AND user_id = ?", (lid, user_id))
+        db.execute("DELETE FROM lecturers WHERE id = %s AND user_id = %s", (lid, user_id))
         return self.send_json({"success": True})
 
     def _delete_budget(self, user_id, match):
         bid = int(match.group(1))
-        db.execute("DELETE FROM budgets WHERE id = ? AND user_id = ?", (bid, user_id))
+        db.execute("DELETE FROM budgets WHERE id = %s AND user_id = %s", (bid, user_id))
         return self.send_json({"success": True})
 
     def _delete_expense(self, user_id, match):
         eid = int(match.group(1))
-        db.execute("DELETE FROM expenses WHERE id = ? AND user_id = ?", (eid, user_id))
+        db.execute("DELETE FROM expenses WHERE id = %s AND user_id = %s", (eid, user_id))
         return self.send_json({"success": True})
 
     def _delete_income(self, user_id, match):
         iid = int(match.group(1))
-        db.execute("DELETE FROM incomes WHERE id = ? AND user_id = ?", (iid, user_id))
+        db.execute("DELETE FROM incomes WHERE id = %s AND user_id = %s", (iid, user_id))
         return self.send_json({"success": True})
 
     def _delete_study_log(self, user_id, match):
         lid = int(match.group(1))
-        db.execute("DELETE FROM study_logs WHERE id = ? AND user_id = ?", (lid, user_id))
+        db.execute("DELETE FROM study_logs WHERE id = %s AND user_id = %s", (lid, user_id))
         return self.send_json({"success": True})
 
 

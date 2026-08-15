@@ -5,7 +5,7 @@ This repository contains two decoupled components:
 | Component | Directory | Stack | Deployment Target |
 |-----------|-----------|-------|-------------------|
 | Web App (SPA + PWA) | `static/` | Vanilla HTML/CSS/JS + Service Worker | Netlify |
-| Backend API | `server.py` + `db.py` + `schema.sql` | Python 3 stdlib HTTP server + SQLite | Self-hosted / Render / Fly.io |
+| Backend API | `server.py` + `db.py` + `schema.sql` | Python 3 HTTP server + PostgreSQL (Supabase) | Render free tier (no card) |
 
 ---
 
@@ -56,10 +56,11 @@ python3 server.py
 # serves http://localhost:8000
 ```
 
-The server is a small stdlib HTTP server backed by SQLite (`schema.sql`,
-`daily_app.db`). It serves the REST API on `/api/*`. For production, run it
-behind a WSGI/ASGI reverse proxy or on a platform like Render/Fly.io, and point
-the Web `_redirects` at its public URL.
+The server is a small stdlib HTTP server backed by **PostgreSQL** (`schema.sql`,
+`DATABASE_URL` — Supabase managed Postgres in production). It serves the REST
+API on `/api/*`. For production, run it on a platform like Render (free tier, no
+credit card), set `DATABASE_URL`, and point the Web `_redirects` at its public
+URL. See [`DEPLOY_SUPABASE_RENDER_NETLIFY.md`](DEPLOY_SUPABASE_RENDER_NETLIFY.md).
 
 ---
 
@@ -74,7 +75,7 @@ the Web `_redirects` at its public URL.
 │   ├── manifest.json
 │   └── sw.js               Service Worker (offline cache)
 │
-├── server.py               Backend REST API (Python stdlib + SQLite)
+├── server.py               Backend REST API (Python stdlib + PostgreSQL)
 ├── db.py
 ├── schema.sql
 └── tests/                  Backend + E2E Playwright suite

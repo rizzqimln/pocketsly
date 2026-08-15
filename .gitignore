@@ -2,6 +2,8 @@
 __pycache__
 *.py[cod]
 .pytest_cache
+.venv/
+venv/
 
 # ── Local databases ──────────────────────────────────────────────────────────
 # Recreated from schema.sql on every server start (db.init_db), so the data

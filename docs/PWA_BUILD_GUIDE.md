@@ -21,7 +21,7 @@ Pocketsly is a guest-first productivity Progressive Web App (PWA). A Python back
 
 | Layer | Technology |
 |-------|-----------|
-| Backend | Python 3 stdlib (`http.server`), SQLite3 (WAL mode), PBKDF2-HMAC-SHA256 |
+| Backend | Python 3 stdlib (`http.server`) + psycopg, PostgreSQL, PBKDF2-HMAC-SHA256 |
 | Frontend | Pure HTML5 SPA, vanilla JS ES6+, pure CSS design system |
 | Routing | Hash-based (`#dashboard`, `#habits`, `#schedule`, `#notes`, `#curriculum`, `#budget`) |
 | PWA | `manifest.json` + `sw.js` (stale-while-revalidate + network-first) |

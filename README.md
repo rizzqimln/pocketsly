@@ -1,13 +1,13 @@
 # Pocketsly — Daily Routine & Student Productivity Suite
 
-A high-performance full-stack productivity suite built with **Pure HTML5, Vanilla CSS3, Modern JavaScript (ES6+), and Python 3 Standard Library** — with **zero external frameworks or runtime dependencies**.
+A high-performance full-stack productivity suite built with **Pure HTML5, Vanilla CSS3, Modern JavaScript (ES6+), and Python 3** — with **zero frontend frameworks** and exactly one backend dependency (the PostgreSQL driver `psycopg`).
 
 Designed as a modern daily routine planner, weekly timetable, notes & academic library manager, curriculum GPA simulator, monthly budget tracker, and offline-capable installable PWA.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![CI](https://github.com/<YOUR-USERNAME>/pocketsly/actions/workflows/ci.yml/badge.svg)](https://github.com/<YOUR-USERNAME>/pocketsly/actions/workflows/ci.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-3776AB.svg)](https://www.python.org/)
-[![Dependencies: zero](https://img.shields.io/badge/dependencies-zero-brightgreen.svg)](README.md)
+[![Dependencies: psycopg](https://img.shields.io/badge/dependencies-psycopg-blue.svg)](requirements.txt)
 
 > Replace `<YOUR-USERNAME>` in the CI badge URL after your first push — it links
 > to your fork's Actions page.
@@ -25,14 +25,14 @@ Designed as a modern daily routine planner, weekly timetable, notes & academic l
 - **Command Palette** — global ⌘K / Ctrl+K spotlight for navigation and actions
 - **PWA & Offline** — installable, offline-capable via service worker caching
 - **Security-first** — PBKDF2 password hashing, HttpOnly session cookies, IP rate limiting, CSP, and XSS escaping
-- **Zero dependencies** — Python 3 stdlib backend + vanilla JS/CSS frontend
+- **Minimal dependencies** — Python 3 stdlib backend + one driver (`psycopg` for PostgreSQL) + vanilla JS/CSS frontend
 
 ## 🧰 Tech Stack
 
 | Layer | Technology |
 |---|---|
-| Backend | Python 3.10+ Standard Library (`http.server`, `sqlite3`, `hashlib`) |
-| Database | SQLite (WAL mode, 25 performance indexes) |
+| Backend | Python 3.10+ Standard Library (`http.server`, `hashlib`) + `psycopg` driver |
+| Database | PostgreSQL 14+ — Supabase managed Postgres in production, local Postgres for dev |
 | Frontend | Pure HTML5, CSS3, Vanilla JavaScript (ES6+) |
 | PWA | Web App Manifest, Service Worker, offline caching |
 | Deploy | Netlify (static) or Render / Railway / Fly / VPS (full app) |
@@ -54,10 +54,16 @@ Want to contribute or report a security issue? See
 ## 🚀 Quick Start
 
 ```bash
-# 1. Start the application server (Python 3.10+ stdlib, zero pip packages)
+# 1. Install the single backend dependency (psycopg — the PostgreSQL driver)
+pip install -r requirements.txt
+
+# 2. Point at a database (defaults to a local Postgres; use your Supabase URL in production)
+export DATABASE_URL="postgresql://postgres:postgres@localhost:5432/pocketsly"
+
+# 3. Start the application server (applies schema.sql automatically on boot)
 python3 server.py
 
-# 2. Open your browser and visit:
+# 4. Open your browser and visit:
 http://localhost:8000
 ```
 
@@ -77,8 +83,8 @@ http://localhost:8000
 
 The repo is deploy-ready for **GitHub** and **Netlify**. Two facts shape every option:
 
-1. **Netlify is static-only** — it can serve the frontend in `static/` (landing page, PWA, installable shell), but the Python API (`server.py`) needs SQLite + a long-running process and **cannot run on Netlify**.
-2. **SQLite lives in a file** (`daily_app.db`, gitignored, recreated from `schema.sql` on start). Free/auto-scaling hosts with ephemeral filesystems (Netlify, Render free tier, Fly without volumes) **lose data on restart** — for real persistence use a VPS or a host with a persistent volume.
+1. **Netlify is static-only** — it can serve the frontend in `static/` (landing page, PWA, installable shell), but the Python API (`server.py`) needs a long-running Python process and **cannot run on Netlify**.
+2. **Data lives in PostgreSQL, not in a file** — the app reads its connection string from `DATABASE_URL` (Supabase managed Postgres in production). Because the database is external, even hosts with ephemeral filesystems (Render free tier) keep your data permanently.
 
 ### Push to GitHub
 
@@ -98,13 +104,13 @@ The repo already ships `.gitignore` (databases, caches, local tooling), `netlify
 The Python server serves both the API and the frontend, so one process = whole app.
 
 1. Push to GitHub.
-2. On **Render** (or Railway/Fly.io/VPS): create a *Web Service* from the repo.
-3. Build command: *(none — zero pip dependencies)*
-4. Start command: `python3 server.py`
-5. The app reads `PORT` from the environment (defaults to `8000` locally), so any host that injects it works.
+2. Create a free **Supabase** project and copy its connection string (Project Settings → Database → Connection string).
+3. On **Render** (no credit card for the free tier): create a *Web Service* from the repo.
+4. Add the environment variable `DATABASE_URL` = your Supabase connection string (the schema is applied automatically on first boot).
+5. Start command: `python3 server.py` — the app reads `PORT` from the environment.
 6. Open the assigned URL — done.
 
-For persistent data, attach a volume at the repo root (Railway volume, Fly volume, or a VPS disk).
+**Free-tier caveats:** Render free services sleep after ~15 min idle (first request takes ~30s to wake); Supabase free projects pause after 7 days of inactivity. Both restore with one click. See [`docs/DEPLOY_SUPABASE_RENDER_NETLIFY.md`](docs/DEPLOY_SUPABASE_RENDER_NETLIFY.md) for the full walkthrough.
 
 ### Option B — Netlify frontend + backend proxy
 
@@ -128,11 +134,14 @@ You can also drag-and-drop the `static/` folder onto Netlify for a static previe
 
 ## 🧪 Automated Testing
 
-The API suite needs only Python's stdlib. The **performance/security** and **E2E**
-suites need a running server (`python3 server.py`) — and the E2E suites need
+The **API suite** needs a reachable PostgreSQL database: it uses
+`TEST_DATABASE_URL` (falls back to `DATABASE_URL`, then to a local Postgres on
+`localhost:5432`) and skips with a clear message if none is reachable. The
+**performance/security** and **E2E** suites need a running server
+(`python3 server.py` with `DATABASE_URL` set) — and the E2E suites need
 Playwright (`pip install playwright && python -m playwright install chromium`).
-GitHub Actions runs all of these on every push and pull request — see
-[`.github/workflows/ci.yml`](.github/workflows/ci.yml).
+GitHub Actions runs all of these on every push and pull request (with a
+PostgreSQL service container) — see [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
 
 ```bash
 # 0. JS static analysis — dead code, unused globals, orphan DOM ids (stdlib only)
@@ -164,9 +173,10 @@ python3 tests/test_e2e_new_features.py
 pocketsly/
 ├── server.py               # Custom HTTP Server, REST API Router, Gzip, Rate Limiter & CSP
 ├── auth.py                 # PBKDF2-HMAC-SHA256 Hashing, Sessions, OTP Password Recovery
-├── db.py                   # SQLite Connection Manager, WAL Configuration & Queries
+├── db.py                   # PostgreSQL Connection Manager (psycopg) & Queries
 ├── receipt_ocr.py          # Tesseract receipt OCR parser (merchant/total/date heuristics)
-├── schema.sql              # Relational DDL (14 Tables, 25 Performance Indexes)
+├── schema.sql              # PostgreSQL DDL (14 Tables, 21 Performance Indexes)
+├── requirements.txt        # Single runtime dependency: psycopg (PostgreSQL driver)
 ├── netlify.toml            # Netlify config: publish static/, immutable cache headers
 ├── README.md               # Quickstart and project introduction
 ├── CONTRIBUTING.md         # Contributor guide: setup, tests, conventions, PR process

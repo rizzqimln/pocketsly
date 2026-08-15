@@ -1,0 +1,9 @@
+# Runtime dependencies for Pocketsly (the only one).
+#
+# The app is otherwise pure Python stdlib. This single dependency is the
+# PostgreSQL driver (psycopg v3) used by db.py when DATABASE_URL points at
+# a Supabase / hosted Postgres database.
+#
+# Install with:
+#   pip install -r requirements.txt
+psycopg[binary]

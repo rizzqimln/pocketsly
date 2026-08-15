@@ -1,42 +1,44 @@
 """
-DATABASE MODULE (db.py)
-=======================
-LEARN: This module manages interactions with the SQLite database using Python's 
-built-in 'sqlite3' module.
+DATABASE MODULE (db.py) — PostgreSQL
+====================================
+LEARN: This module manages interactions with the PostgreSQL database using the
+'psycopg' driver (the de-facto standard PostgreSQL adapter for Python).
 
 Key Concepts:
 1. Connection Management: Always close DB connections or use context managers ('with').
-2. Parameterized Queries: Using '?' placeholders prevents SQL Injection attacks.
-3. Row Factory: 'sqlite3.Row' allows accessing column values by name like Python dicts.
+2. Parameterized Queries: Using '%s' placeholders prevents SQL Injection attacks.
+3. Row Factory: 'dict_row' returns rows as dicts so columns are accessed by name.
+
+Production deployment (Supabase / Render / any Postgres host):
+    export DATABASE_URL="postgresql://user:password@host:5432/database"
 """
 
-import sqlite3
 import os
 from contextlib import contextmanager
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "daily_app.db")
+import psycopg
+from psycopg.rows import dict_row
+
+# Supabase / any PostgreSQL connection string. Cloud hosts inject DATABASE_URL;
+# local default assumes a Postgres on localhost for development.
+DATABASE_URL = os.environ.get(
+    "DATABASE_URL",
+    "postgresql://postgres:postgres@localhost:5432/pocketsly",
+)
 SCHEMA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "schema.sql")
 
 
 @contextmanager
 def get_db():
     """
-    Context manager for database connections with WAL mode and high-performance PRAGMAs.
+    Context manager for PostgreSQL connections.
     Usage:
         with get_db() as db:
             db.execute(...)
     LEARN: Context managers ('with' statement) automatically handle setup and cleanup.
     If an error occurs, it rolls back changes; otherwise, it commits transactions automatically.
     """
-    conn = sqlite3.connect(DB_PATH, timeout=20.0)
-    # Enable foreign key constraints and high-performance concurrency in SQLite
-    conn.execute("PRAGMA foreign_keys = ON;")
-    conn.execute("PRAGMA journal_mode = WAL;")
-    conn.execute("PRAGMA synchronous = NORMAL;")
-    conn.execute("PRAGMA cache_size = -64000;")
-    conn.execute("PRAGMA temp_store = MEMORY;")
-    # Return rows as dict-like objects rather than raw tuples
-    conn.row_factory = sqlite3.Row
+    conn = psycopg.connect(DATABASE_URL, row_factory=dict_row)
     try:
         yield conn
         conn.commit()
@@ -47,10 +49,19 @@ def get_db():
         conn.close()
 
 
+def _column_exists(db, table: str, column: str) -> bool:
+    """Returns True if a column exists in a table (used by schema migrations)."""
+    try:
+        db.execute(f"SELECT {column} FROM {table} LIMIT 1")
+        return True
+    except psycopg.errors.UndefinedColumn:
+        return False
+
+
 def init_db():
     """
-    Reads schema.sql and creates tables if they don't already exist.
-    Called once when the server starts up.
+    Applies schema.sql (CREATE TABLE IF NOT EXISTS) plus idempotent migrations
+    for databases created by older schema versions. Called once at startup.
     """
     if not os.path.exists(SCHEMA_PATH):
         raise FileNotFoundError(f"Schema file not found at {SCHEMA_PATH}")
@@ -59,76 +70,28 @@ def init_db():
         schema_sql = f.read()
 
     with get_db() as db:
-        # executeScript handles multiple SQL statements separated by semicolons
-        db.executescript(schema_sql)
-        # Migration: add category column to resources if it doesn't exist
-        try:
-            db.execute("SELECT category FROM resources LIMIT 1")
-        except sqlite3.OperationalError:
-            db.execute("ALTER TABLE resources ADD COLUMN category TEXT DEFAULT 'general'")
-        # Migration: add progress column to courses if it doesn't exist
-        try:
-            db.execute("SELECT progress FROM courses LIMIT 1")
-        except sqlite3.OperationalError:
-            db.execute("ALTER TABLE courses ADD COLUMN progress INTEGER DEFAULT 0")
-        # Migration: add security_pin column to users if it doesn't exist
-        try:
-            db.execute("SELECT security_pin FROM users LIMIT 1")
-        except sqlite3.OperationalError:
-            db.execute("ALTER TABLE users ADD COLUMN security_pin TEXT DEFAULT '123456'")
-        # Migration: add email column to users if it doesn't exist
-        try:
-            db.execute("SELECT email FROM users LIMIT 1")
-        except sqlite3.OperationalError:
-            db.execute("ALTER TABLE users ADD COLUMN email TEXT")
-        # Migration: add phone column to users if it doesn't exist
-        try:
-            db.execute("SELECT phone FROM users LIMIT 1")
-        except sqlite3.OperationalError:
-            db.execute("ALTER TABLE users ADD COLUMN phone TEXT")
-        # Migration: add otp_code column to users if it doesn't exist
-        try:
-            db.execute("SELECT otp_code FROM users LIMIT 1")
-        except sqlite3.OperationalError:
-            db.execute("ALTER TABLE users ADD COLUMN otp_code TEXT")
-        # Migration: add otp_expires_at column to users if it doesn't exist
-        try:
-            db.execute("SELECT otp_expires_at FROM users LIMIT 1")
-        except sqlite3.OperationalError:
-            db.execute("ALTER TABLE users ADD COLUMN otp_expires_at DATETIME")
-        # Migration: add wallet column to incomes if it doesn't exist
-        try:
-            db.execute("SELECT wallet FROM incomes LIMIT 1")
-        except sqlite3.OperationalError:
-            db.execute("ALTER TABLE incomes ADD COLUMN wallet TEXT DEFAULT 'Cash'")
-        # Migration: add recurring column to incomes if it doesn't exist
-        try:
-            db.execute("SELECT recurring FROM incomes LIMIT 1")
-        except sqlite3.OperationalError:
-            db.execute("ALTER TABLE incomes ADD COLUMN recurring TEXT DEFAULT 'none'")
-        # Migration: add wallet column to expenses if it doesn't exist
-        try:
-            db.execute("SELECT wallet FROM expenses LIMIT 1")
-        except sqlite3.OperationalError:
-            db.execute("ALTER TABLE expenses ADD COLUMN wallet TEXT DEFAULT 'Cash'")
-        # Migration: add currency column to users if it doesn't exist
-        try:
-            db.execute("SELECT currency FROM users LIMIT 1")
-        except sqlite3.OperationalError:
-            db.execute("ALTER TABLE users ADD COLUMN currency TEXT DEFAULT 'IDR'")
-        # Migration: add citation columns to resources if they don't exist
-        try:
-            db.execute("SELECT year FROM resources LIMIT 1")
-        except sqlite3.OperationalError:
-            db.execute("ALTER TABLE resources ADD COLUMN year TEXT")
-        try:
-            db.execute("SELECT publisher FROM resources LIMIT 1")
-        except sqlite3.OperationalError:
-            db.execute("ALTER TABLE resources ADD COLUMN publisher TEXT")
-        try:
-            db.execute("SELECT doi FROM resources LIMIT 1")
-        except sqlite3.OperationalError:
-            db.execute("ALTER TABLE resources ADD COLUMN doi TEXT")
+        # psycopg runs multi-statement scripts via PostgreSQL's simple query protocol
+        db.execute(schema_sql)
+        # Idempotent migrations: add columns added after the original schema
+        migrations = [
+            ("resources", "category", "TEXT DEFAULT 'general'"),
+            ("courses", "progress", "INTEGER DEFAULT 0"),
+            ("users", "security_pin", "TEXT DEFAULT '123456'"),
+            ("users", "email", "TEXT"),
+            ("users", "phone", "TEXT"),
+            ("users", "otp_code", "TEXT"),
+            ("users", "otp_expires_at", "TEXT"),
+            ("incomes", "wallet", "TEXT DEFAULT 'Cash'"),
+            ("incomes", "recurring", "TEXT DEFAULT 'none'"),
+            ("expenses", "wallet", "TEXT DEFAULT 'Cash'"),
+            ("users", "currency", "TEXT DEFAULT 'IDR'"),
+            ("resources", "year", "TEXT"),
+            ("resources", "publisher", "TEXT"),
+            ("resources", "doi", "TEXT"),
+        ]
+        for table, column, column_ddl in migrations:
+            if not _column_exists(db, table, column):
+                db.execute(f"ALTER TABLE {table} ADD COLUMN {column} {column_ddl}")
     print("✓ Database initialized successfully.")
 
 
@@ -136,8 +99,7 @@ def query_all(sql, params=()):
     """Helper to run SELECT queries returning multiple rows as lists of dicts."""
     with get_db() as db:
         cursor = db.execute(sql, params)
-        rows = cursor.fetchall()
-        return [dict(row) for row in rows]
+        return cursor.fetchall()
 
 
 def query_one(sql, params=()):
@@ -151,8 +113,19 @@ def query_one(sql, params=()):
 def execute(sql, params=()):
     """
     Helper for INSERT, UPDATE, DELETE statements.
-    Returns the lastrowid (useful for getting the ID of a newly inserted record).
+    Returns the cursor; the transaction commits when the context manager exits.
     """
     with get_db() as db:
-        cursor = db.execute(sql, params)
-        return cursor.lastrowid
+        return db.execute(sql, params)
+
+
+def insert(sql, params=()):
+    """
+    Helper for INSERT statements that need the new primary key back.
+    Appends 'RETURNING id' so the ID is fetched in the same round-trip
+    (the PostgreSQL equivalent of SQLite's cursor.lastrowid).
+    """
+    with get_db() as db:
+        cursor = db.execute(sql + " RETURNING id", params)
+        row = cursor.fetchone()
+        return row["id"] if row else None

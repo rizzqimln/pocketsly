@@ -269,7 +269,15 @@ const API = {
     try {
       const response = await fetch(endpoint, config);
       // LEARN: response.json() is also async — it reads and parses the body stream.
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch (e) {
+        // LEARN: A non-JSON response (e.g. a static host answering /api/* with
+        // its index.html, or a CDN error page) means the API backend is not
+        // reachable. Surface a clear message instead of a cryptic parse error.
+        throw new Error('Unexpected server response — the API backend is not reachable.');
+      }
 
       // LEARN: response.ok is true for status codes 200–299. We throw an Error
       // so callers can handle all failures uniformly in a single catch block.

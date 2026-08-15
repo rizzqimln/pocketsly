@@ -49,19 +49,18 @@ def test_security_headers():
         assert "default-src" in headers.get("Content-Security-Policy", "")
         print("✓ Defense-in-depth security headers verified.")
 
-def test_database_wal_and_indexes():
-    """Verify SQLite WAL mode and presence of performance indexes."""
+def test_database_indexes():
+    """Verify the PostgreSQL connection and presence of performance indexes."""
     with db.get_db() as conn:
-        journal_mode = conn.execute("PRAGMA journal_mode;").fetchone()[0]
-        assert journal_mode.upper() == "WAL"
-
-        cursor = conn.execute("SELECT name FROM sqlite_master WHERE type = 'index';")
-        index_names = [r[0] for r in cursor.fetchall()]
+        cursor = conn.execute(
+            "SELECT indexname FROM pg_indexes WHERE schemaname = 'public' ORDER BY indexname"
+        )
+        index_names = [r["indexname"] for r in cursor.fetchall()]
         assert "idx_users_username" in index_names
         assert "idx_sessions_token" in index_names
         assert "idx_habits_user" in index_names
         assert "idx_tasks_user_done" in index_names
-        print(f"✓ SQLite WAL mode active ({journal_mode}) with {len(index_names)} performance indexes.")
+        print(f"✓ PostgreSQL connected with {len(index_names)} performance indexes.")
 
 def test_rate_limiter_protection():
     """Verify rate limiter blocks brute-force authentication floods with 429."""
@@ -86,6 +85,6 @@ def test_rate_limiter_protection():
 if __name__ == "__main__":
     test_gzip_compression_on_static_and_api()
     test_security_headers()
-    test_database_wal_and_indexes()
+    test_database_indexes()
     test_rate_limiter_protection()
     print("🎉 ALL PERFORMANCE & SECURITY OPTIMIZATION TESTS PASSED 100%!")

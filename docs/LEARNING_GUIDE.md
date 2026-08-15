@@ -27,8 +27,8 @@
 **Pocketsly** is a high-performance daily routine, academic curriculum lab, and financial productivity application built with **Pure HTML5, Vanilla CSS3, Modern JavaScript (ES6+), and Python 3 Standard Library**—with **zero external runtime dependencies or frameworks**.
 
 ### Core Engineering Principles:
-1. **Zero-Dependency Purity**: Built from fundamental web standards (HTTP protocol, DOM API, SQLite engine, CSS Grid/Flexbox) so every developer and AI agent can inspect and understand exactly how every line operates.
-2. **Speed & Efficiency**: Instant startup, sub-millisecond local responses, Gzip compression, SQLite WAL mode, and PWA Service Worker caching.
+1. **Minimal-Dependency Purity**: Built from fundamental web standards (HTTP protocol, DOM API, PostgreSQL engine, CSS Grid/Flexbox) plus exactly one driver (`psycopg`) so every developer and AI agent can inspect and understand exactly how every line operates.
+2. **Speed & Efficiency**: Instant startup, Gzip compression, PostgreSQL indexing, and PWA Service Worker caching.
 3. **Defense-in-Depth Security**: Cryptographic salting/hashing, timing-safe auth, HttpOnly cookies, sliding-window IP rate limiting, CSP, anti-clickjacking headers, and XSS sanitization.
 4. **Platform Independence**: Seamlessly operates as a desktop web app, mobile responsive web app, offline-ready PWA, and standalone native Android APK.
 
@@ -40,8 +40,8 @@
 pocketsly/
 ├── server.py               # Custom HTTP Server, REST API Router, Gzip, Rate Limiter & CSP
 ├── auth.py                 # PBKDF2-HMAC-SHA256 Hashing, Sessions, OTP Password Recovery
-├── db.py                   # SQLite Connection Manager, WAL Configuration & Queries
-├── schema.sql              # Relational DDL (14 Tables, 25 Performance Indexes)
+├── db.py                   # PostgreSQL Connection Manager (psycopg) & Queries
+├── schema.sql              # PostgreSQL DDL (14 Tables, 21 Performance Indexes)
 ├── LEARNING_GUIDE.md       # Master Architecture & Developer Learning Guide
 ├── README.md               # Quickstart and project introduction
 │
@@ -87,7 +87,7 @@ pocketsly/
 │
 └── tests/                  # Automated Test Suites
     ├── test_api.py                 # Backend REST API Integration Tests (11 Tests)
-    ├── test_perf_security.py       # Gzip, CSP, WAL, Indexes, Rate Limiter Tests
+    ├── test_perf_security.py       # Gzip, CSP, Indexes, Rate Limiter Tests
     ├── test_e2e_quiz.py            # Playwright 3D Quiz Card Flip E2E Test
     └── test_e2e_mobile_redesign.py # Mobile & Desktop UI/UX Responsive E2E Test
 ```
@@ -104,7 +104,7 @@ sequenceDiagram
     participant SW as Service Worker (sw.js)
     participant Server as Python HTTP Server (server.py)
     participant Auth as Auth & Crypto (auth.py)
-    participant DB as SQLite DB Engine (db.py)
+    participant DB as PostgreSQL Database (Supabase / local)
 
     User->>UI: Interacts with UI (e.g. Log Habit, Save Note)
     UI->>UI: Optimistic UI Update (Instant visual feedback)
@@ -115,7 +115,7 @@ sequenceDiagram
         SW->>Server: Forward HTTP Request with Session Cookie
         Server->>Server: Check IP Rate Limiter (Max 20 req/min)
         Server->>Auth: Validate Session Token from Cookie
-        Auth->>DB: Query Session & User Details (WAL Mode)
+        Auth->>DB: Query Session & User Details
         DB-->>Auth: User Record
         Auth-->>Server: Authenticated User ID
         Server->>DB: Execute Parameterized SQL Query
@@ -131,17 +131,16 @@ sequenceDiagram
 
 ## 4. Database & Persistence Engine
 
-The persistence layer uses SQLite configured for multi-threaded concurrency and transaction safety.
+The persistence layer uses PostgreSQL (managed by Supabase in production, or a
+local Postgres for development) — a production-grade database that handles
+concurrency and transaction safety natively.
 
-### A. Performance PRAGMAs (`db.py`)
+### A. Connection & Row Access (`db.py`)
 ```python
-conn = sqlite3.connect(DB_PATH, timeout=20.0)
-conn.execute("PRAGMA foreign_keys = ON;")       # Enforces relational integrity (ON DELETE CASCADE)
-conn.execute("PRAGMA journal_mode = WAL;")       # Write-Ahead Logging: readers never block writers
-conn.execute("PRAGMA synchronous = NORMAL;")     # Drastic speedup while preserving power-loss safety
-conn.execute("PRAGMA cache_size = -64000;")      # 64MB RAM query cache
-conn.execute("PRAGMA temp_store = MEMORY;")      # In-memory sorting and temporary tables
-conn.row_factory = sqlite3.Row                  # Dict-like row access: row['column_name']
+conn = psycopg.connect(DATABASE_URL)   # Connection string from the environment
+conn.row_factory = dict_row            # Rows come back as dicts: row['column_name']
+# All access goes through `with db.get_db() as db:` — commits on success,
+# rolls back on error, and always closes the connection.
 ```
 
 ### B. Relational Schema Summary (`schema.sql`)
@@ -361,7 +360,7 @@ Before making any changes:
 |---|---|---|
 | **`HTTP 401 Unauthorized` on API call** | Session cookie expired, cleared, or missing. | Re-authenticate at `/api/login` or check `session_id` in browser cookies (`auth.py`). |
 | **`HTTP 429 Too Many Requests`** | IP exceeded 20 requests/minute on sensitive auth routes. | Wait 60s or adjust `RATE_LIMIT_MAX_ATTEMPTS` in `server.py`. |
-| **`sqlite3.OperationalError: database is locked`** | Long-running transaction blocked writers in legacy rollback journal mode. | Ensure WAL mode is active (`PRAGMA journal_mode = WAL;`) in `db.py`. |
+| **PostgreSQL not reachable** | No database answers at `DATABASE_URL` / `TEST_DATABASE_URL`. | Start a local Postgres, or point the env vars at your Supabase database. |
 | **CSS or JS changes do not update in browser** | Service Worker or browser HTTP cache serving stale files. | Bump version string (`?v=7.0`) in `index.html` and update `CACHE_NAME` in `sw.js`. |
 | **Card elements colliding with 0px spacing on mobile** | Container missing flex gap or grid row gap rule. | In `responsive.css`, add `display: flex !important; flex-direction: column !important; gap: 1rem !important;`. |
 | **Inline `onclick="MyModule.doSomething()"` fails** | Module is not assigned to global `window` scope. | Add `window.MyModule = MyModule;` at the end of the module file. |

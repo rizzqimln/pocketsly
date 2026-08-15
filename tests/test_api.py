@@ -19,24 +19,65 @@ from datetime import datetime
 # Add parent directory to module search path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-import db
-import auth
-from server import AppRequestHandler, PORT
+# Guarded imports: if psycopg (the PostgreSQL driver) is missing, the suite
+# skips with a clear message instead of crashing on import.
+try:
+    import psycopg
+    import db
+    import auth
+    from server import AppRequestHandler, PORT
+    BACKEND_IMPORTABLE = True
+except ImportError as _import_err:
+    BACKEND_IMPORTABLE = False
+    _IMPORT_ERROR = _import_err
 
 TEST_PORT = 8999
-TEST_DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "test_daily.db")
+# Test database: TEST_DATABASE_URL wins, else DATABASE_URL, else a local default.
+TEST_DATABASE_URL = os.environ.get(
+    "TEST_DATABASE_URL",
+    os.environ.get("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/pocketsly_test"),
+)
+
+
+def _postgres_reachable(url):
+    """Returns True if a PostgreSQL server answers on the given URL."""
+    if not BACKEND_IMPORTABLE:
+        return False
+    try:
+        conn = psycopg.connect(url)
+        conn.close()
+        return True
+    except Exception:
+        return False
 
 
 class ApiIntegrationTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        """Runs once before all tests: sets test DB path and starts background server."""
-        # Override DB_PATH in db module
-        db.DB_PATH = TEST_DB_PATH
-        if os.path.exists(TEST_DB_PATH):
-            os.remove(TEST_DB_PATH)
+        """Runs once before all tests: points at a clean PostgreSQL test DB and starts the server."""
+        if not BACKEND_IMPORTABLE:
+            raise unittest.SkipTest(
+                f"PostgreSQL driver not installed ({_IMPORT_ERROR}). "
+                "Run: pip install -r requirements.txt"
+            )
+        if not _postgres_reachable(TEST_DATABASE_URL):
+            raise unittest.SkipTest(
+                f"PostgreSQL not reachable at {TEST_DATABASE_URL}. "
+                "Start a Postgres instance or set TEST_DATABASE_URL to run this suite."
+            )
 
+        # Point the db module at the test database and apply the schema
+        db.DATABASE_URL = TEST_DATABASE_URL
         db.init_db()
+
+        # Reset every table for a clean, deterministic run (CASCADE handles FKs)
+        with db.get_db() as conn:
+            tables = [
+                "habit_logs", "sessions", "study_logs", "resources", "incomes",
+                "expenses", "budgets", "lecturers", "courses", "events",
+                "notes", "tasks", "habits", "users",
+            ]
+            conn.execute("TRUNCATE TABLE " + ", ".join(tables) + " RESTART IDENTITY CASCADE")
 
         # Start HTTP server on test port in background thread
         import http.server
@@ -48,15 +89,13 @@ class ApiIntegrationTestCase(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        """Runs once after all tests: shuts down server and cleans temp database."""
+        """Runs once after all tests: shuts down server and restores the default DB URL."""
         cls.server.shutdown()
         cls.server.server_close()
-        db.DB_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "daily_app.db")
-        if os.path.exists(TEST_DB_PATH):
-            try:
-                os.remove(TEST_DB_PATH)
-            except Exception:
-                pass
+        db.DATABASE_URL = os.environ.get(
+            "DATABASE_URL",
+            "postgresql://postgres:postgres@localhost:5432/pocketsly",
+        )
 
     def request(self, method, path, body=None, cookie=None):
         """Helper to send HTTP requests to test server and return (status, headers, parsed_json_dict)."""

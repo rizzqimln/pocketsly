@@ -4,13 +4,17 @@
  * Offline Resilience & Sub-Millisecond Caching Engine
  */
 
-const CACHE_NAME = "pocketsly-cache-v4.0";
+// Cache name is derived from the bundle ?v= version so every release installs
+// a fresh cache and the old one is purged on activate. If this ever grows a
+// version string, it changes — the SW would serve a stale app shell otherwise.
+const BUNDLE_JS = '/js/bundle.js?v=8.4';
+const CACHE_NAME = 'pocketsly-cache-' + BUNDLE_JS.split('v=')[1];
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/css/bundle.css?v=8.3',
-  '/js/bundle.js?v=8.3',
+  '/css/bundle.css?v=8.4',
+  BUNDLE_JS,
   // Async-loaded font stylesheet; runtime caching covers the woff2 files it
   // references. cache.addAll tolerates a failure here (catch below) so a
   // first install while offline still succeeds.
