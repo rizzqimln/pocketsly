@@ -639,11 +639,8 @@
     padding-bottom: 1.5rem !important;
   }
 
-  .budget-layout:focus-within ~ .budget-fab,
-  .budget-form-container:focus-within ~ .budget-fab {
-    opacity: 0.2;
-    pointer-events: none;
-    transform: scale(0.85);
+  .budget-fab {
+    display: none !important;
   }
 
   /* Budget mobile refinements: stack donut, full-width actions, bigger touch targets */

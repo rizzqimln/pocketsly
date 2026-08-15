@@ -29,7 +29,7 @@
   
   <!-- Bundled styling: one file, zero render-blocking fan-out over HTTP/1.1.
        Sources stay modular under static/css; regenerate via scripts/build.py. -->
-  <link href="/css/bundle.css?v=8.5" rel="stylesheet" />
+  <link href="/css/bundle.css?v=8.6" rel="stylesheet" />
 </head>
 
 <body>
@@ -1232,6 +1232,72 @@
                           <span class="bento-tag">DOM Scripting</span>
                         </div>
                       </a>
+                      <!-- 1. Interactive Flexbox & Grid Sandbox -->
+                      <div class="card bento-tile" onclick="window.Curriculum.switchTab('flexbox')">
+                        <div class="bento-header">
+                          <span class="bento-icon-box text-purple">
+                            <svg class="icon-svg" viewBox="0 0 24 24">
+                              <rect height="18" rx="2" width="18" x="3" y="3"></rect>
+                              <line x1="3" x2="21" y1="9" y2="9"></line>
+                              <line x1="9" x2="9" y1="21" y2="9"></line>
+                            </svg>
+                          </span>
+                          <div class="bento-meta-group">
+                            <span class="priority-badge priority-high">Live Lab</span>
+                            <span class="bento-arrow">↗</span>
+                          </div>
+                        </div>
+                        <h4 class="bento-title">CSS Flexbox &amp; Grid Visualizer</h4>
+                        <p class="bento-desc">Interactive live CSS stage to tweak direction, alignment, justify-content, and copy snippets.</p>
+                        <div class="bento-tags-row">
+                          <span class="bento-tag">CSS Flexbox</span>
+                          <span class="bento-tag">CSS Grid</span>
+                          <span class="bento-tag">Live Stage</span>
+                        </div>
+                      </div>
+                      <!-- 2. JS Array Methods Lab -->
+                      <div class="card bento-tile" onclick="window.Curriculum.switchTab('jslab')">
+                        <div class="bento-header">
+                          <span class="bento-icon-box text-warning">
+                            <svg class="icon-svg" viewBox="0 0 24 24">
+                              <polyline points="16 18 22 12 16 6"></polyline>
+                              <polyline points="8 6 2 12 8 18"></polyline>
+                            </svg>
+                          </span>
+                          <div class="bento-meta-group">
+                            <span class="priority-badge priority-low">Live Code</span>
+                            <span class="bento-arrow">↗</span>
+                          </div>
+                        </div>
+                        <h4 class="bento-title">JS Array &amp; Functional Lab</h4>
+                        <p class="bento-desc">Interactive pipeline for .map(), .filter(), .reduce(), and data transformations.</p>
+                        <div class="bento-tags-row">
+                          <span class="bento-tag">Array Methods</span>
+                          <span class="bento-tag">Functional JS</span>
+                        </div>
+                      </div>
+                      <!-- 3. Regex Validator Lab -->
+                      <div class="card bento-tile" onclick="window.Curriculum.switchTab('regexlab')">
+                        <div class="bento-header">
+                          <span class="bento-icon-box bento-icon-cyan">
+                            <svg class="icon-svg" viewBox="0 0 24 24">
+                              <circle cx="12" cy="12" r="10"></circle>
+                              <line x1="12" x2="12" y1="8" y2="12"></line>
+                              <line x1="12" x2="12.01" y1="16" y2="16"></line>
+                            </svg>
+                          </span>
+                          <div class="bento-meta-group">
+                            <span class="priority-badge priority-high">Tester</span>
+                            <span class="bento-arrow">↗</span>
+                          </div>
+                        </div>
+                        <h4 class="bento-title">Regex Pattern Validator</h4>
+                        <p class="bento-desc">Test real-time Regular Expressions with instant match highlighting and group capture.</p>
+                        <div class="bento-tags-row">
+                          <span class="bento-tag">RegEx</span>
+                          <span class="bento-tag">Input Validation</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                   <!-- Section 3: Backend & Databases -->
@@ -1913,6 +1979,220 @@
                   </div>
                 </div>
               </div>
+              <!-- 8. CSS FLEXBOX & GRID VISUALIZER LAB -->
+              <div class="curr-panel hidden" id="curr-flexbox">
+                <div class="panel-header d-flex justify-between items-start flex-wrap gap-md">
+                  <div>
+                    <button class="btn btn-outline btn-sm back-to-hub-btn d-inline-flex items-center gap-sm mb-sm text-xs p-md"
+                      onclick="window.Curriculum.switchTab('hub')" type="button">
+                      <svg class="icon-svg" viewBox="0 0 24 24"><line x1="19" x2="5" y1="12" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                      Back to Catalog
+                    </button>
+                    <h3>CSS Flexbox &amp; Grid Visualizer Lab</h3>
+                    <p class="text-muted">Interactively manipulate modern CSS layout primitives and preview changes live on stage.</p>
+                  </div>
+                  <div class="d-flex gap-sm">
+                    <button class="btn btn-primary btn-sm" onclick="window.Curriculum.addFlexItem()" type="button">+ Add Box</button>
+                    <button class="btn btn-outline btn-sm" onclick="window.Curriculum.removeFlexItem()" type="button">- Remove Box</button>
+                  </div>
+                </div>
+
+                <div class="flex-lab-layout">
+                  <!-- Control Settings Sidebar -->
+                  <div class="card flex-controls-card">
+                    <div class="card-body">
+                      <h4 class="font-bold text-sm mb-md text-primary">Container Properties</h4>
+                      
+                      <div class="form-group mb-sm">
+                        <label class="text-xs font-semibold">flex-direction</label>
+                        <select class="w-full" id="flex-dir-select" onchange="window.Curriculum.updateFlexStage()">
+                          <option value="row">row (default)</option>
+                          <option value="row-reverse">row-reverse</option>
+                          <option value="column">column</option>
+                          <option value="column-reverse">column-reverse</option>
+                        </select>
+                      </div>
+
+                      <div class="form-group mb-sm">
+                        <label class="text-xs font-semibold">justify-content</label>
+                        <select class="w-full" id="flex-justify-select" onchange="window.Curriculum.updateFlexStage()">
+                          <option value="flex-start">flex-start</option>
+                          <option value="center">center</option>
+                          <option value="flex-end">flex-end</option>
+                          <option value="space-between">space-between</option>
+                          <option value="space-around">space-around</option>
+                          <option value="space-evenly">space-evenly</option>
+                        </select>
+                      </div>
+
+                      <div class="form-group mb-sm">
+                        <label class="text-xs font-semibold">align-items</label>
+                        <select class="w-full" id="flex-align-select" onchange="window.Curriculum.updateFlexStage()">
+                          <option value="stretch">stretch</option>
+                          <option value="center">center</option>
+                          <option value="flex-start">flex-start</option>
+                          <option value="flex-end">flex-end</option>
+                          <option value="baseline">baseline</option>
+                        </select>
+                      </div>
+
+                      <div class="form-group mb-sm">
+                        <label class="text-xs font-semibold">flex-wrap</label>
+                        <select class="w-full" id="flex-wrap-select" onchange="window.Curriculum.updateFlexStage()">
+                          <option value="nowrap">nowrap</option>
+                          <option value="wrap">wrap</option>
+                          <option value="wrap-reverse">wrap-reverse</option>
+                        </select>
+                      </div>
+
+                      <div class="form-group mb-sm">
+                        <div class="d-flex justify-between items-center mb-xs">
+                          <label class="text-xs font-semibold m-0">gap</label>
+                          <span class="text-xs font-bold text-brand" id="flex-gap-val">12px</span>
+                        </div>
+                        <input class="w-full" id="flex-gap-slider" max="48" min="0" oninput="window.Curriculum.updateFlexStage()" step="4" type="range" value="12" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Live Interactive Stage & Generated CSS Snippet -->
+                  <div class="d-flex flex-col gap-md flex-1">
+                    <div class="card flex-stage-card">
+                      <div class="card-header d-flex justify-between items-center">
+                        <span class="font-bold text-xs text-muted">LIVE VIEWPORT STAGE</span>
+                        <span class="priority-badge priority-low text-xs" id="flex-item-count-badge">4 Items</span>
+                      </div>
+                      <div class="card-body p-lg">
+                        <div class="flex-interactive-stage" id="flex-interactive-stage">
+                          <div class="flex-stage-box box-1"><span>Box 1</span></div>
+                          <div class="flex-stage-box box-2"><span>Box 2</span></div>
+                          <div class="flex-stage-box box-3"><span>Box 3</span></div>
+                          <div class="flex-stage-box box-4"><span>Box 4</span></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Code Snippet Output Box -->
+                    <div class="card flex-code-card">
+                      <div class="card-header d-flex justify-between items-center">
+                        <span class="font-mono text-xs text-primary font-bold">Generated CSS Rules</span>
+                        <button class="btn btn-outline btn-xs" onclick="window.Curriculum.copyFlexCSS()" type="button">📋 Copy CSS</button>
+                      </div>
+                      <div class="card-body p-md">
+                        <pre class="flex-css-snippet font-mono text-xs m-0" id="flex-css-snippet"></pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 9. JAVASCRIPT ARRAY & FUNCTIONAL LAB -->
+              <div class="curr-panel hidden" id="curr-jslab">
+                <div class="panel-header d-flex justify-between items-start flex-wrap gap-md">
+                  <div>
+                    <button class="btn btn-outline btn-sm back-to-hub-btn d-inline-flex items-center gap-sm mb-sm text-xs p-md"
+                      onclick="window.Curriculum.switchTab('hub')" type="button">
+                      <svg class="icon-svg" viewBox="0 0 24 24"><line x1="19" x2="5" y1="12" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                      Back to Catalog
+                    </button>
+                    <h3>JavaScript Functional &amp; Array Lab</h3>
+                    <p class="text-muted">Master .map(), .filter(), .reduce(), and data pipelines with live code execution and visual data flow.</p>
+                  </div>
+                </div>
+
+                <div class="card mb-md">
+                  <div class="card-body p-lg">
+                    <div class="d-flex gap-xs flex-wrap mb-md" id="js-method-pills">
+                      <button class="day-pill-btn active" onclick="window.Curriculum.selectJSMethod('map')" type="button">.map()</button>
+                      <button class="day-pill-btn" onclick="window.Curriculum.selectJSMethod('filter')" type="button">.filter()</button>
+                      <button class="day-pill-btn" onclick="window.Curriculum.selectJSMethod('reduce')" type="button">.reduce()</button>
+                      <button class="day-pill-btn" onclick="window.Curriculum.selectJSMethod('find')" type="button">.find()</button>
+                      <button class="day-pill-btn" onclick="window.Curriculum.selectJSMethod('sort')" type="button">.sort()</button>
+                    </div>
+
+                    <div class="form-group mb-sm">
+                      <label class="text-xs font-semibold">Initial Array (JSON format)</label>
+                      <input class="font-mono text-sm w-full" id="js-input-array" type="text" value="[12, 45, 68, 23, 89, 34, 90]" />
+                    </div>
+
+                    <div class="form-group mb-md">
+                      <label class="text-xs font-semibold">Callback Expression</label>
+                      <input class="font-mono text-sm w-full" id="js-callback-expr" type="text" value="x => x * 2" />
+                    </div>
+
+                    <button class="btn btn-primary btn-sm d-inline-flex items-center gap-xs font-bold" onclick="window.Curriculum.runJSLab()" type="button">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                      Execute Transformation
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Execution Output Flow -->
+                <div class="card">
+                  <div class="card-header">
+                    <span class="font-bold text-xs text-secondary">PIPELINE EXECUTION RESULT</span>
+                  </div>
+                  <div class="card-body p-lg" id="js-lab-result-view">
+                    <!-- Populated by JS -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- 10. REGEX PATTERN VALIDATOR LAB -->
+              <div class="curr-panel hidden" id="curr-regexlab">
+                <div class="panel-header d-flex justify-between items-start flex-wrap gap-md">
+                  <div>
+                    <button class="btn btn-outline btn-sm back-to-hub-btn d-inline-flex items-center gap-sm mb-sm text-xs p-md"
+                      onclick="window.Curriculum.switchTab('hub')" type="button">
+                      <svg class="icon-svg" viewBox="0 0 24 24"><line x1="19" x2="5" y1="12" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                      Back to Catalog
+                    </button>
+                    <h3>Interactive Regex Pattern Validator</h3>
+                    <p class="text-muted">Test regular expressions against dynamic strings with real-time match highlighting and capture analysis.</p>
+                  </div>
+                </div>
+
+                <div class="card mb-md">
+                  <div class="card-body p-lg">
+                    <div class="d-flex gap-xs flex-wrap mb-md">
+                      <span class="text-xs font-bold text-muted self-center mr-xs">Presets:</span>
+                      <button class="preset-chip" onclick="window.Curriculum.setRegexPreset('email')" type="button">Email</button>
+                      <button class="preset-chip" onclick="window.Curriculum.setRegexPreset('date')" type="button">Date (YYYY-MM-DD)</button>
+                      <button class="preset-chip" onclick="window.Curriculum.setRegexPreset('phone')" type="button">Phone / Mobile</button>
+                      <button class="preset-chip" onclick="window.Curriculum.setRegexPreset('hex')" type="button">Hex Color</button>
+                      <button class="preset-chip" onclick="window.Curriculum.setRegexPreset('nim')" type="button">NIM / Student ID</button>
+                    </div>
+
+                    <div class="d-flex gap-sm mb-sm">
+                      <div class="flex-1">
+                        <label class="text-xs font-semibold">Regular Expression Pattern</label>
+                        <input class="font-mono text-sm w-full" id="regex-pattern-input" oninput="window.Curriculum.testRegex()" type="text" value="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" />
+                      </div>
+                      <div style="width: 90px;">
+                        <label class="text-xs font-semibold">Flags</label>
+                        <input class="font-mono text-sm w-full" id="regex-flags-input" oninput="window.Curriculum.testRegex()" type="text" value="gi" />
+                      </div>
+                    </div>
+
+                    <div class="form-group mb-sm">
+                      <label class="text-xs font-semibold">Test Input Text</label>
+                      <textarea class="font-mono text-sm w-full" id="regex-test-text" oninput="window.Curriculum.testRegex()" rows="4">Contact our student admin at support@pocketsly.edu or alex.turner@campus.ac.id for assistance with semester enrollment.</textarea>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card">
+                  <div class="card-header d-flex justify-between items-center">
+                    <span class="font-bold text-xs text-secondary">MATCH ANALYSIS &amp; HIGHLIGHTS</span>
+                    <span class="priority-badge" id="regex-match-badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">0 Matches</span>
+                  </div>
+                  <div class="card-body p-lg">
+                    <div class="regex-highlight-box p-md mb-md" id="regex-highlight-output"></div>
+                    <div id="regex-matches-list"></div>
+                  </div>
+                </div>
+              </div>
+
               <!-- 7. GPA & TARGET GRADE SIMULATOR -->
               <div class="curr-panel hidden" id="curr-gpa">
                 <div class="panel-header d-flex justify-between items-start flex-wrap gap-lg">
@@ -3210,7 +3490,7 @@
   <!-- ===================================================================== -->
   <!-- Bundled scripts: one deferred file (parses in parallel, executes in
        dependency order after HTML parse). Regenerate via scripts/build.py. -->
-  <script defer src="/js/bundle.js?v=8.5"></script>
+  <script defer src="/js/bundle.js?v=8.6"></script>
 </body>
 
 </html>

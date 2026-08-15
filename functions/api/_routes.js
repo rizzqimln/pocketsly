@@ -518,10 +518,60 @@ export async function handleDeleteStudyLog(db, userId, logId) {
 
 export async function handleGetCurriculumSchema() {
   return {
-    tables: [
-      { name: 'courses', columns: ['id', 'code', 'name', 'credits', 'semester', 'progress'] },
-      { name: 'lecturers', columns: ['id', 'name', 'email', 'office', 'phone'] },
-      { name: 'study_logs', columns: ['id', 'course_name', 'hours', 'activity_type', 'log_date', 'notes'] }
+    courses: [
+      { name: 'id', type: 'INTEGER', pk: 1, notnull: 0 },
+      { name: 'code', type: 'TEXT', pk: 0, notnull: 1 },
+      { name: 'name', type: 'TEXT', pk: 0, notnull: 1 },
+      { name: 'credits', type: 'INTEGER', pk: 0, notnull: 1 },
+      { name: 'semester', type: 'INTEGER', pk: 0, notnull: 1 },
+      { name: 'progress', type: 'INTEGER', pk: 0, notnull: 0 }
+    ],
+    lecturers: [
+      { name: 'id', type: 'INTEGER', pk: 1, notnull: 0 },
+      { name: 'name', type: 'TEXT', pk: 0, notnull: 1 },
+      { name: 'email', type: 'TEXT', pk: 0, notnull: 0 },
+      { name: 'office', type: 'TEXT', pk: 0, notnull: 0 },
+      { name: 'phone', type: 'TEXT', pk: 0, notnull: 0 }
+    ],
+    study_logs: [
+      { name: 'id', type: 'INTEGER', pk: 1, notnull: 0 },
+      { name: 'course_name', type: 'TEXT', pk: 0, notnull: 1 },
+      { name: 'hours', type: 'REAL', pk: 0, notnull: 1 },
+      { name: 'activity_type', type: 'TEXT', pk: 0, notnull: 0 },
+      { name: 'log_date', type: 'TEXT', pk: 0, notnull: 1 },
+      { name: 'notes', type: 'TEXT', pk: 0, notnull: 0 }
+    ],
+    tasks: [
+      { name: 'id', type: 'INTEGER', pk: 1, notnull: 0 },
+      { name: 'title', type: 'TEXT', pk: 0, notnull: 1 },
+      { name: 'priority', type: 'INTEGER', pk: 0, notnull: 0 },
+      { name: 'due_date', type: 'TEXT', pk: 0, notnull: 0 },
+      { name: 'done', type: 'INTEGER', pk: 0, notnull: 0 }
+    ],
+    habits: [
+      { name: 'id', type: 'INTEGER', pk: 1, notnull: 0 },
+      { name: 'name', type: 'TEXT', pk: 0, notnull: 1 },
+      { name: 'streak', type: 'INTEGER', pk: 0, notnull: 0 },
+      { name: 'category', type: 'TEXT', pk: 0, notnull: 0 }
+    ],
+    notes: [
+      { name: 'id', type: 'INTEGER', pk: 1, notnull: 0 },
+      { name: 'title', type: 'TEXT', pk: 0, notnull: 1 },
+      { name: 'body', type: 'TEXT', pk: 0, notnull: 0 },
+      { name: 'mood', type: 'TEXT', pk: 0, notnull: 0 }
+    ],
+    expenses: [
+      { name: 'id', type: 'INTEGER', pk: 1, notnull: 0 },
+      { name: 'category', type: 'TEXT', pk: 0, notnull: 1 },
+      { name: 'amount', type: 'REAL', pk: 0, notnull: 1 },
+      { name: 'expense_date', type: 'TEXT', pk: 0, notnull: 1 },
+      { name: 'wallet', type: 'TEXT', pk: 0, notnull: 0 }
+    ],
+    incomes: [
+      { name: 'id', type: 'INTEGER', pk: 1, notnull: 0 },
+      { name: 'source', type: 'TEXT', pk: 0, notnull: 1 },
+      { name: 'amount', type: 'REAL', pk: 0, notnull: 1 },
+      { name: 'income_date', type: 'TEXT', pk: 0, notnull: 1 }
     ]
   };
 }
@@ -529,18 +579,30 @@ export async function handleGetCurriculumSchema() {
 export async function handlePostCurriculumPlayground(db, userId, body) {
   const { query } = body;
   if (!query || !query.trim()) throw new Error('Query string is required.');
-  const clean = query.trim();
+  const clean = query.trim().replace(/;+$/, '');
 
   // Safety filter: only allow read-only SELECT statements
   if (!/^SELECT\b/i.test(clean) || /;\s*(DROP|DELETE|UPDATE|INSERT|ALTER|CREATE)\b/i.test(clean)) {
-    throw new Error('Only read-only SELECT queries are allowed in the playground.');
+    return {
+      error: 'Security Notice: Only read-only SELECT queries are permitted in the Live SQL Playground.'
+    };
   }
 
   try {
     const results = await queryAll(db, clean);
-    return { success: true, rows: results, count: results.length };
+    const columns = results.length > 0 ? Object.keys(results[0]) : [];
+    return {
+      success: true,
+      type: 'select',
+      columns,
+      rows: results,
+      count: results.length,
+      affected_rows: 0
+    };
   } catch (err) {
-    throw new Error(`SQL Execution Error: ${err.message}`);
+    return {
+      error: `SQL Execution Error: ${err.message}`
+    };
   }
 }
 

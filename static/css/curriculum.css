@@ -976,6 +976,7 @@
 .gpa-card-score {
   border: 2px solid var(--primary);
   background: linear-gradient(135deg, var(--bg-surface) 0%, rgba(124, 58, 237, 0.08) 100%);
+  border-radius: var(--radius-lg);
 }
 
 .gpa-score-large {
@@ -989,7 +990,103 @@
 .gpa-input-control {
   width: 100%;
   padding: 0.4rem 0.6rem;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
   background: var(--bg-surface);
+}
+
+/* ── FRONTEND LABS: FLEXBOX & GRID VISUALIZER ──────────────────────────────── */
+.flex-lab-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .flex-lab-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.flex-controls-card {
+  border-radius: var(--radius-lg);
+}
+
+.flex-stage-card {
+  border-radius: var(--radius-lg);
+}
+
+.flex-interactive-stage {
+  display: flex;
+  min-height: 260px;
+  background: var(--bg-surface-alt);
+  border: 2px dashed var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: auto;
+}
+
+.flex-stage-box {
+  min-width: 70px;
+  min-height: 70px;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), all 0.25s ease;
+  user-select: none;
+}
+
+.flex-stage-box:hover {
+  transform: scale(1.06);
+}
+
+.flex-stage-box.box-1 { background: linear-gradient(135deg, #7C3AED, #9333EA); }
+.flex-stage-box.box-2 { background: linear-gradient(135deg, #06B6D4, #0891B2); }
+.flex-stage-box.box-3 { background: linear-gradient(135deg, #10B981, #059669); }
+.flex-stage-box.box-4 { background: linear-gradient(135deg, #F59E0B, #D97706); }
+.flex-stage-box.box-5 { background: linear-gradient(135deg, #EF4444, #DC2626); }
+.flex-stage-box.box-6 { background: linear-gradient(135deg, #EC4899, #DB2777); }
+
+.flex-code-card {
+  border-radius: var(--radius-lg);
+}
+
+.flex-css-snippet {
+  background: var(--bg-surface-alt);
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  color: #38BDF8;
+  line-height: 1.5;
+  overflow-x: auto;
+}
+
+/* ── FRONTEND LABS: REGEX VALIDATOR ────────────────────────────────────────── */
+.regex-highlight-box {
+  background: var(--bg-surface-alt);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  min-height: 70px;
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.regex-match-pill {
+  background: rgba(124, 58, 237, 0.35);
+  color: #DDD6FE;
+  border-bottom: 2px solid var(--primary);
+  border-radius: 4px;
+  padding: 1px 4px;
+  font-weight: 700;
 }

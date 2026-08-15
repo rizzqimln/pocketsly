@@ -2966,6 +2966,12 @@ window.Curriculum = {
       this.loadQuizQuestion();
     } else if (tabName === 'gpa') {
       this.renderGPACalculator();
+    } else if (tabName === 'flexbox') {
+      this.updateFlexStage();
+    } else if (tabName === 'jslab') {
+      this.runJSLab();
+    } else if (tabName === 'regexlab') {
+      this.testRegex();
     }
   },
 
@@ -3115,6 +3121,9 @@ window.Curriculum = {
         return;
       }
 
+      const rows = res.rows || (Array.isArray(res) ? res : []);
+      const columns = res.columns || (rows.length > 0 ? Object.keys(rows[0]) : []);
+
       if (res.type === 'write') {
         resultsContainer.innerHTML = `
           <div class="sql-success-box" style="padding: 0.85rem 1rem; border-radius: var(--radius-md); background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25);">
@@ -3125,15 +3134,15 @@ window.Curriculum = {
               </span>
               <span style="font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono);">${elapsedMs}ms</span>
             </div>
-            <p style="margin: 0.35rem 0 0 0; font-size: 0.82rem; color: var(--text-secondary);"><strong>Affected rows:</strong> ${res.affected_rows}</p>
+            <p style="margin: 0.35rem 0 0 0; font-size: 0.82rem; color: var(--text-secondary);"><strong>Affected rows:</strong> ${res.affected_rows || 0}</p>
           </div>
         `;
         UI.toast('Database updated successfully.', 'success');
         this.loadSchema(); // Reload tables in case keys or tables changed
-      } else if (res.type === 'select') {
-        if (!res.columns || res.columns.length === 0 || res.rows.length === 0) {
-          const colsHeader = (res.columns && res.columns.length > 0)
-            ? `<thead><tr>${res.columns.map(c => `<th>${UI.esc(c)}</th>`).join('')}</tr></thead>`
+      } else {
+        if (!columns || columns.length === 0 || rows.length === 0) {
+          const colsHeader = (columns && columns.length > 0)
+            ? `<thead><tr>${columns.map(c => `<th>${UI.esc(c)}</th>`).join('')}</tr></thead>`
             : '';
           resultsContainer.innerHTML = `
             <div class="sql-success-box">
@@ -3146,7 +3155,7 @@ window.Curriculum = {
                   ${colsHeader}
                   <tbody>
                     <tr>
-                      <td colspan="${(res.columns && res.columns.length) || 1}" style="text-align: center; color: var(--text-muted); padding: 1.5rem 1rem;">
+                      <td colspan="${(columns && columns.length) || 1}" style="text-align: center; color: var(--text-muted); padding: 1.5rem 1rem;">
                         Query executed successfully, but returned 0 rows.
                       </td>
                     </tr>
@@ -3158,9 +3167,9 @@ window.Curriculum = {
           return;
         }
 
-        const headersHtml = res.columns.map(c => `<th>${UI.esc(c)}</th>`).join('');
-        const rowsHtml = res.rows.map(row => {
-          return `<tr>${res.columns.map(col => {
+        const headersHtml = columns.map(c => `<th>${UI.esc(c)}</th>`).join('');
+        const rowsHtml = rows.map(row => {
+          return `<tr>${columns.map(col => {
             const val = row[col];
             if (val === null || val === undefined) {
               return `<td><span class="null-tag">NULL</span></td>`;
@@ -3174,7 +3183,7 @@ window.Curriculum = {
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
               <span class="priority-badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981; font-weight: 700; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 4px;">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                ${res.rows.length} rows returned
+                ${rows.length} rows returned
               </span>
               <span style="font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono);">${elapsedMs}ms</span>
             </div>
@@ -3190,7 +3199,7 @@ window.Curriculum = {
             </div>
           </div>
         `;
-        UI.toast(`Query returned ${res.rows.length} rows (${elapsedMs}ms)`, 'success');
+        UI.toast(`Query returned ${rows.length} rows.`, 'success');
       }
     } catch (e) {
       resultsContainer.innerHTML = `
@@ -4109,6 +4118,260 @@ window.Curriculum = {
         gpaBadgeEl.textContent = 'Academic Advisory Zone';
         gpaBadgeEl.style.color = 'var(--accent-danger)';
       }
+    }
+  },
+
+  // ── 8. CSS FLEXBOX & GRID VISUALIZER ─────────────────────────────────────
+  _flexBoxCount: 4,
+
+  updateFlexStage() {
+    const stage = document.getElementById('flex-interactive-stage');
+    const dir = document.getElementById('flex-dir-select')?.value || 'row';
+    const justify = document.getElementById('flex-justify-select')?.value || 'flex-start';
+    const align = document.getElementById('flex-align-select')?.value || 'stretch';
+    const wrap = document.getElementById('flex-wrap-select')?.value || 'nowrap';
+    const gap = document.getElementById('flex-gap-slider')?.value || '12';
+    const gapVal = document.getElementById('flex-gap-val');
+    const snippet = document.getElementById('flex-css-snippet');
+
+    if (gapVal) gapVal.textContent = `${gap}px`;
+
+    if (stage) {
+      stage.style.flexDirection = dir;
+      stage.style.justifyContent = justify;
+      stage.style.alignItems = align;
+      stage.style.flexWrap = wrap;
+      stage.style.gap = `${gap}px`;
+    }
+
+    if (snippet) {
+      snippet.textContent = `.container {\n  display: flex;\n  flex-direction: ${dir};\n  justify-content: ${justify};\n  align-items: ${align};\n  flex-wrap: ${wrap};\n  gap: ${gap}px;\n}`;
+    }
+  },
+
+  addFlexItem() {
+    if (this._flexBoxCount >= 8) {
+      UI.toast('Maximum 8 boxes reached.', 'info');
+      return;
+    }
+    this._flexBoxCount++;
+    const stage = document.getElementById('flex-interactive-stage');
+    const badge = document.getElementById('flex-item-count-badge');
+    if (stage) {
+      const box = document.createElement('div');
+      box.className = `flex-stage-box box-${((this._flexBoxCount - 1) % 6) + 1}`;
+      box.innerHTML = `<span>Box ${this._flexBoxCount}</span>`;
+      stage.appendChild(box);
+    }
+    if (badge) badge.textContent = `${this._flexBoxCount} Items`;
+    this.updateFlexStage();
+  },
+
+  removeFlexItem() {
+    if (this._flexBoxCount <= 1) {
+      UI.toast('Minimum 1 box required.', 'info');
+      return;
+    }
+    const stage = document.getElementById('flex-interactive-stage');
+    const badge = document.getElementById('flex-item-count-badge');
+    if (stage && stage.lastElementChild) {
+      stage.removeChild(stage.lastElementChild);
+      this._flexBoxCount--;
+    }
+    if (badge) badge.textContent = `${this._flexBoxCount} Items`;
+    this.updateFlexStage();
+  },
+
+  copyFlexCSS() {
+    const snippet = document.getElementById('flex-css-snippet')?.textContent || '';
+    navigator.clipboard?.writeText(snippet).then(() => {
+      UI.toast('CSS rules copied to clipboard!', 'success');
+    }).catch(() => {
+      UI.toast('Failed to copy.', 'warning');
+    });
+  },
+
+  // ── 9. JS FUNCTIONAL & ARRAY METHODS LAB ──────────────────────────────────
+  _currentJSMethod: 'map',
+
+  selectJSMethod(method) {
+    this._currentJSMethod = method;
+    const pills = document.querySelectorAll('#js-method-pills .day-pill-btn');
+    pills.forEach(p => {
+      if (p.textContent.includes(method)) p.classList.add('active');
+      else p.classList.remove('active');
+    });
+
+    const exprInput = document.getElementById('js-callback-expr');
+    const presets = {
+      map: 'x => x * 2',
+      filter: 'x => x > 40',
+      reduce: '(acc, curr) => acc + curr',
+      find: 'x => x % 5 === 0',
+      sort: '(a, b) => a - b'
+    };
+    if (exprInput && presets[method]) {
+      exprInput.value = presets[method];
+    }
+    this.runJSLab();
+  },
+
+  runJSLab() {
+    const rawArr = document.getElementById('js-input-array')?.value || '[]';
+    const rawExpr = document.getElementById('js-callback-expr')?.value || 'x => x';
+    const resultView = document.getElementById('js-lab-result-view');
+    if (!resultView) return;
+
+    try {
+      const arr = JSON.parse(rawArr);
+      if (!Array.isArray(arr)) throw new Error('Input must be a valid JSON array.');
+
+      // Safely evaluate functional expression
+      const fn = new Function(`return (${rawExpr})`)();
+      let result;
+      let explanation = '';
+
+      if (this._currentJSMethod === 'map') {
+        result = arr.map(fn);
+        explanation = `Transformed each of the ${arr.length} elements using ${rawExpr}.`;
+      } else if (this._currentJSMethod === 'filter') {
+        result = arr.filter(fn);
+        explanation = `Filtered ${arr.length} elements down to ${result.length} matching elements.`;
+      } else if (this._currentJSMethod === 'reduce') {
+        result = arr.reduce(fn);
+        explanation = `Aggregated ${arr.length} elements into a single accumulated scalar value.`;
+      } else if (this._currentJSMethod === 'find') {
+        result = arr.find(fn);
+        explanation = `Found first matching element: ${result !== undefined ? result : 'undefined'}`;
+      } else if (this._currentJSMethod === 'sort') {
+        result = [...arr].sort(fn);
+        explanation = `Sorted ${arr.length} elements using custom comparator.`;
+      }
+
+      resultView.innerHTML = `
+        <div class="d-flex flex-col gap-md">
+          <div class="d-flex justify-between items-center flex-wrap gap-xs">
+            <span class="font-bold text-success text-sm d-flex items-center gap-xs">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Operation Successful
+            </span>
+            <span class="priority-badge priority-low font-mono text-xs">.${this._currentJSMethod}()</span>
+          </div>
+          <p class="text-muted text-xs m-0">${UI.esc(explanation)}</p>
+          <div class="p-md rounded" style="background: var(--bg-surface-alt); border: 1px solid var(--border-color); border-radius: var(--radius-md);">
+            <div class="text-xs font-bold text-muted mb-xs">OUTPUT RESULT:</div>
+            <pre class="font-mono text-sm font-bold text-brand m-0">${UI.esc(JSON.stringify(result, null, 2))}</pre>
+          </div>
+        </div>
+      `;
+    } catch (err) {
+      resultView.innerHTML = `
+        <div class="p-md rounded" style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: var(--radius-md);">
+          <span class="font-bold text-danger text-sm">Execution Error</span>
+          <p class="font-mono text-xs text-secondary mt-xs m-0">${UI.esc(err.message)}</p>
+        </div>
+      `;
+    }
+  },
+
+  // ── 10. REGEX PATTERN VALIDATOR LAB ───────────────────────────────────────
+  setRegexPreset(preset) {
+    const patternInput = document.getElementById('regex-pattern-input');
+    const flagsInput = document.getElementById('regex-flags-input');
+    const textInput = document.getElementById('regex-test-text');
+
+    const presets = {
+      email: {
+        pattern: '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}',
+        flags: 'gi',
+        text: 'Contact support@pocketsly.edu or rizzqi.maulana@campus.ac.id for assistance.'
+      },
+      date: {
+        pattern: '\\b\\d{4}-\\d{2}-\\d{2}\\b',
+        flags: 'g',
+        text: 'Upcoming semester deadlines: Midterm Exam on 2026-10-15 and Final Project submission on 2026-12-20.'
+      },
+      phone: {
+        pattern: '(?:\\+62|08)[0-9]{8,12}',
+        flags: 'g',
+        text: 'Academic advisor mobile: +6281234567890 or student hotline 081987654321.'
+      },
+      hex: {
+        pattern: '#(?:[0-9a-fA-F]{3}){1,2}\\b',
+        flags: 'gi',
+        text: 'Design tokens: primary #7C3AED, success #10B981, danger #EF4444, and white #FFF.'
+      },
+      nim: {
+        pattern: '\\b(?:20|21|22|23|24|25|26)\\d{6,8}\\b',
+        flags: 'g',
+        text: 'Registered students: NIM 241011526, NIM 241011589, and NIM 231011902.'
+      }
+    };
+
+    if (presets[preset]) {
+      if (patternInput) patternInput.value = presets[preset].pattern;
+      if (flagsInput) flagsInput.value = presets[preset].flags;
+      if (textInput) textInput.value = presets[preset].text;
+    }
+    this.testRegex();
+  },
+
+  testRegex() {
+    const pattern = document.getElementById('regex-pattern-input')?.value || '';
+    const flags = document.getElementById('regex-flags-input')?.value || 'g';
+    const text = document.getElementById('regex-test-text')?.value || '';
+    const highlightOutput = document.getElementById('regex-highlight-output');
+    const matchesList = document.getElementById('regex-matches-list');
+    const badge = document.getElementById('regex-match-badge');
+
+    if (!pattern) {
+      if (highlightOutput) highlightOutput.textContent = text;
+      if (badge) badge.textContent = '0 Matches';
+      if (matchesList) matchesList.innerHTML = '';
+      return;
+    }
+
+    try {
+      const regex = new RegExp(pattern, flags.includes('g') ? flags : flags + 'g');
+      const matches = [...text.matchAll(regex)];
+
+      if (badge) {
+        badge.textContent = `${matches.length} Match${matches.length === 1 ? '' : 'es'}`;
+      }
+
+      if (matches.length === 0) {
+        if (highlightOutput) highlightOutput.textContent = text;
+        if (matchesList) matchesList.innerHTML = '<p class="text-muted text-xs m-0">No matches found in test string.</p>';
+        return;
+      }
+
+      // Highlight in text
+      let highlighted = '';
+      let lastIndex = 0;
+      for (const m of matches) {
+        const matchStart = m.index;
+        const matchEnd = matchStart + m[0].length;
+        highlighted += UI.esc(text.substring(lastIndex, matchStart));
+        highlighted += `<mark class="regex-match-pill">${UI.esc(m[0])}</mark>`;
+        lastIndex = matchEnd;
+      }
+      highlighted += UI.esc(text.substring(lastIndex));
+      if (highlightOutput) highlightOutput.innerHTML = highlighted;
+
+      // Render matched details
+      if (matchesList) {
+        matchesList.innerHTML = `
+          <div class="d-flex flex-col gap-xs">
+            <span class="text-xs font-bold text-muted">CAPTURED MATCHES:</span>
+            <div class="d-flex gap-xs flex-wrap">
+              ${matches.map((m, idx) => `<span class="priority-badge" style="background: var(--bg-surface-alt); border: 1px solid var(--border-color); font-family: var(--font-mono); font-size: 0.75rem;">#${idx + 1}: ${UI.esc(m[0])}</span>`).join('')}
+            </div>
+          </div>
+        `;
+      }
+    } catch (err) {
+      if (highlightOutput) highlightOutput.innerHTML = `<span class="text-danger font-mono text-xs">Invalid Regex: ${UI.esc(err.message)}</span>`;
+      if (badge) badge.textContent = 'Error';
     }
   }
 };
