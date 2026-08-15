@@ -81,10 +81,17 @@ http://localhost:8000
 
 ## 🚢 Deployment
 
-The repo is deploy-ready for **GitHub** and **Netlify**. Two facts shape every option:
+The repo is deploy-ready for **GitHub**, **Cloudflare Pages**, and any Python
+host. Two facts shape every option:
 
-1. **Netlify is static-only** — it can serve the frontend in `static/` (landing page, PWA, installable shell), but the Python API (`server.py`) needs a long-running Python process and **cannot run on Netlify**.
-2. **Data lives in PostgreSQL, not in a file** — the app reads its connection string from `DATABASE_URL` (Supabase managed Postgres in production). Because the database is external, even hosts with ephemeral filesystems (Render free tier) keep your data permanently.
+1. **The frontend is static; the API is Python** — `static/` (landing page,
+   PWA, installable shell) can be served by any static host, but the Python
+   API (`server.py`) needs a process that can run Python and reach your
+   database. The two are glued together by the Cloudflare proxy function.
+2. **Data lives in PostgreSQL, not in a file** — the app reads its connection
+   string from `DATABASE_URL` (Supabase managed Postgres in production).
+   Because the database is external, even hosts with ephemeral filesystems
+   keep your data permanently.
 
 ### Push to GitHub
 
@@ -97,48 +104,48 @@ git remote add origin https://github.com/<you>/pocketsly.git
 git push -u origin main
 ```
 
-The repo already ships `.gitignore` (databases, caches, local tooling), `netlify.toml`, and `static/_redirects`.
+The repo already ships `.gitignore` (databases, caches, local tooling),
+`wrangler.toml` + `functions/` (Cloudflare Pages), and `static/_redirects`.
 
-### Option A — Full app on a Python host (recommended)
+### Option A — Cloudflare Pages + Cloudflare D1 (Recommended — 100% Free, All-in-One)
 
-The Python server serves both the API and the frontend, so one process = whole app.
+The entire application (**Frontend + Serverless API + Database**) runs natively inside **Cloudflare Pages** using **Cloudflare D1** (Serverless SQLite) and the Web Crypto API. **Zero external backend hosts, zero credit cards, and zero cold-start sleeps.**
 
 1. Push to GitHub.
-2. Create a free **Supabase** project and copy its connection string (Project Settings → Database → Connection string).
-3. On **Render** (no credit card for the free tier): create a *Web Service* from the repo.
-4. Add the environment variable `DATABASE_URL` = your Supabase connection string (the schema is applied automatically on first boot).
-5. Start command: `python3 server.py` — the app reads `PORT` from the environment.
-6. Open the assigned URL — done.
+2. In the [Cloudflare Dashboard](https://dash.cloudflare.com):
+   - **Storage & Databases → D1 SQL Database → Create database** named `pocketsly-db`.
+   - **Workers & Pages → Create → Pages → Connect to Git** → select your `pocketsly` repo.
+   - Build output directory: `static` (leave build command empty).
+   - Click **Save and Deploy**.
+3. In your Pages project: **Settings → Functions → D1 database bindings → Add binding**:
+   - Variable name: `DB`
+   - D1 database: select `pocketsly-db`
+4. Deploy! Your app is live at `https://<your-project>.pages.dev` with full authentication and offline sync. See [`docs/DEPLOY_CLOUDFLARE_PAGES_D1.md`](docs/DEPLOY_CLOUDFLARE_PAGES_D1.md) for the full guide.
 
-**Free-tier caveats:** Render free services sleep after ~15 min idle (first request takes ~30s to wake); Supabase free projects pause after 7 days of inactivity. Both restore with one click. See [`docs/DEPLOY_SUPABASE_RENDER_NETLIFY.md`](docs/DEPLOY_SUPABASE_RENDER_NETLIFY.md) for the full walkthrough.
+### Option B — Traditional Python Server + External PostgreSQL
 
-### Option B — Everything on Netlify: API as a serverless function (recommended)
+If you prefer to run the standalone Python server (`server.py` + PostgreSQL):
 
-The API runs as a **Netlify Function** (`netlify/functions/api.py`) — no separate
-backend host, no card, no sleeping. The frontend and API are served from the
-same origin, so cookies and sessions just work.
+1. Set `DATABASE_URL` to your PostgreSQL database (e.g. Supabase or local Postgres).
+2. Run `python3 server.py`.
+3. Deploy to any independent Linux host (e.g. Alwaysdata, DomCloud, Serv00, or a VPS).
 
-1. On Netlify: *Add new site → Import from GitHub → pick the repo*.
-   [`netlify.toml`](netlify.toml) already sets `publish = "static"` + the
-   functions directory; no build step needed (bundles are committed).
-2. Set one environment variable in the Netlify dashboard (**Site settings →
-   Environment variables**): `DATABASE_URL` = your Supabase connection string.
-3. Done — [`static/_redirects`](static/_redirects) routes every `/api/*`
-   request to the function. Deploy and sign in.
+### Option B′ — Where the Python API actually runs
 
-**Serverless caveats:** ~2–4s cold start after idle, 10s request limit (free
-plan) — every endpoint finishes in milliseconds — and the in-memory rate
-limiter resets per request. All real state (accounts, sessions, data) lives in
-PostgreSQL, so nothing is lost.
+`server.py` is a full HTTP server; it needs a host that can run Python and
+reach your PostgreSQL database. `DATABASE_URL` is the only variable it needs:
 
-> **Alternative (Option B′):** if you prefer a long-running backend host
-> instead, edit `static/_redirects` to proxy `/api/*` to an external URL
-> (HF Spaces / Render) — the frontend calls relative paths, so the proxy keeps
-> everything same-origin with no CORS work.
+- **Your own machine + Cloudflare Tunnel** — free, no card; the app is public
+  at a `trycloudflare.com` URL while your PC is on.
+- **Render free** — asks for card *verification* when creating a service (a
+  temporary $1 hold, refunded; you're never charged on the free tier) and
+  sleeps after ~15 min idle.
+- **Student cloud (Azure for Students, GitHub Student Pack)** — a real
+  always-on VM using only your `.edu` email, no card.
 
 ### Local preview without GitHub
 
-You can also drag-and-drop the `static/` folder onto Netlify for a static preview, or run everything locally with `python3 server.py`.
+You can also drag-and-drop the `static/` folder onto Cloudflare Pages (or Netlify) for a static preview, or run everything locally with `python3 server.py`.
 
 ---
 

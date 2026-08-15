@@ -1,10 +1,11 @@
-# Netlify-native backend: every /api/* request is served by the Python
-# function in netlify/functions/api.py — no separate backend host needed.
-# Keep this ABOVE the /* SPA fallback — Netlify matches rules in order.
-/api/*  /.netlify/functions/api  200
-
-# Alternative: proxy to an external backend host (HF Spaces / Render) instead.
-# Uncomment this and delete the function line above — order still matters:
+# Cloudflare Pages + Netlify-compatible routing.
+#
+# /api/* is intentionally NOT listed here. On Cloudflare Pages it is handled by
+# the proxy function at functions/api/[[path]].js, which forwards every request
+# to your Python backend (configure BACKEND_URL in the Pages dashboard).
+#
+# Netlify alternative (only if you ever deploy the API there again): uncomment
+# this line ABOVE the SPA fallback and point it at your backend:
 # /api/*  https://<your-backend>/api/:splat  200
 
 # SPA fallback: every unknown path serves the app shell (index.html).
