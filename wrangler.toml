@@ -1,14 +1,9 @@
-# Cloudflare Pages + D1 Serverless Database configuration.
+# Cloudflare Pages configuration.
 #
-# When connecting via the Cloudflare Dashboard:
-#   1. Project Settings -> Build & Deployments -> Build output directory: static
-#   2. Project Settings -> Functions -> D1 Database Bindings:
-#      Variable name: DB  ->  Select your D1 database (e.g. "pocketsly-db")
+# Build output directory is set to static/.
+# D1 database bindings are configured in the Cloudflare Dashboard:
+#   Pages Project -> Settings -> Functions -> D1 database bindings:
+#   Variable name: DB -> select your D1 database
 name = "pocketsly"
 compatibility_date = "2025-06-01"
 pages_build_output_dir = "static"
-
-[[d1_databases]]
-binding = "DB"
-database_name = "pocketsly-db"
-database_id = "pocketsly-db"
