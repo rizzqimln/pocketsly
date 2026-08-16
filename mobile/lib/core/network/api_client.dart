@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'api_endpoints.dart';
 
 /// Network API Client connecting to 24/7 Cloudflare Pages D1 Backend
 class ApiClient {
