@@ -20,7 +20,7 @@ class BottomNavBar extends StatelessWidget {
       ),
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -45,7 +45,7 @@ class BottomNavBar extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: isActive ? AppColors.primary.withOpacity(0.15) : Colors.transparent,
+          color: isActive ? AppColors.primary.withAlpha(40) : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(

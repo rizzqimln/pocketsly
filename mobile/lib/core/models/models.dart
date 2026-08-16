@@ -1,3 +1,38 @@
+/// User Profile Model
+class UserModel {
+  final int id;
+  final String username;
+  final String email;
+  final String phone;
+  final String currency;
+
+  UserModel({
+    required this.id,
+    required this.username,
+    this.email = '',
+    this.phone = '',
+    this.currency = 'IDR',
+  });
+
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    return UserModel(
+      id: json['id'] as int? ?? 0,
+      username: json['username'] as String? ?? 'User',
+      email: json['email'] as String? ?? '',
+      phone: json['phone'] as String? ?? '',
+      currency: json['currency'] as String? ?? 'IDR',
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'username': username,
+    'email': email,
+    'phone': phone,
+    'currency': currency,
+  };
+}
+
 /// Task Item Model
 class TaskItem {
   final int id;
@@ -58,6 +93,14 @@ class HabitItem {
       completedToday: json['completed_today'] == true || json['completed_today'] == 1,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'category': category,
+    'streak': streak,
+    'completed_today': completedToday,
+  };
 }
 
 /// Timetable / Schedule Item Model
@@ -81,13 +124,22 @@ class ScheduleItem {
   factory ScheduleItem.fromJson(Map<String, dynamic> json) {
     return ScheduleItem(
       id: json['id'] as int? ?? 0,
-      day: json['day'] as String? ?? 'Monday',
-      time: json['time'] as String? ?? '08:00 - 10:00',
-      subject: json['subject'] as String? ?? '',
+      day: json['day'] as String? ?? (json['day_of_week'] as String? ?? 'Monday'),
+      time: json['time'] as String? ?? '${json['start_time'] ?? "08:00"} - ${json['end_time'] ?? "10:00"}',
+      subject: json['subject'] as String? ?? (json['title'] as String? ?? ''),
       room: json['room'] as String? ?? '',
       lecturer: json['lecturer'] as String? ?? '',
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'day': day,
+    'time': time,
+    'subject': subject,
+    'room': room,
+    'lecturer': lecturer,
+  };
 }
 
 /// Note Item Model
@@ -96,6 +148,7 @@ class NoteItem {
   final String title;
   final String content;
   final String tags;
+  final String mood;
   final String updatedAt;
 
   NoteItem({
@@ -103,6 +156,7 @@ class NoteItem {
     required this.title,
     required this.content,
     this.tags = '',
+    this.mood = 'neutral',
     this.updatedAt = '',
   });
 
@@ -112,9 +166,19 @@ class NoteItem {
       title: json['title'] as String? ?? '',
       content: json['content'] as String? ?? '',
       tags: json['tags'] as String? ?? '',
+      mood: json['mood'] as String? ?? 'neutral',
       updatedAt: json['updated_at'] as String? ?? '',
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'title': title,
+    'content': content,
+    'tags': tags,
+    'mood': mood,
+    'updated_at': updatedAt,
+  };
 }
 
 /// Academic Resource / Journal Model
@@ -148,6 +212,16 @@ class ResourceItem {
       summary: json['summary'] as String? ?? '',
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'title': title,
+    'author': author,
+    'type': type,
+    'category': category,
+    'url': url,
+    'summary': summary,
+  };
 }
 
 /// Transaction (Income & Expense) Model
@@ -202,6 +276,70 @@ class BudgetLimitItem {
       category: json['category'] as String? ?? 'General',
       amount: (json['amount'] as num?)?.toDouble() ?? 0.0,
       month: json['month'] as String? ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'category': category,
+    'amount': amount,
+    'month': month,
+  };
+}
+
+/// Course Item Model
+class CourseItem {
+  final int id;
+  final String code;
+  final String name;
+  final int credits;
+  final String lecturer;
+  final double progress;
+
+  CourseItem({
+    required this.id,
+    required this.code,
+    required this.name,
+    this.credits = 3,
+    this.lecturer = '',
+    this.progress = 0.0,
+  });
+
+  factory CourseItem.fromJson(Map<String, dynamic> json) {
+    return CourseItem(
+      id: json['id'] as int? ?? 0,
+      code: json['code'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      credits: (json['credits'] as num?)?.toInt() ?? 3,
+      lecturer: json['lecturer'] as String? ?? '',
+      progress: (json['progress'] as num?)?.toDouble() ?? 0.0,
+    );
+  }
+}
+
+/// Lecturer Directory Item Model
+class LecturerItem {
+  final int id;
+  final String name;
+  final String email;
+  final String office;
+  final String department;
+
+  LecturerItem({
+    required this.id,
+    required this.name,
+    this.email = '',
+    this.office = '',
+    this.department = 'Computer Science',
+  });
+
+  factory LecturerItem.fromJson(Map<String, dynamic> json) {
+    return LecturerItem(
+      id: json['id'] as int? ?? 0,
+      name: json['name'] as String? ?? '',
+      email: json['email'] as String? ?? '',
+      office: json['office'] as String? ?? '',
+      department: json['department'] as String? ?? 'Computer Science',
     );
   }
 }

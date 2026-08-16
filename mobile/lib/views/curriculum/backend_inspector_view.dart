@@ -66,7 +66,7 @@ class _BackendInspectorViewState extends State<BackendInspectorView> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
-                      color: AppColors.success.withOpacity(0.2),
+                      color: AppColors.success.withAlpha(40),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: const Text('GET', style: TextStyle(color: AppColors.success, fontWeight: FontWeight.w800, fontSize: 12)),
@@ -115,7 +115,7 @@ class _BackendInspectorViewState extends State<BackendInspectorView> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: _statusCode == 200 ? AppColors.success.withOpacity(0.15) : AppColors.danger.withOpacity(0.15),
+                      color: _statusCode == 200 ? AppColors.success.withAlpha(35) : AppColors.danger.withAlpha(35),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text('Status: $_statusCode OK', style: TextStyle(color: _statusCode == 200 ? AppColors.success : AppColors.danger, fontSize: 10, fontWeight: FontWeight.w700)),

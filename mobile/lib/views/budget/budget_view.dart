@@ -19,6 +19,7 @@ class _BudgetViewState extends State<BudgetView> {
   double _totalExpense = 0.0;
   List<TransactionItem> _transactions = [];
   List<BudgetLimitItem> _limits = [];
+  String _ledgerFilter = 'all'; // 'all', 'expense', 'income'
 
   @override
   void initState() {
@@ -64,6 +65,20 @@ class _BudgetViewState extends State<BudgetView> {
     if (mounted) setState(() => _isLoading = false);
   }
 
+  Future<void> _deleteTransaction(TransactionItem t) async {
+    if (t.isIncome) {
+      await ApiClient.instance.delete(ApiEndpoints.income(t.id));
+    } else {
+      await ApiClient.instance.delete(ApiEndpoints.expense(t.id));
+    }
+    _loadBudgetData();
+  }
+
+  Future<void> _deleteBudgetLimit(BudgetLimitItem l) async {
+    await ApiClient.instance.delete(ApiEndpoints.budget(l.id));
+    _loadBudgetData();
+  }
+
   void _openEntry(String tab) {
     BudgetEntrySheet.show(context, initialTab: tab, onSaved: _loadBudgetData);
   }
@@ -75,7 +90,15 @@ class _BudgetViewState extends State<BudgetView> {
     }
 
     final balance = _totalIncome - _totalExpense;
-    final usagePct = _totalIncome > 0 ? ((_totalExpense / _totalIncome) * 100).clamp(0, 100).toInt() : (_totalExpense > 0 ? 100 : 0);
+    final usagePct = _totalIncome > 0
+        ? ((_totalExpense / _totalIncome) * 100).clamp(0, 100).toInt()
+        : (_totalExpense > 0 ? 100 : 0);
+
+    final filteredTransactions = _transactions.where((t) {
+      if (_ledgerFilter == 'income') return t.isIncome;
+      if (_ledgerFilter == 'expense') return !t.isIncome;
+      return true;
+    }).toList();
 
     return RefreshIndicator(
       color: AppColors.primary,
@@ -105,7 +128,7 @@ class _BudgetViewState extends State<BudgetView> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: balance >= 0 ? AppColors.success.withOpacity(0.15) : AppColors.danger.withOpacity(0.15),
+                        color: balance >= 0 ? AppColors.success.withAlpha(35) : AppColors.danger.withAlpha(35),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
@@ -225,7 +248,7 @@ class _BudgetViewState extends State<BudgetView> {
                   padding: const EdgeInsets.all(12),
                 ),
                 icon: const Icon(Icons.track_changes_rounded, color: Colors.white),
-                tooltip: 'Set Limit',
+                tooltip: 'Set Target Limit',
               ),
             ],
           ),
@@ -259,14 +282,26 @@ class _BudgetViewState extends State<BudgetView> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(l.category, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: AppColors.textPrimary)),
-                        Text('Rp ${spent.toStringAsFixed(0)} / ${l.amount.toStringAsFixed(0)}', style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, fontFamily: 'monospace')),
+                        Row(
+                          children: [
+                            Text(
+                              'Rp ${spent.toStringAsFixed(0)} / ${l.amount.toStringAsFixed(0)}',
+                              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, fontFamily: 'monospace'),
+                            ),
+                            const SizedBox(width: 4),
+                            InkWell(
+                              onTap: () => _deleteBudgetLimit(l),
+                              child: const Icon(Icons.close_rounded, size: 14, color: AppColors.textMuted),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                     const SizedBox(height: 6),
                     LinearProgressIndicator(
                       value: pct / 100.0,
                       backgroundColor: AppColors.bgSurfaceAlt,
-                      valueColor: AlwaysStoppedAnimation<Color>(pct > 90 ? AppColors.danger : AppColors.primary),
+                      valueColor: AlwaysStoppedAnimation<Color>(pct > 90 ? AppColors.danger : (pct > 70 ? AppColors.warning : AppColors.primary)),
                       minHeight: 5,
                       borderRadius: BorderRadius.circular(3),
                     ),
@@ -278,17 +313,32 @@ class _BudgetViewState extends State<BudgetView> {
           ],
 
           // ── Recent Transactions Ledger ────────────────────────────────────
-          const Text(
-            'TRANSACTION LEDGER',
-            style: TextStyle(
-              color: AppColors.textMuted,
-              fontSize: 11,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 0.8,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'TRANSACTION LEDGER',
+                style: TextStyle(
+                  color: AppColors.textMuted,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.8,
+                ),
+              ),
+              Row(
+                children: [
+                  _buildLedgerFilterChip('all', 'All'),
+                  const SizedBox(width: 4),
+                  _buildLedgerFilterChip('expense', 'Expense'),
+                  const SizedBox(width: 4),
+                  _buildLedgerFilterChip('income', 'Income'),
+                ],
+              ),
+            ],
           ),
           const SizedBox(height: 8),
-          if (_transactions.isEmpty)
+
+          if (filteredTransactions.isEmpty)
             const GlassCard(
               child: Padding(
                 padding: EdgeInsets.all(16),
@@ -296,7 +346,7 @@ class _BudgetViewState extends State<BudgetView> {
               ),
             )
           else
-            ..._transactions.map((t) => GlassCard(
+            ...filteredTransactions.map((t) => GlassCard(
               margin: const EdgeInsets.only(bottom: 6),
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               child: Row(
@@ -304,7 +354,7 @@ class _BudgetViewState extends State<BudgetView> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: t.isIncome ? AppColors.success.withOpacity(0.15) : AppColors.danger.withOpacity(0.15),
+                      color: t.isIncome ? AppColors.success.withAlpha(35) : AppColors.danger.withAlpha(35),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -323,7 +373,7 @@ class _BudgetViewState extends State<BudgetView> {
                           style: const TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w700),
                         ),
                         Text(
-                          '${t.date} ${t.description.isNotEmpty ? "• " + t.description : ""}',
+                          '${t.date}${t.description.isNotEmpty ? " • ${t.description}" : ""}',
                           style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
                         ),
                       ],
@@ -338,10 +388,38 @@ class _BudgetViewState extends State<BudgetView> {
                       fontFamily: 'monospace',
                     ),
                   ),
+                  const SizedBox(width: 4),
+                  IconButton(
+                    onPressed: () => _deleteTransaction(t),
+                    icon: const Icon(Icons.close_rounded, color: AppColors.textMuted, size: 16),
+                  ),
                 ],
               ),
             )),
         ],
+      ),
+    );
+  }
+
+  Widget _buildLedgerFilterChip(String filter, String label) {
+    final isSelected = _ledgerFilter == filter;
+    return InkWell(
+      onTap: () => setState(() => _ledgerFilter = filter),
+      borderRadius: BorderRadius.circular(6),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primary : AppColors.bgSurfaceAlt,
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? Colors.white : AppColors.textSecondary,
+            fontSize: 10,
+            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+          ),
+        ),
       ),
     );
   }

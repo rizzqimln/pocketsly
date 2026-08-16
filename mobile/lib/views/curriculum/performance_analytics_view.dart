@@ -11,10 +11,10 @@ class PerformanceAnalyticsView extends StatefulWidget {
 }
 
 class _PerformanceAnalyticsViewState extends State<PerformanceAnalyticsView> {
-  double _currentGpa = 3.75;
+  final double _currentGpa = 3.75;
   double _targetGpa = 3.85;
-  double _currentCredits = 64;
-  double _nextSemesterCredits = 20;
+  final double _currentCredits = 64;
+  final double _nextSemesterCredits = 20;
 
   double get _requiredNextGpa {
     final totalTargetPoints = _targetGpa * (_currentCredits + _nextSemesterCredits);
@@ -49,7 +49,7 @@ class _PerformanceAnalyticsViewState extends State<PerformanceAnalyticsView> {
               child: KpiCard(
                 title: 'Cumulative GPA',
                 value: '3.75 / 4.0',
-                subtitle: 'Dean\'s Honor List',
+                subtitle: "Dean's Honor List",
                 icon: Icons.school_outlined,
                 iconColor: AppColors.success,
               ),
@@ -94,7 +94,7 @@ class _PerformanceAnalyticsViewState extends State<PerformanceAnalyticsView> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: _requiredNextGpa <= 4.0 ? AppColors.success.withOpacity(0.15) : AppColors.danger.withOpacity(0.15),
+                      color: _requiredNextGpa <= 4.0 ? AppColors.success.withAlpha(35) : AppColors.danger.withAlpha(35),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(

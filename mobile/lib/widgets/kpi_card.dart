@@ -30,7 +30,7 @@ class KpiCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.12),
+              color: iconColor.withAlpha(30),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, color: iconColor, size: 20),
@@ -58,6 +58,8 @@ class KpiCard extends StatelessWidget {
                     fontSize: 16,
                     fontWeight: FontWeight.w800,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 if (subtitle != null) ...[
                   const SizedBox(height: 2),
@@ -67,6 +69,8 @@ class KpiCard extends StatelessWidget {
                       color: AppColors.textSecondary,
                       fontSize: 11,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ],

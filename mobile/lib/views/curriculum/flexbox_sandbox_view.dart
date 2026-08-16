@@ -21,7 +21,7 @@ class _FlexboxSandboxViewState extends State<FlexboxSandboxView> {
       padding: const EdgeInsets.all(16),
       children: [
         const Text(
-          'CSS FLEXBOX VISUALIZER SANDBOX',
+          'CSS FLEXBOX & GRID VISUALIZER SANDBOX',
           style: TextStyle(color: AppColors.textMuted, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 0.8),
         ),
         const SizedBox(height: 8),
@@ -30,7 +30,7 @@ class _FlexboxSandboxViewState extends State<FlexboxSandboxView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Flex Controls:', style: TextStyle(fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+              const Text('Flexbox Stage Controls:', style: TextStyle(fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
@@ -57,7 +57,7 @@ class _FlexboxSandboxViewState extends State<FlexboxSandboxView> {
           decoration: BoxDecoration(
             color: AppColors.bgMain,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.primary.withOpacity(0.4), width: 1.5),
+            border: Border.all(color: AppColors.primary.withAlpha(90), width: 1.5),
           ),
           child: Flex(
             direction: _direction,

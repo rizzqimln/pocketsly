@@ -32,7 +32,7 @@ class _CurrencyFieldState extends State<CurrencyField> {
     }
     final num = int.tryParse(clean) ?? 0;
     final formatted = _formatter.format(num);
-    
+
     widget.controller.value = TextEditingValue(
       text: formatted,
       selection: TextSelection.collapsed(offset: formatted.length),
@@ -152,9 +152,9 @@ class _CurrencyFieldState extends State<CurrencyField> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: AppColors.danger.withOpacity(0.1),
+                  color: AppColors.danger.withAlpha(25),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppColors.danger.withOpacity(0.3)),
+                  border: Border.all(color: AppColors.danger.withAlpha(70)),
                 ),
                 child: const Text(
                   'Clear',

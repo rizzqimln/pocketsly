@@ -103,9 +103,9 @@ class _SqlD1SandboxComponentState extends State<_SqlD1SandboxComponent> {
     try {
       final res = await ApiClient.instance.post(ApiEndpoints.curriculumQuery, {'query': query});
       if (mounted) {
-        if (res['error'] != null) {
+        if (res is Map && res['error'] != null) {
           setState(() => _sqlResult = "Error:\n${res['error']}");
-        } else if (res['rows'] is List && (res['rows'] as List).isNotEmpty) {
+        } else if (res is Map && res['rows'] is List && (res['rows'] as List).isNotEmpty) {
           final rows = res['rows'] as List;
           setState(() => _sqlResult = "Success (${rows.length} rows returned):\n${rows.join('\n')}");
         } else {

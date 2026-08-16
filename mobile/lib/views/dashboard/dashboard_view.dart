@@ -2,17 +2,23 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/network/api_client.dart';
 import '../../core/network/api_endpoints.dart';
+import '../../core/models/models.dart';
 import '../../widgets/glass_card.dart';
 import '../../widgets/kpi_card.dart';
+import '../../widgets/pomodoro_timer_dialog.dart';
 
 class DashboardView extends StatefulWidget {
   final VoidCallback onNavigateToBudget;
   final VoidCallback onNavigateToHabits;
+  final VoidCallback onNavigateToNotes;
+  final VoidCallback onOpenProfile;
 
   const DashboardView({
     super.key,
     required this.onNavigateToBudget,
     required this.onNavigateToHabits,
+    required this.onNavigateToNotes,
+    required this.onOpenProfile,
   });
 
   @override
@@ -23,13 +29,24 @@ class _DashboardViewState extends State<DashboardView> {
   bool _isLoading = true;
   int _pendingTasks = 0;
   int _completedTasks = 0;
-  int _activeHabits = 0;
+  int _activeHabitsCount = 0;
+  int _completedHabitsToday = 0;
   double _balance = 0.0;
+  double _totalIncome = 0.0;
+  double _totalExpense = 0.0;
+  List<TaskItem> _recentTasks = [];
+  List<ScheduleItem> _todaySchedules = [];
 
   @override
   void initState() {
     super.initState();
     _loadDashboardData();
+  }
+
+  String _getTodayWeekdayName() {
+    final days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    final weekday = DateTime.now().weekday; // 1 = Mon, 7 = Sun
+    return days[weekday - 1];
   }
 
   Future<void> _loadDashboardData() async {
@@ -39,29 +56,43 @@ class _DashboardViewState extends State<DashboardView> {
       final habitsRes = await ApiClient.instance.get(ApiEndpoints.habits);
       final incRes = await ApiClient.instance.get(ApiEndpoints.incomes);
       final expRes = await ApiClient.instance.get(ApiEndpoints.expenses);
+      final schedRes = await ApiClient.instance.get(ApiEndpoints.schedules);
 
       if (mounted) {
         if (tasksRes is List) {
-          _pendingTasks = tasksRes.where((t) => t['done'] != 1 && t['done'] != true).length;
-          _completedTasks = tasksRes.where((t) => t['done'] == 1 || t['done'] == true).length;
-        }
-        if (habitsRes is List) {
-          _activeHabits = habitsRes.length;
+          final allTasks = tasksRes.map((t) => TaskItem.fromJson(t)).toList();
+          _pendingTasks = allTasks.where((t) => !t.done).length;
+          _completedTasks = allTasks.where((t) => t.done).length;
+          _recentTasks = allTasks.take(3).toList();
         }
 
-        double totalInc = 0;
-        double totalExp = 0;
+        if (habitsRes is List) {
+          final allHabits = habitsRes.map((h) => HabitItem.fromJson(h)).toList();
+          _activeHabitsCount = allHabits.length;
+          _completedHabitsToday = allHabits.where((h) => h.completedToday).length;
+        }
+
+        _totalIncome = 0;
+        _totalExpense = 0;
         if (incRes is List) {
           for (var i in incRes) {
-            totalInc += (i['amount'] as num?)?.toDouble() ?? 0;
+            _totalIncome += (i['amount'] as num?)?.toDouble() ?? 0;
           }
         }
         if (expRes is List) {
           for (var e in expRes) {
-            totalExp += (e['amount'] as num?)?.toDouble() ?? 0;
+            _totalExpense += (e['amount'] as num?)?.toDouble() ?? 0;
           }
         }
-        _balance = totalInc - totalExp;
+        _balance = _totalIncome - _totalExpense;
+
+        if (schedRes is List) {
+          final today = _getTodayWeekdayName().toLowerCase();
+          _todaySchedules = schedRes
+              .map((s) => ScheduleItem.fromJson(s))
+              .where((s) => s.day.toLowerCase() == today)
+              .toList();
+        }
       }
     } catch (_) {}
     if (mounted) setState(() => _isLoading = false);
@@ -72,6 +103,9 @@ class _DashboardViewState extends State<DashboardView> {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator(color: AppColors.primary));
     }
+
+    final user = ApiClient.instance.currentUser;
+    final displayName = user != null && user.username.isNotEmpty ? user.username : 'there';
 
     return RefreshIndicator(
       color: AppColors.primary,
@@ -84,13 +118,9 @@ class _DashboardViewState extends State<DashboardView> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF1E1B4B), Color(0xFF0F172A)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              gradient: AppColors.heroGradient,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+              border: Border.all(color: AppColors.primary.withAlpha(80)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,9 +128,9 @@ class _DashboardViewState extends State<DashboardView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Welcome to Pocketsly 👋',
-                      style: TextStyle(
+                    Text(
+                      'Welcome, $displayName 👋',
+                      style: const TextStyle(
                         color: AppColors.textPrimary,
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
@@ -109,9 +139,9 @@ class _DashboardViewState extends State<DashboardView> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: AppColors.success.withOpacity(0.15),
+                        color: AppColors.success.withAlpha(35),
                         borderRadius: BorderRadius.circular(99),
-                        border: Border.all(color: AppColors.success.withOpacity(0.3)),
+                        border: Border.all(color: AppColors.success.withAlpha(80)),
                       ),
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,
@@ -129,7 +159,7 @@ class _DashboardViewState extends State<DashboardView> {
                 ),
                 const SizedBox(height: 6),
                 const Text(
-                  'Your daily routines, academic curriculum, and monthly cash flow synced at the edge.',
+                  'Your daily routines, academic curriculum, and monthly cash flow synced seamlessly.',
                   style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
                 ),
               ],
@@ -163,9 +193,36 @@ class _DashboardViewState extends State<DashboardView> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
 
-          // ── Quick Actions ──────────────────────────────────────────────────
+          Row(
+            children: [
+              Expanded(
+                child: KpiCard(
+                  title: 'Daily Habits',
+                  value: '$_completedHabitsToday / $_activeHabitsCount',
+                  subtitle: 'Completed today',
+                  icon: Icons.local_fire_department_rounded,
+                  iconColor: AppColors.warning,
+                  onTap: widget.onNavigateToHabits,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: KpiCard(
+                  title: 'Focus Timer',
+                  value: 'Pomodoro',
+                  subtitle: '25m session',
+                  icon: Icons.timer_outlined,
+                  iconColor: AppColors.cyan,
+                  onTap: () => PomodoroTimerDialog.show(context),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+
+          // ── Quick Shortcuts ────────────────────────────────────────────────
           const Text(
             'QUICK SHORTCUTS',
             style: TextStyle(
@@ -181,12 +238,101 @@ class _DashboardViewState extends State<DashboardView> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildQuickBtn(Icons.add_shopping_cart_rounded, 'Log Expense', AppColors.danger, widget.onNavigateToBudget),
-                _buildQuickBtn(Icons.savings_outlined, 'Add Income', AppColors.success, widget.onNavigateToBudget),
-                _buildQuickBtn(Icons.check_circle_outline_rounded, 'Habit Check', AppColors.primaryLight, widget.onNavigateToHabits),
+                _buildQuickBtn(Icons.remove_circle_outline_rounded, 'Log Expense', AppColors.danger, widget.onNavigateToBudget),
+                _buildQuickBtn(Icons.add_circle_outline_rounded, 'Add Income', AppColors.success, widget.onNavigateToBudget),
+                _buildQuickBtn(Icons.check_circle_outline_rounded, 'Habit Matrix', AppColors.primaryLight, widget.onNavigateToHabits),
+                _buildQuickBtn(Icons.note_add_outlined, 'Notes', AppColors.indigo, widget.onNavigateToNotes),
               ],
             ),
           ),
+          const SizedBox(height: 20),
+
+          // ── Today's Classes & Timetable ────────────────────────────────────
+          if (_todaySchedules.isNotEmpty) ...[
+            Text(
+              "TODAY'S SCHEDULE (${_getTodayWeekdayName().toUpperCase()})",
+              style: const TextStyle(
+                color: AppColors.textMuted,
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.8,
+              ),
+            ),
+            const SizedBox(height: 8),
+            ..._todaySchedules.map((s) => GlassCard(
+              margin: const EdgeInsets.only(bottom: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              child: Row(
+                children: [
+                  const Icon(Icons.school_outlined, color: AppColors.primaryLight, size: 20),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(s.subject, style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700, fontSize: 13)),
+                        Text('${s.time} • Room: ${s.room.isEmpty ? "Online" : s.room}', style: const TextStyle(color: AppColors.textSecondary, fontSize: 11)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            )),
+            const SizedBox(height: 16),
+          ],
+
+          // ── Priority Tasks Preview ─────────────────────────────────────────
+          if (_recentTasks.isNotEmpty) ...[
+            const Text(
+              'ACTIVE TASKS',
+              style: TextStyle(
+                color: AppColors.textMuted,
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.8,
+              ),
+            ),
+            const SizedBox(height: 8),
+            ..._recentTasks.map((t) => GlassCard(
+              margin: const EdgeInsets.only(bottom: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: Row(
+                children: [
+                  Icon(
+                    t.done ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
+                    color: t.done ? AppColors.success : AppColors.textMuted,
+                    size: 18,
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      t.title,
+                      style: TextStyle(
+                        color: t.done ? AppColors.textMuted : AppColors.textPrimary,
+                        fontSize: 13,
+                        decoration: t.done ? TextDecoration.lineThrough : null,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: t.priority == 'high' ? AppColors.danger.withAlpha(35) : AppColors.primary.withAlpha(35),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      t.priority.toUpperCase(),
+                      style: TextStyle(
+                        color: t.priority == 'high' ? AppColors.danger : AppColors.primaryLight,
+                        fontSize: 9,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            )),
+          ],
         ],
       ),
     );
@@ -197,13 +343,13 @@ class _DashboardViewState extends State<DashboardView> {
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         child: Column(
           children: [
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.15),
+                color: color.withAlpha(35),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, color: color, size: 20),
@@ -211,7 +357,7 @@ class _DashboardViewState extends State<DashboardView> {
             const SizedBox(height: 6),
             Text(
               label,
-              style: const TextStyle(color: AppColors.textPrimary, fontSize: 12, fontWeight: FontWeight.w600),
+              style: const TextStyle(color: AppColors.textPrimary, fontSize: 11, fontWeight: FontWeight.w600),
             ),
           ],
         ),

@@ -43,8 +43,9 @@ class GlassCard extends StatelessWidget {
     );
 
     if (onTap != null) {
-      return GestureDetector(
+      return InkWell(
         onTap: onTap,
+        borderRadius: BorderRadius.circular(borderRadius),
         child: card,
       );
     }

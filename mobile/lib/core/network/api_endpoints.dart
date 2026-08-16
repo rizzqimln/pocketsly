@@ -1,12 +1,12 @@
-/// Cloudflare 24/7 Edge Server & API Endpoint Definitions
+/// Cloudflare 24/7 Edge Server & Local API Endpoint Definitions
 class ApiEndpoints {
   ApiEndpoints._();
 
   /// 24/7 Serverless Edge Production Base URL (Cloudflare Pages + D1)
   static const String productionBaseUrl = 'https://pocketsly.pages.dev/api';
 
-  /// Local Development Base URL (Python server or local proxy)
-  static const String localBaseUrl = 'http://10.0.2.2:8000/api'; // Android emulator localhost
+  /// Local Development Base URL (Python server on Android emulator localhost)
+  static const String localBaseUrl = 'http://10.0.2.2:8000/api';
 
   /// Active Base URL
   static String baseUrl = productionBaseUrl;
@@ -17,6 +17,8 @@ class ApiEndpoints {
   static String get logout => '$baseUrl/logout';
   static String get session => '$baseUrl/session';
   static String get profile => '$baseUrl/profile';
+  static String get requestOtp => '$baseUrl/request-otp';
+  static String get resetPassword => '$baseUrl/reset-password';
 
   // ── Tasks & Habits ────────────────────────────────────────────────────────
   static String get tasks => '$baseUrl/tasks';
@@ -34,11 +36,13 @@ class ApiEndpoints {
   static String get notes => '$baseUrl/notes';
   static String note(int id) => '$baseUrl/notes/$id';
   static String get resources => '$baseUrl/resources';
+  static String resource(int id) => '$baseUrl/resources/$id';
 
   // ── Academic & Curriculum ─────────────────────────────────────────────────
   static String get courses => '$baseUrl/courses';
   static String course(int id) => '$baseUrl/courses/$id';
   static String get lecturers => '$baseUrl/lecturers';
+  static String lecturer(int id) => '$baseUrl/lecturers/$id';
   static String get studyLogs => '$baseUrl/study_logs';
   static String get curriculumSchema => '$baseUrl/curriculum/schema';
   static String get curriculumQuery => '$baseUrl/curriculum/query';
@@ -54,4 +58,6 @@ class ApiEndpoints {
   static String budget(int id) => '$baseUrl/budgets/$id';
 
   static String get receiptScan => '$baseUrl/receipt/scan';
+  static String get backupExport => '$baseUrl/backup/export';
+  static String get backupImport => '$baseUrl/backup/import';
 }

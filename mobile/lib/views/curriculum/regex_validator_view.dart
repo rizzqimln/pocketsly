@@ -54,7 +54,7 @@ class _RegexValidatorViewState extends State<RegexValidatorView> {
                   _buildPresetChip('Email', r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', 'dev@pocketsly.com'),
                   _buildPresetChip('Date (YYYY-MM-DD)', r'^\d{4}-\d{2}-\d{2}$', '2026-08-16'),
                   _buildPresetChip('Hex Color', r'^#?([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$', '#7C3AED'),
-                  _buildPresetChip('Indonesian Phone', r'^(\+62|62|0)8[1-9][0-9]{6,10}$', '081234567890'),
+                  _buildPresetChip('Phone (+62)', r'^(\+62|62|0)8[1-9][0-9]{6,10}$', '081234567890'),
                 ],
               ),
               const SizedBox(height: 12),
@@ -77,7 +77,7 @@ class _RegexValidatorViewState extends State<RegexValidatorView> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: _isMatch ? AppColors.success.withOpacity(0.15) : AppColors.danger.withOpacity(0.15),
+                  color: _isMatch ? AppColors.success.withAlpha(35) : AppColors.danger.withAlpha(35),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: _isMatch ? AppColors.success : AppColors.danger),
                 ),
@@ -85,9 +85,11 @@ class _RegexValidatorViewState extends State<RegexValidatorView> {
                   children: [
                     Icon(_isMatch ? Icons.check_circle_rounded : Icons.cancel_rounded, color: _isMatch ? AppColors.success : AppColors.danger, size: 20),
                     const SizedBox(width: 8),
-                    Text(
-                      _isMatch ? 'MATCH FOUND! The string matches the regular expression.' : 'NO MATCH. The string failed to match the pattern.',
-                      style: TextStyle(color: _isMatch ? AppColors.success : AppColors.danger, fontWeight: FontWeight.w700, fontSize: 12),
+                    Expanded(
+                      child: Text(
+                        _isMatch ? 'MATCH FOUND! The string matches the regular expression.' : 'NO MATCH. The string failed to match the pattern.',
+                        style: TextStyle(color: _isMatch ? AppColors.success : AppColors.danger, fontWeight: FontWeight.w700, fontSize: 12),
+                      ),
                     ),
                   ],
                 ),

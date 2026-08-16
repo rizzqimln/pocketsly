@@ -38,10 +38,30 @@ class _BudgetEntrySheetState extends State<BudgetEntrySheet> {
   String _wallet = 'Cash';
   bool _isSubmitting = false;
 
+  final List<String> _expensePresets = [
+    'Food & Dining',
+    'Transportation',
+    'Books & Tools',
+    'Entertainment',
+    'Housing & Utilities',
+    'Groceries',
+  ];
+
+  final List<String> _incomePresets = [
+    'Allowance',
+    'Part-time Salary',
+    'Freelance Work',
+    'Scholarship Grant',
+    'Gifts & Other',
+  ];
+
   @override
   void initState() {
     super.initState();
     _activeTab = widget.initialTab;
+    if (_activeTab == 'income') {
+      _categoryController.text = 'Allowance';
+    }
   }
 
   Future<void> _submit() async {
@@ -93,6 +113,7 @@ class _BudgetEntrySheetState extends State<BudgetEntrySheet> {
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    final presets = _activeTab == 'income' ? _incomePresets : _expensePresets;
 
     return Padding(
       padding: EdgeInsets.only(
@@ -101,135 +122,169 @@ class _BudgetEntrySheetState extends State<BudgetEntrySheet> {
         top: 12,
         bottom: bottomInset + 20,
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // ── Drag Handle Pill ──────────────────────────────────────────────
-          Center(
-            child: Container(
-              width: 44,
-              height: 5,
-              decoration: BoxDecoration(
-                color: AppColors.borderLight,
-                borderRadius: BorderRadius.circular(99),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // ── Drag Handle Pill ────────────────────────────────────────────
+            Center(
+              child: Container(
+                width: 44,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: AppColors.borderLight,
+                  borderRadius: BorderRadius.circular(99),
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 16),
+            const SizedBox(height: 16),
 
-          // ── Modal Header & Tab Switcher ────────────────────────────────────
-          Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: AppColors.bgSurfaceAlt,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.border),
-            ),
-            child: Row(
-              children: [
-                _buildTabBtn('expense', '- Expense', AppColors.danger),
-                _buildTabBtn('income', '+ Income', AppColors.success),
-                _buildTabBtn('budget', '🎯 Target', AppColors.primary),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // ── Amount Input with Quick Increment Chips ────────────────────────
-          CurrencyField(
-            controller: _amountController,
-            label: _activeTab == 'income' ? 'Income Amount' : 'Amount Spent',
-            quickPresets: _activeTab == 'income'
-                ? const [100000, 500000, 1000000, 2500000]
-                : const [10000, 25000, 50000, 100000],
-          ),
-          const SizedBox(height: 12),
-
-          // ── Category Input ────────────────────────────────────────────────
-          Text(
-            _activeTab == 'income' ? 'Source' : 'Category',
-            style: const TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 6),
-          TextField(
-            controller: _categoryController,
-            decoration: InputDecoration(
-              hintText: _activeTab == 'income' ? 'e.g. Allowance, Salary' : 'e.g. Food & Dining, Transportation',
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          // ── Wallet / Account Selector ─────────────────────────────────────
-          if (_activeTab != 'budget') ...[
-            const Text(
-              'Account / Wallet',
-              style: TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 6),
+            // ── Modal Header & Tab Switcher ──────────────────────────────────
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
                 color: AppColors.bgSurfaceAlt,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.border),
               ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  value: _wallet,
-                  isExpanded: true,
-                  dropdownColor: AppColors.bgSurfaceAlt,
-                  items: const [
-                    DropdownMenuItem(value: 'Cash', child: Text('Cash in Hand')),
-                    DropdownMenuItem(value: 'Bank Transfer', child: Text('Bank Account')),
-                    DropdownMenuItem(value: 'E-Wallet', child: Text('E-Wallet (GoPay/OVO/Dana)')),
-                    DropdownMenuItem(value: 'Card', child: Text('Debit / Credit Card')),
-                  ],
-                  onChanged: (val) {
-                    if (val != null) setState(() => _wallet = val);
-                  },
-                ),
+              child: Row(
+                children: [
+                  _buildTabBtn('expense', '- Expense', AppColors.danger),
+                  _buildTabBtn('income', '+ Income', AppColors.success),
+                  _buildTabBtn('budget', '🎯 Target Limit', AppColors.primary),
+                ],
               ),
             ),
+            const SizedBox(height: 16),
+
+            // ── Amount Input with Quick Increment Chips ──────────────────────
+            CurrencyField(
+              controller: _amountController,
+              label: _activeTab == 'income' ? 'Income Amount' : 'Amount Spent',
+              quickPresets: _activeTab == 'income'
+                  ? const [100000, 500000, 1000000, 2500000]
+                  : const [10000, 25000, 50000, 100000],
+            ),
             const SizedBox(height: 12),
-            const Text(
-              'Notes (Optional)',
-              style: TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.w600),
+
+            // ── Category Input & Preset Chips ────────────────────────────────
+            Text(
+              _activeTab == 'income' ? 'Source' : 'Category',
+              style: const TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 6),
             TextField(
-              controller: _descController,
-              decoration: const InputDecoration(hintText: 'e.g. Lunch with classmates'),
+              controller: _categoryController,
+              decoration: InputDecoration(
+                hintText: _activeTab == 'income' ? 'e.g. Allowance, Salary' : 'e.g. Food & Dining, Transportation',
+              ),
             ),
-            const SizedBox(height: 16),
-          ],
+            const SizedBox(height: 8),
 
-          // ── Submit Button ─────────────────────────────────────────────────
-          ElevatedButton(
-            onPressed: _isSubmitting ? null : _submit,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: _activeTab == 'expense'
-                  ? AppColors.danger
-                  : _activeTab == 'income'
-                      ? AppColors.success
-                      : AppColors.primary,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              elevation: 4,
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: presets.map((p) {
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: InkWell(
+                      onTap: () => setState(() => _categoryController.text = p),
+                      borderRadius: BorderRadius.circular(6),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: _categoryController.text == p ? AppColors.primary.withAlpha(40) : AppColors.bgSurfaceAlt,
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(color: _categoryController.text == p ? AppColors.primary : AppColors.border),
+                        ),
+                        child: Text(
+                          p,
+                          style: TextStyle(
+                            color: _categoryController.text == p ? AppColors.primaryLight : AppColors.textSecondary,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
             ),
-            child: _isSubmitting
-                ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                : Text(
-                    _activeTab == 'expense'
-                        ? '- Log Expense'
-                        : _activeTab == 'income'
-                            ? '+ Log Income'
-                            : '🎯 Allocate Limit',
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+            const SizedBox(height: 12),
+
+            // ── Wallet / Account Selector ───────────────────────────────────
+            if (_activeTab != 'budget') ...[
+              const Text(
+                'Account / Wallet',
+                style: TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: AppColors.bgSurfaceAlt,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: _wallet,
+                    isExpanded: true,
+                    dropdownColor: AppColors.bgSurfaceAlt,
+                    items: const [
+                      DropdownMenuItem(value: 'Cash', child: Text('Cash in Hand')),
+                      DropdownMenuItem(value: 'Bank Transfer', child: Text('Bank Account')),
+                      DropdownMenuItem(value: 'E-Wallet', child: Text('E-Wallet (GoPay/OVO/Dana)')),
+                      DropdownMenuItem(value: 'Card', child: Text('Debit / Credit Card')),
+                    ],
+                    onChanged: (val) {
+                      if (val != null) setState(() => _wallet = val);
+                    },
                   ),
-          ),
-        ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'Notes (Optional)',
+                style: TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 6),
+              TextField(
+                controller: _descController,
+                decoration: const InputDecoration(hintText: 'e.g. Lunch with classmates'),
+              ),
+              const SizedBox(height: 16),
+            ],
+
+            // ── Submit Button ───────────────────────────────────────────────
+            ElevatedButton(
+              onPressed: _isSubmitting ? null : _submit,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _activeTab == 'expense'
+                    ? AppColors.danger
+                    : _activeTab == 'income'
+                        ? AppColors.success
+                        : AppColors.primary,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                elevation: 4,
+              ),
+              child: _isSubmitting
+                  ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                  : Text(
+                      _activeTab == 'expense'
+                          ? '- Log Expense'
+                          : _activeTab == 'income'
+                              ? '+ Log Income'
+                              : '🎯 Allocate Limit',
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }
