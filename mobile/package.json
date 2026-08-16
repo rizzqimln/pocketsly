@@ -1,0 +1,25 @@
+{
+  "name": "pocketsly-mobile",
+  "version": "1.0.0",
+  "description": "Flutter mobile application for Pocketsly with 24/7 Cloudflare Edge API integration",
+  "scripts": {
+    "dev": "flutter run",
+    "dev:android": "flutter run -d android",
+    "dev:linux": "flutter run -d linux",
+    "dev:web": "flutter run -d chrome",
+    "build:apk": "flutter build apk --release",
+    "build:appbundle": "flutter build appbundle --release",
+    "lint": "flutter analyze",
+    "format": "dart format lib/"
+  },
+  "keywords": [
+    "flutter",
+    "dart",
+    "android",
+    "mobile",
+    "productivity",
+    "cloudflare-d1"
+  ],
+  "author": "Pocketsly Team",
+  "license": "MIT"
+}
