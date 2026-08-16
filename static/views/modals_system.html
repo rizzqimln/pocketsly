@@ -1,0 +1,484 @@
+  <!-- ===================================================================== -->
+  <!-- MOBILE MORE DRAWER / BOTTOM SHEET                                      -->
+  <!-- ===================================================================== -->
+  <div class="modal-overlay hidden" id="more-sheet-overlay" onclick="if(event.target === this) App.closeMoreDrawer()">
+    <div class="modal-card more-sheet-card">
+      <div class="modal-drag-indicator-bar" onclick="App.closeMoreDrawer()" title="Click to close">
+        <span class="modal-drag-pill"></span>
+      </div>
+      <div class="modal-header">
+        <h3 class="m-0 font-extrabold d-flex items-center gap-xs text-base">
+          <svg class="icon-svg text-brand" viewBox="0 0 24 24">
+            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+            <line x1="12" y1="18" x2="12.01" y2="18"></line>
+          </svg>
+          More Sections &amp; Settings
+        </h3>
+        <button aria-label="Close" class="btn-icon drawer-close-btn" onclick="App.closeMoreDrawer()" type="button">
+          <svg class="icon-svg" viewBox="0 0 24 24">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="more-sheet-grid">
+        <button class="more-menu-tile" onclick="App.closeMoreDrawer(); CommandPalette.open();" type="button">
+          <span class="tile-icon text-brand">
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </span>
+          <div>
+            <div class="tile-title">Quick Search</div>
+            <div class="tile-desc">Pages, tasks &amp; actions</div>
+          </div>
+        </button>
+        <button class="more-menu-tile" onclick="App.closeMoreDrawer(); App.navigateTo('schedule');" type="button">
+          <span class="tile-icon text-brand">
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+          </span>
+          <div>
+            <div class="tile-title">Timetable</div>
+            <div class="tile-desc">Weekly class blocks</div>
+          </div>
+        </button>
+        <button class="more-menu-tile" onclick="App.closeMoreDrawer(); App.navigateTo('budget');" type="button">
+          <span class="tile-icon text-success">
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+              <line x1="1" y1="10" x2="23" y2="10"></line>
+            </svg>
+          </span>
+          <div>
+            <div class="tile-title">Budget</div>
+            <div class="tile-desc">Finance &amp; expenses</div>
+          </div>
+        </button>
+        <button class="more-menu-tile" data-view="profile" onclick="App.closeMoreDrawer(); App.openProfileSettings();"
+          type="button">
+          <span class="tile-icon text-warning">
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </span>
+          <div>
+            <div class="tile-title">Profile</div>
+            <div class="tile-desc">Account &amp; backup</div>
+          </div>
+        </button>
+        <button class="more-menu-tile" onclick="UI.toggleTheme(); App.syncThemeState();" type="button">
+          <span class="tile-icon text-purple" id="more-theme-icon">
+            <svg class="icon-svg" viewBox="0 0 24 24" id="more-theme-svg">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </span>
+          <div>
+            <div class="tile-title" id="more-theme-label">Dark Mode</div>
+            <div class="tile-desc">Toggle appearance</div>
+          </div>
+        </button>
+      </div>
+      <div>
+        <button class="signout-btn-left" onclick="App.closeMoreDrawer(); Auth.logout();" type="button">
+          <svg class="icon-svg" viewBox="0 0 24 24">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          <span>Sign Out</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- BUDGET QUICK ACTIONS BOTTOM SHEET (mobile)                            -->
+  <!-- ===================================================================== -->
+  <div class="modal-overlay hidden" id="budget-quick-overlay"
+    onclick="if(event.target === this) Budget.closeQuickActions()">
+    <div class="modal-card more-sheet-card">
+      <div class="modal-drag-indicator-bar" onclick="Budget.closeQuickActions()" title="Click or pull down to close">
+        <span class="modal-drag-pill"></span>
+      </div>
+      <div class="modal-header">
+        <h3 class="m-0 font-extrabold d-flex items-center gap-xs text-base">
+          <svg class="icon-svg text-success" viewBox="0 0 24 24">
+            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+            <line x1="1" y1="10" x2="23" y2="10"></line>
+          </svg>
+          Monthly Budget Quick Actions
+        </h3>
+        <button aria-label="Close" class="btn-icon drawer-close-btn" onclick="Budget.closeQuickActions()" type="button">
+          <svg class="icon-svg" viewBox="0 0 24 24">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="more-sheet-grid">
+        <button class="more-menu-tile" data-quick-action="income" onclick="Budget.quickAction('income')" type="button">
+          <span class="tile-icon text-success">
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <line x1="12" y1="19" x2="12" y2="5"></line>
+              <polyline points="5 12 12 5 19 12"></polyline>
+            </svg>
+          </span>
+          <div>
+            <div class="tile-title">Log Income</div>
+            <div class="tile-desc">Salary, allowance, scholarships</div>
+          </div>
+        </button>
+        <button class="more-menu-tile" data-quick-action="expense" onclick="Budget.quickAction('expense')"
+          type="button">
+          <span class="tile-icon text-danger">
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <polyline points="19 12 12 19 5 12"></polyline>
+            </svg>
+          </span>
+          <div>
+            <div class="tile-title">Log Expense</div>
+            <div class="tile-desc">Food, transport, bills</div>
+          </div>
+        </button>
+        <button class="more-menu-tile" data-quick-action="scan" onclick="Budget.quickAction('scan')" type="button">
+          <span class="tile-icon text-brand">
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+              <circle cx="12" cy="13" r="4"></circle>
+            </svg>
+          </span>
+          <div>
+            <div class="tile-title">Scan Receipt</div>
+            <div class="tile-desc">Auto-fill from a photo</div>
+          </div>
+        </button>
+        <button class="more-menu-tile" data-quick-action="budget" onclick="Budget.quickAction('budget')" type="button">
+          <span class="tile-icon text-warning">
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="16"></line>
+              <line x1="8" y1="12" x2="16" y2="12"></line>
+            </svg>
+          </span>
+          <div>
+            <div class="tile-title">Set Target</div>
+            <div class="tile-desc">Monthly category limits</div>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- PROFILE SETTINGS OVERLAY                                               -->
+  <!-- ===================================================================== -->
+  <div class="modal-overlay hidden" id="profile-overlay">
+    <div class="modal-card profile-modal-card">
+      <div class="modal-drag-indicator-bar" id="profile-drag-handle" onclick="App.closeProfileSettings()"
+        title="Click or pull down to close">
+        <span class="modal-drag-pill"></span>
+      </div>
+      <div class="modal-header">
+        <div class="d-flex items-center gap-sm">
+          <svg class="icon-svg icon-md icon-brand" viewBox="0 0 24 24">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <h3 class="m-0 text-lg">Profile Settings</h3>
+        </div>
+        <button aria-label="Close profile" class="btn-icon d-flex items-center justify-center cursor-pointer text-xl"
+          onclick="App.closeProfileSettings()" type="button">×</button>
+      </div>
+      <!-- Guest mode: sign in / register (shown when not authenticated) -->
+      <div class="modal-body d-flex flex-col gap-md hidden" id="profile-guest">
+        <div class="auth-header p-0">
+          <div class="auth-logo text-lg">
+            Pocketsly
+          </div>
+          <p class="auth-subtitle m-0" id="auth-subtitle">Sign in to sync your rhythm across devices.</p>
+        </div>
+        <form class="auth-form d-flex flex-col gap-md" id="login-form">
+          <div class="form-group">
+            <label for="login-username">Username</label>
+            <input autocomplete="username" id="login-username" placeholder="e.g. alex_student" required=""
+              type="text" />
+          </div>
+          <div class="form-group">
+            <div class="d-flex justify-between items-center mb-xs">
+              <label for="login-password">Password</label>
+              <a class="auth-forgot-link text-sm" href="#" id="show-forgot-link">Forgot Password?</a>
+            </div>
+            <input autocomplete="current-password" id="login-password" placeholder="••••••••" required=""
+              type="password" />
+          </div>
+          <button class="btn btn-primary btn-block btn-auth-submit" type="submit">Sign In</button>
+          <p class="auth-switch m-0">Don't have an account? <a href="#" id="show-register-link">Create Account</a></p>
+        </form>
+        <form class="auth-form d-flex flex-col gap-md hidden" id="register-form">
+          <div class="form-group">
+            <label for="reg-username">Username</label>
+            <input autocomplete="username" id="reg-username" placeholder="e.g. alex_student" required="" type="text" />
+          </div>
+          <div class="form-group">
+            <label for="reg-email">Email Address <span class="auth-label-hint">(for password recovery)</span></label>
+            <input autocomplete="email" id="reg-email" placeholder="alex@example.com" type="email" />
+          </div>
+          <div class="form-group">
+            <label for="reg-phone">Phone Number <span class="auth-label-hint">(for password recovery)</span></label>
+            <input autocomplete="tel" id="reg-phone" placeholder="+1234567890" type="tel" />
+          </div>
+          <div class="form-group">
+            <label for="reg-password">Password (min. 6 characters)</label>
+            <input autocomplete="new-password" id="reg-password" minlength="6" placeholder="••••••••" required=""
+              type="password" />
+          </div>
+          <button class="btn btn-primary btn-block btn-auth-submit" type="submit">Create Account</button>
+          <p class="auth-switch m-0">Already have an account? <a href="#" id="show-login-link">Sign In</a></p>
+        </form>
+        <form class="auth-form d-flex flex-col gap-md hidden" id="forgot-form">
+          <div class="form-group">
+            <label for="forgot-username">Username or Registered Email</label>
+            <div class="d-flex gap-sm">
+              <input autocomplete="username" id="forgot-username" placeholder="e.g. alex_student or alex@example.com"
+                required="" type="text" />
+              <button class="btn btn-secondary text-nowrap text-sm" id="btn-send-otp" type="button">Send OTP</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="forgot-otp-code">6-Digit Email OTP Code <span
+                class="auth-label-required">*(Required)</span></label>
+            <input id="forgot-otp-code" maxlength="6" pattern="[0-9]{6}" placeholder="Enter 6-digit OTP (e.g. 584920)"
+              required="" type="text" />
+          </div>
+          <div class="form-group">
+            <label for="forgot-new-password">New Password (min. 6 characters)</label>
+            <input autocomplete="new-password" id="forgot-new-password" minlength="6" placeholder="••••••••" required=""
+              type="password" />
+          </div>
+          <div class="form-group">
+            <label for="forgot-confirm-password">Confirm New Password</label>
+            <input autocomplete="new-password" id="forgot-confirm-password" minlength="6" placeholder="••••••••"
+              required="" type="password" />
+          </div>
+          <button class="btn btn-primary btn-block btn-auth-submit" type="submit">Verify OTP &amp; Reset Password</button>
+          <p class="auth-switch m-0">Remember your password? <a href="#" id="forgot-back-login-link">Back to Sign In</a>
+          </p>
+        </form>
+      </div>
+      <!-- Signed-in mode: account settings -->
+      <div class="modal-body d-flex flex-col gap-md" id="profile-signedin">
+        <form class="auth-form d-flex flex-col gap-md" id="profile-settings-form">
+          <!-- Current Info Display -->
+          <div class="d-flex items-center gap-lg p-sm profile-user-strip">
+            <div class="avatar text-base" id="profile-avatar">U</div>
+            <div>
+              <div class="font-bold text-primary text-base" id="profile-display-name">User</div>
+              <div class="text-muted text-xs">Student / Worker Account</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="profile-username">Username</label>
+            <input id="profile-username" minlength="3" placeholder="Your username" type="text" />
+          </div>
+          <div class="form-group">
+            <label for="profile-email">Recovery Email</label>
+            <input autocomplete="email" id="profile-email" placeholder="alex@example.com" type="email" />
+          </div>
+          <div class="form-group">
+            <label for="profile-phone">Recovery Phone Number</label>
+            <input autocomplete="tel" id="profile-phone" placeholder="+1234567890" type="tel" />
+          </div>
+          <div>
+            <div class="form-group mb-sm">
+              <label for="profile-password">New Password <span class="text-muted text-xs">(leave blank to keep
+                  current)</span></label>
+              <div class="d-flex gap-sm">
+                <input autocomplete="new-password" id="profile-password" minlength="6" placeholder="••••••••"
+                  type="password" />
+                <button class="btn btn-secondary text-nowrap text-sm btn-profile-otp" id="profile-btn-send-otp" type="button">Get OTP</button>
+              </div>
+            </div>
+            <div class="form-group" id="profile-otp-group">
+              <label for="profile-otp-code">6-Digit OTP Code <span class="text-muted text-xs">(required to change
+                  password)</span></label>
+              <input id="profile-otp-code" maxlength="6" pattern="[0-9]{6}" placeholder="Enter 6-digit OTP"
+                type="text" />
+            </div>
+          </div>
+          <button class="btn btn-primary btn-block btn-auth-submit mt-xs" type="submit">Save Account Changes</button>
+        </form>
+
+        <!-- Theme Preference Option -->
+        <div class="profile-section-card">
+          <div class="font-bold text-primary d-flex items-center gap-sm mb-xs">
+            <svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+              stroke-width="2.2" viewBox="0 0 24 24" width="15">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+            Theme Preference
+          </div>
+          <p class="text-muted mb-md text-xs">Switch between light and dark visual aesthetics.</p>
+          <button class="theme-switch-btn w-full d-flex items-center justify-between cursor-pointer profile-theme-btn"
+            id="theme-toggle-btn" onclick="UI.toggleTheme()" title="Toggle Light / Dark Mode" type="button">
+            <span class="d-flex items-center gap-sm font-semibold text-primary text-sm">
+              <svg class="icon-svg text-brand" viewBox="0 0 24 24" id="profile-theme-svg">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+              Appearance Mode
+            </span>
+            <span class="priority-badge priority-medium font-bold text-xs" id="theme-toggle-text">Dark Mode</span>
+          </button>
+        </div>
+
+        <!-- Data Backup & Restore Zone -->
+        <div class="profile-section-card">
+          <div class="font-bold text-primary d-flex items-center gap-sm mb-xs">
+            <svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+              stroke-width="2.2" viewBox="0 0 24 24" width="15">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+              <polyline points="17 21 17 13 7 13 7 21"></polyline>
+              <polyline points="7 3 7 8 15 8"></polyline>
+            </svg>
+            Data Backup &amp; Portability
+          </div>
+          <p class="text-muted mb-md text-xs">Export your full routines, notes, budget logs, and courses as JSON or
+            restore anytime.</p>
+          <div class="d-grid grid-2col gap-sm">
+            <button class="btn btn-outline btn-sm d-flex items-center justify-center gap-sm font-bold profile-backup-btn"
+              onclick="App.exportBackup()" type="button">
+              <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                stroke-width="2.2" viewBox="0 0 24 24" width="14">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Backup JSON
+            </button>
+            <label class="btn btn-outline btn-sm d-flex items-center justify-center gap-sm font-bold cursor-pointer m-0 profile-backup-btn">
+              <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                stroke-width="2.2" viewBox="0 0 24 24" width="14">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="12" x2="12" y2="3"></line>
+              </svg>
+              Restore Backup
+              <input accept=".json,application/json" class="hidden" id="backup-file-input"
+                onchange="App.importBackup(event)" type="file" />
+            </label>
+          </div>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="mt-xs">
+          <button class="btn btn-danger btn-block d-flex items-center justify-center gap-sm font-bold btn-auth-submit"
+            id="profile-logout-btn" type="button">
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- COMMAND PALETTE MODAL (⌘K / Ctrl+K Spotlight)                          -->
+  <!-- ===================================================================== -->
+  <div class="modal-overlay hidden" id="command-palette-overlay"
+    onclick="if(event.target === this) CommandPalette.close()">
+    <div class="command-palette-card">
+      <div class="palette-input-wrapper">
+        <svg class="icon-svg text-brand palette-icon" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input autocomplete="off" class="flex-1 text-primary text-base" id="command-palette-input"
+          oninput="CommandPalette.onInputDebounced(this.value)" onkeydown="CommandPalette.handleKey(event)"
+          placeholder="Search pages, notes, tasks, actions..." type="text" />
+        <button aria-label="Close command palette" class="palette-close-btn" onclick="CommandPalette.close()"
+          type="button">×</button>
+      </div>
+      <div class="palette-filter-bar d-flex gap-xs" id="palette-filter-bar">
+        <button type="button" class="palette-filter-pill active" data-cat="all"
+          onclick="CommandPalette.setCategory('all')">All</button>
+        <button type="button" class="palette-filter-pill" data-cat="Navigation"
+          onclick="CommandPalette.setCategory('Navigation')">Pages</button>
+        <button type="button" class="palette-filter-pill" data-cat="Actions"
+          onclick="CommandPalette.setCategory('Actions')">Actions</button>
+        <button type="button" class="palette-filter-pill" data-cat="Finance"
+          onclick="CommandPalette.setCategory('Finance')">Finance</button>
+        <button type="button" class="palette-filter-pill" data-cat="System"
+          onclick="CommandPalette.setCategory('System')">System</button>
+      </div>
+      <div class="palette-results p-sm" id="command-palette-results">
+        <!-- Results injected by JS -->
+      </div>
+      <div class="palette-footer text-muted d-flex justify-between">
+        <span class="palette-desktop-hint">Navigate: <kbd>↑</kbd> <kbd>↓</kbd> • Select: <kbd>↵ Enter</kbd> • Close:
+          <kbd>Esc</kbd></span>
+        <span class="palette-mobile-hint">Tap any item or action to execute</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- POMODORO FOCUS TIMER MODAL                                            -->
+  <!-- ===================================================================== -->
+  <div class="modal-overlay hidden" id="pomo-modal-overlay" onclick="if(event.target === this) Timer.closeModal()">
+    <div class="modal-card text-center">
+      <div class="modal-header justify-between">
+        <div class="d-flex items-center gap-sm">
+          <svg class="icon-svg text-brand pomo-title-icon" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <h3 class="m-0 text-lg">Pomodoro Focus Session</h3>
+        </div>
+        <button aria-label="Close timer" class="btn-icon" onclick="Timer.closeModal()" type="button">×</button>
+      </div>
+      <div class="modal-body d-flex flex-col items-center">
+        <!-- Mode Tabs -->
+        <div class="pomo-tabs d-flex gap-sm">
+          <button class="day-pill-btn pomo-tab-btn active" data-mode="pomodoro" onclick="Timer.setMode('pomodoro')"
+            type="button">Focus (25m)</button>
+          <button class="day-pill-btn pomo-tab-btn" data-mode="short_break" onclick="Timer.setMode('short_break')"
+            type="button">Break (5m)</button>
+          <button class="day-pill-btn pomo-tab-btn" data-mode="long_break" onclick="Timer.setMode('long_break')"
+            type="button">Long (15m)</button>
+        </div>
+        <!-- Timer Circular Ring -->
+        <div>
+          <svg height="180" viewBox="0 0 36 36" width="180">
+            <circle cx="18" cy="18" fill="transparent" r="15.915" stroke="var(--border-color)" stroke-width="2.5">
+            </circle>
+            <circle cx="18" cy="18" fill="transparent" id="pomo-progress-ring" r="15.915" stroke="var(--primary)"
+              stroke-dasharray="0 100" stroke-linecap="round" stroke-width="2.5">
+            </circle>
+          </svg>
+          <div class="pomo-timer-inner">
+            <div class="pomo-timer-display" id="pomo-timer-display">25:00</div>
+            <div class="pomo-mode-label" id="pomo-mode-label">Focus</div>
+          </div>
+        </div>
+        <!-- Controls -->
+        <div class="pomo-controls d-flex gap-md">
+          <button class="btn btn-primary btn-sm pomo-play-btn" id="pomo-toggle-btn" onclick="Timer.toggle()"
+            type="button">Start</button>
+          <button class="btn btn-outline btn-sm" onclick="Timer.reset()" type="button">Reset</button>
+        </div>
+        <!-- Cycle Info -->
+        <div class="pomo-cycle-text text-muted" id="pomo-cycle-count">Completed Cycles: 0</div>
+      </div>
+    </div>
+  </div>

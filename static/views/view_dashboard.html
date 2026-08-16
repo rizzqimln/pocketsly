@@ -1,0 +1,354 @@
+        <!-- 1. DASHBOARD VIEW -->
+        <section class="view-panel" id="view-dashboard">
+          <div class="dashboard-wrapper">
+            <!-- Greeting Hero Card with Quick Actions -->
+            <div class="card welcome-card">
+              <div class="card-body">
+                <div class="d-flex justify-between items-start flex-wrap gap-lg">
+                  <div class="flex-1">
+                    <h2 id="dash-greeting">Good morning</h2>
+                    <p class="text-muted" id="dash-date-str">Loading today's date...</p>
+                  </div>
+                  <!-- Profile Card (visible on mobile, compact on desktop) -->
+                  <a class="dash-profile-card" data-view="profile" href="#profile"
+                    onclick="App.openProfileSettings(); return false;" title="Profile &amp; Settings">
+                    <div class="avatar" id="mobile-header-avatar">U</div>
+                    <div class="dash-profile-meta">
+                      <span class="dash-profile-name" id="mobile-header-username">User</span>
+                      <span class="dash-profile-sub">Profile &amp; Security Settings</span>
+                    </div>
+                  </a>
+                </div>
+                <!-- 4 KPI Summary Cards Row -->
+                <div class="dash-kpi-grid">
+                  <!-- KPI 1: Habits -->
+                  <div class="stat-item stat-item-indigo">
+                    <div class="d-flex justify-between items-start">
+                      <div>
+                        <span class="stat-label">Habits Checked</span>
+                        <div class="stat-value" id="dash-kpi-habits-val">0 / 0</div>
+                      </div>
+                      <div class="stat-icon-box stat-icon-indigo">
+                        <svg class="icon-svg" viewBox="0 0 24 24">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </div>
+                    </div>
+                    <div>
+                      <span class="stat-pill stat-pill-indigo" id="dash-kpi-habits-sub">0% Done</span>
+                    </div>
+                  </div>
+                  <!-- KPI 2: Tasks -->
+                  <div class="stat-item stat-item-amber">
+                    <div class="d-flex justify-between items-start">
+                      <div>
+                        <span class="stat-label">Pending Tasks</span>
+                        <div class="stat-value stat-value-amber" id="dash-kpi-tasks-val">0</div>
+                      </div>
+                      <div class="stat-icon-box stat-icon-amber">
+                        <svg class="icon-svg" viewBox="0 0 24 24">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <line x1="12" x2="12" y1="8" y2="12"></line>
+                          <line x1="12" x2="12.01" y1="16" y2="16"></line>
+                        </svg>
+                      </div>
+                    </div>
+                    <div>
+                      <span class="stat-pill stat-pill-amber" id="dash-kpi-tasks-sub">Focus Today</span>
+                    </div>
+                  </div>
+                  <!-- KPI 3: Schedule -->
+                  <div class="stat-item stat-item-purple">
+                    <div class="d-flex justify-between items-start">
+                      <div>
+                        <span class="stat-label">Today's Classes</span>
+                        <div class="stat-value stat-value-purple" id="dash-kpi-events-val">0</div>
+                      </div>
+                      <div class="stat-icon-box stat-icon-purple">
+                        <svg class="icon-svg" viewBox="0 0 24 24">
+                          <rect height="18" rx="2" ry="2" width="18" x="3" y="4"></rect>
+                          <line x1="16" x2="16" y1="2" y2="6"></line>
+                          <line x1="8" x2="8" y1="2" y2="6"></line>
+                          <line x1="3" x2="21" y1="10" y2="10"></line>
+                        </svg>
+                      </div>
+                    </div>
+                    <div>
+                      <span class="stat-pill stat-pill-purple" id="dash-kpi-events-sub">Scheduled</span>
+                    </div>
+                  </div>
+                  <!-- KPI 4: Cashflow -->
+                  <div class="stat-item stat-item-emerald">
+                    <div class="d-flex justify-between items-start">
+                      <div>
+                        <span class="stat-label">Net Balance</span>
+                        <div class="stat-value stat-value-emerald" id="dash-kpi-budget-val">0</div>
+                      </div>
+                      <div class="stat-icon-box stat-icon-emerald">
+                        <svg class="icon-svg" viewBox="0 0 24 24">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <path d="M12 6v12M15 9.5H10.5a2 2 0 0 0 0 4h3a2 2 0 0 1 0 4H9"></path>
+                        </svg>
+                      </div>
+                    </div>
+                    <div>
+                      <span class="stat-pill stat-pill-emerald" id="dash-kpi-budget-sub">Cash Flow</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- First-Run Onboarding Panel (hidden once the user has any data) -->
+            <div class="dash-onboarding-panel" id="dash-onboarding-panel">
+              <div class="onboarding-hero">
+                <div class="onboarding-hero-icon">
+                  <svg fill="none" height="28" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                    stroke-width="2.2" viewBox="0 0 24 24" width="28">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                    <path d="M2 17l10 5 10-5"></path>
+                    <path d="M2 12l10 5 10-5"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="onboarding-title">Welcome to Pocketsly</h3>
+                  <p class="onboarding-subtitle">Your all-in-one student day — habits, tasks, timetable, journal,
+                    learning labs, and budget. Everything lives in one place.</p>
+                </div>
+              </div>
+              <div class="onboarding-modules-grid">
+                <a class="onboarding-module-tile" href="#habits">
+                  <span class="tile-icon text-brand">
+                    <svg class="icon-svg" viewBox="0 0 24 24">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                  </span>
+                  <div>
+                    <div class="tile-title">Habits &amp; Tasks</div>
+                    <div class="tile-desc">Build consistent routines and organize your priorities.</div>
+                  </div>
+                  <span class="tile-open">Open →</span>
+                </a>
+                <a class="onboarding-module-tile" href="#schedule">
+                  <span class="tile-icon text-brand">
+                    <svg class="icon-svg" viewBox="0 0 24 24">
+                      <rect height="18" rx="2" ry="2" width="18" x="3" y="4"></rect>
+                      <line x1="16" x2="16" y1="2" y2="6"></line>
+                      <line x1="8" x2="8" y1="2" y2="6"></line>
+                      <line x1="3" x2="21" y1="10" y2="10"></line>
+                    </svg>
+                  </span>
+                  <div>
+                    <div class="tile-title">Weekly Timetable</div>
+                    <div class="tile-desc">Block out classes, focus work, and personal routines.</div>
+                  </div>
+                  <span class="tile-open">Open →</span>
+                </a>
+                <a class="onboarding-module-tile" href="#notes">
+                  <span class="tile-icon text-brand">
+                    <svg class="icon-svg" viewBox="0 0 24 24">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14 2 14 8 20 8"></polyline>
+                      <line x1="16" x2="8" y1="13" y2="13"></line>
+                      <line x1="16" x2="8" y1="17" y2="17"></line>
+                    </svg>
+                  </span>
+                  <div>
+                    <div class="tile-title">Journal &amp; Notes</div>
+                    <div class="tile-desc">Capture daily reflections, ideas, and lecture notes.</div>
+                  </div>
+                  <span class="tile-open">Open →</span>
+                </a>
+                <a class="onboarding-module-tile" href="#curriculum">
+                  <span class="tile-icon text-brand">
+                    <svg class="icon-svg" viewBox="0 0 24 24">
+                      <line x1="8" x2="21" y1="6" y2="6"></line>
+                      <line x1="8" x2="21" y1="12" y2="12"></line>
+                      <line x1="8" x2="21" y1="18" y2="18"></line>
+                      <line x1="3" x2="3.01" y1="6" y2="6"></line>
+                      <line x1="3" x2="3.01" y1="12" y2="12"></line>
+                      <line x1="3" x2="3.01" y1="18" y2="18"></line>
+                    </svg>
+                  </span>
+                  <div>
+                    <div class="tile-title">Curriculum Lab</div>
+                    <div class="tile-desc">Learn DB design, fullstack architecture, and algorithms live.</div>
+                  </div>
+                  <span class="tile-open">Open →</span>
+                </a>
+                <a class="onboarding-module-tile" href="#budget">
+                  <span class="tile-icon text-success">
+                    <svg class="icon-svg" viewBox="0 0 24 24">
+                      <rect height="14" rx="2" width="20" x="2" y="5"></rect>
+                      <line x1="2" x2="22" y1="10" y2="10"></line>
+                    </svg>
+                  </span>
+                  <div>
+                    <div class="tile-title">Monthly Budget</div>
+                    <div class="tile-desc">Set limits and log expenses to manage student finances.</div>
+                  </div>
+                  <span class="tile-open">Open →</span>
+                </a>
+              </div>
+              <div class="onboarding-cta">
+                <button class="btn btn-primary font-bold d-inline-flex items-center gap-sm p-md"
+                  onclick="Habits.openCreateModal()" type="button">
+                  <svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                    stroke-width="2.5" viewBox="0 0 24 24" width="15">
+                    <line x1="12" x2="12" y1="5" y2="19"></line>
+                    <line x1="5" x2="19" y1="12" y2="12"></line>
+                  </svg>
+                  Start here — add your first habit
+                </button>
+                <span class="onboarding-hint">Your dashboard fills in automatically as you add data anywhere.</span>
+              </div>
+            </div>
+            <!-- Two-Column Productive Dashboard Grid -->
+            <div class="dashboard-main-grid">
+              <!-- LEFT MAIN COLUMN -->
+              <div class="d-flex flex-col gap-xl">
+                <!-- 1. Today's Habits Progress -->
+                <div class="card">
+                  <div class="card-header">
+                    <div class="d-flex items-center gap-sm">
+                      <svg class="icon-svg icon-md icon-brand" viewBox="0 0 24 24">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                      <h3 class="m-0 text-lg font-bold">Today's Habits &amp; Routines</h3>
+                    </div>
+                    <a class="link-btn text-sm font-semibold" href="#habits">Planner →</a>
+                  </div>
+                  <div class="card-body" id="dash-habits-list">
+                    <p class="text-muted">Loading habits...</p>
+                  </div>
+                </div>
+                <!-- 2. Focus Tasks for Today -->
+                <div class="card">
+                  <div class="card-header">
+                    <div class="d-flex items-center gap-sm">
+                      <svg class="icon-svg icon-md icon-amber" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" x2="12" y1="8" y2="12"></line>
+                        <line x1="12" x2="12.01" y1="16" y2="16"></line>
+                      </svg>
+                      <h3 class="m-0 text-lg font-bold">Priority Focus Tasks</h3>
+                    </div>
+                    <a class="link-btn text-sm font-semibold" href="#habits">View All →</a>
+                  </div>
+                  <div class="card-body" id="dash-tasks-list">
+                    <p class="text-muted">Loading tasks...</p>
+                  </div>
+                </div>
+                <!-- 3. Recent Journal & Notes (Desktop Only) -->
+                <div class="card desktop-only-card">
+                  <div class="card-header">
+                    <div class="d-flex items-center gap-sm">
+                      <svg class="icon-svg icon-md icon-pink" viewBox="0 0 24 24">
+                        <path d="M12 20h9"></path>
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                      </svg>
+                      <h3 class="m-0 text-lg font-bold">Recent Journal &amp; Study Notes</h3>
+                    </div>
+                    <a class="link-btn text-sm" href="#notes">Open Notes →</a>
+                  </div>
+                  <div class="card-body" id="dash-notes-preview">
+                    <p class="text-muted">Loading recent reflections...</p>
+                  </div>
+                </div>
+              </div>
+              <!-- RIGHT SIDEBAR COLUMN -->
+              <div class="d-flex flex-col gap-xl">
+                <!-- 4. Today's Timetable / Schedule -->
+                <div class="card">
+                  <div class="card-header">
+                    <div class="d-flex items-center gap-sm">
+                      <svg class="icon-svg icon-md icon-purple" viewBox="0 0 24 24">
+                        <rect height="18" rx="2" ry="2" width="18" x="3" y="4"></rect>
+                        <line x1="16" x2="16" y1="2" y2="6"></line>
+                        <line x1="8" x2="8" y1="2" y2="6"></line>
+                        <line x1="3" x2="21" y1="10" y2="10"></line>
+                      </svg>
+                      <h3 class="m-0 text-lg font-bold">Today's Timetable</h3>
+                    </div>
+                    <a class="link-btn text-sm" href="#schedule">Full Schedule →</a>
+                  </div>
+                  <div class="card-body" id="dash-events-list">
+                    <p class="text-muted">Loading schedule...</p>
+                  </div>
+                </div>
+                <!-- 5. Monthly Budget Snapshot (Desktop Only) -->
+                <div class="card desktop-only-card dash-financial-gradient">
+                  <div class="card-header">
+                    <div class="d-flex items-center gap-sm">
+                      <svg class="icon-svg icon-md icon-emerald" viewBox="0 0 24 24">
+                        <line x1="12" x2="12" y1="1" y2="23"></line>
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                      </svg>
+                      <h3 class="m-0 text-lg font-bold">Financial Snapshot</h3>
+                    </div>
+                    <a class="link-btn text-sm" href="#budget">Budget App →</a>
+                  </div>
+                  <div class="card-body" id="dash-budget-summary">
+                    <p class="text-muted">Loading cashflow...</p>
+                  </div>
+                </div>
+                <!-- 6. Curriculum Lab Quick Jump (Desktop Only) -->
+                <div class="card desktop-only-card dash-curriculum-gradient">
+                  <div class="card-header">
+                    <div class="d-flex items-center gap-sm">
+                      <svg class="icon-svg icon-md icon-brand" viewBox="0 0 24 24">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                        <path d="M2 17l10 5 10-5"></path>
+                      </svg>
+                      <h3 class="m-0 text-lg font-bold">Curriculum Sandboxes</h3>
+                    </div>
+                    <a class="link-btn text-sm" href="#curriculum">All Labs →</a>
+                  </div>
+                  <div class="card-body d-flex flex-col gap-md">
+                    <button class="btn btn-outline btn-block d-flex items-center justify-between text-sm p-md"
+                      onclick="App.navigateTo('curriculum'); window.Curriculum.switchTab('db');" type="button">
+                      <span class="d-flex items-center gap-sm">
+                        <svg class="icon-svg text-success" viewBox="0 0 24 24">
+                          <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                          <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+                        </svg>
+                        SQL Live Sandbox
+                      </span>
+                      <span>→</span>
+                    </button>
+                    <button class="btn btn-outline btn-block d-flex items-center justify-between text-sm p-md"
+                      onclick="App.navigateTo('curriculum'); window.Curriculum.switchTab('algorithms');" type="button">
+                      <span class="d-flex items-center gap-sm">
+                        <svg class="icon-svg text-brand" viewBox="0 0 24 24">
+                          <polygon points="12 2 2 22 22 22"></polygon>
+                        </svg>
+                        DSA Sorting Visualizer
+                      </span>
+                      <span>→</span>
+                    </button>
+                    <button class="btn btn-outline btn-block d-flex items-center justify-between text-sm p-md"
+                      onclick="App.navigateTo('curriculum'); window.Curriculum.switchTab('flashcards');" type="button">
+                      <span class="d-flex items-center gap-sm">
+                        <svg class="icon-svg text-purple" viewBox="0 0 24 24">
+                          <rect height="16" rx="2" width="18" x="3" y="4"></rect>
+                          <line x1="7" x2="17" y1="8" y2="8"></line>
+                        </svg>
+                        CS Theory Flashcards
+                      </span>
+                      <span>→</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Main Dashboard Floating Action Button (Log Cash Flow & Quick Actions) -->
+          <button aria-label="Log Cash Flow &amp; Quick Actions" class="mobile-fab dashboard-fab"
+            onclick="Dashboard.openLogCashFlowModal()" title="Log Cash Flow &amp; Quick Actions" type="button">
+            <svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+              stroke-width="2.5" viewBox="0 0 24 24" width="24">
+              <line x1="12" x2="12" y1="5" y2="19"></line>
+              <line x1="5" x2="19" y1="12" y2="12"></line>
+            </svg>
+          </button>
+        </section>

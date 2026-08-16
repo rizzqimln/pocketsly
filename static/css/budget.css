@@ -888,3 +888,33 @@
   color: #ffffff !important;
   box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35);
 }
+
+.kpi-hero-balance {
+  letter-spacing: -0.02em;
+  margin: 0.15rem 0;
+}
+
+.donut-mini-svg {
+  width: 40px;
+  height: 40px;
+}
+
+.budget-flow-strip {
+  background: var(--bg-surface-alt);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.text-income-arrow {
+  color: #10B981;
+  font-weight: 800;
+}
+
+.text-expense-arrow {
+  color: #EF4444;
+  font-weight: 800;
+}
+
+.donut-feedback-text {
+  font-size: 0.76rem;
+}

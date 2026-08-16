@@ -316,3 +316,25 @@
   max-width: 260px;
   line-height: 1.5;
 }
+
+/* ── REUSABLE UTILITIES & SEMANTIC CLASSES ─────────────────────────────────── */
+.tile-line-80 { width: 80% !important; }
+.tile-line-70 { width: 70% !important; }
+.tile-line-65 { width: 65% !important; }
+
+.badge-success-subtle {
+  background: rgba(16, 185, 129, 0.15) !important;
+  color: #10B981 !important;
+}
+
+.palette-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--primary);
+}
+
+.pomo-title-icon {
+  width: 20px;
+  height: 20px;
+}

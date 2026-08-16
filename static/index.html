@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
   <meta charset="utf-8" />
   <meta content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" name="viewport" />
@@ -21,9 +19,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
-  <!-- Google Fonts is loaded async (media=print trick) so it never blocks first
-       paint; after the first online visit the service worker runtime-caches it,
-       keeping the PWA's offline promise intact. -->
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
     rel="stylesheet" media="print" onload="this.media='all'" />
   <noscript>
@@ -31,13 +26,12 @@
       rel="stylesheet" />
   </noscript>
 
-  <!-- Bundled styling: one file, zero render-blocking fan-out over HTTP/1.1.
-       Sources stay modular under static/css; regenerate via scripts/build.py. -->
+  <!-- Bundled styling: one file, zero render-blocking fan-out over HTTP/1.1. -->
   <link href="/css/bundle.css?v=8.8" rel="stylesheet" />
 </head>
-
 <body>
-  <!-- ===================================================================== -->
+
+<!-- ===================================================================== -->
   <!-- LANDING PAGE (public entry, replaces login-first gate)                -->
   <!-- ===================================================================== -->
   <div class="landing" id="landing-container">
@@ -108,7 +102,7 @@
                 </svg></div>
               <div class="tile-line"></div>
               <div class="tile-line short"></div>
-              <div class="tile-line success" style="width:80%"></div>
+              <div class="tile-line success tile-line-80"></div>
             </div>
             <div class="ld-mock-tile">
               <div class="tile-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
@@ -119,7 +113,7 @@
                   <line x1="3" y1="10" x2="21" y2="10"></line>
                 </svg></div>
               <div class="tile-line"></div>
-              <div class="tile-line warn" style="width:65%"></div>
+              <div class="tile-line warn tile-line-65"></div>
             </div>
             <div class="ld-mock-tile">
               <div class="tile-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
@@ -137,7 +131,7 @@
                   <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
                 </svg></div>
               <div class="tile-line"></div>
-              <div class="tile-line success" style="width:70%"></div>
+              <div class="tile-line success tile-line-70"></div>
             </div>
           </div>
         </div>
@@ -344,18 +338,18 @@
       </div>
     </footer>
   </div>
-  <!-- ===================================================================== -->
-  <!-- MAIN APP CONTAINER (SPA Shell)                                        -->
-  <!-- ===================================================================== -->
-  <div class="app-layout hidden" id="app-container">
+
+<div class="app-layout hidden" id="app-container">
     <!-- SIDEBAR NAVIGATION -->
     <aside class="sidebar">
       <div class="brand">
-        <span class="brand-icon-dot"></span>
-        <span class="brand-name">Pocketsly</span>
+        <a class="brand-main" href="#dashboard">
+          <span class="brand-icon-dot"></span>
+          <span class="brand-name">Pocketsly</span>
+        </a>
         <button aria-label="Toggle Sidebar" class="sidebar-toggle-btn" id="sidebar-toggle-btn"
-          onclick="App.toggleSidebar()" title="Collapse Sidebar" type="button">
-          <svg class="icon-svg icon-12" viewBox="0 0 24 24">
+          onclick="App.toggleSidebar()" title="Toggle Sidebar" type="button">
+          <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="15 18 9 12 15 6"></polyline>
           </svg>
         </button>
@@ -447,7 +441,7 @@
           <span class="user-role">Student / Worker</span>
         </div>
         <div class="d-flex gap-xs">
-          <button class="btn-icon" onclick="App.navigateTo('profile')" title="Profile Settings">
+          <button class="btn-icon" onclick="App.navigateTo('profile')" title="Profile Settings" type="button">
             <svg class="icon-svg" viewBox="0 0 24 24">
               <circle cx="12" cy="12" r="3"></circle>
               <path
@@ -455,17 +449,18 @@
               </path>
             </svg>
           </button>
-          <button class="btn-icon" id="logout-btn" title="Logout">
+          <button class="btn-icon" id="logout-btn" title="Logout" type="button">
             <svg class="icon-svg" viewBox="0 0 24 24">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
               <polyline points="16 17 21 12 16 7"></polyline>
-              <line x1="21" x2="9" y1="12" y2="12"></line>
+              <line x1="21" x2="9" y1="12" x2="9" y2="12"></line>
             </svg>
           </button>
         </div>
       </div>
     </aside>
-    <!-- MAIN CONTENT AREA -->
+
+<!-- MAIN CONTENT AREA -->
     <main class="main-content">
       <!-- HEADER -->
       <header class="top-header">
@@ -477,7 +472,8 @@
       </header>
       <!-- DYNAMIC VIEWS CONTAINER -->
       <div class="view-container">
-        <!-- 1. DASHBOARD VIEW -->
+
+<!-- 1. DASHBOARD VIEW -->
         <section class="view-panel" id="view-dashboard">
           <div class="dashboard-wrapper">
             <!-- Greeting Hero Card with Quick Actions -->
@@ -785,7 +781,7 @@
                   </div>
                   <div class="card-body d-flex flex-col gap-md">
                     <button class="btn btn-outline btn-block d-flex items-center justify-between text-sm p-md"
-                      onclick="App.navigateTo('curriculum'); window.Curriculum.switchTab('db');">
+                      onclick="App.navigateTo('curriculum'); window.Curriculum.switchTab('db');" type="button">
                       <span class="d-flex items-center gap-sm">
                         <svg class="icon-svg text-success" viewBox="0 0 24 24">
                           <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
@@ -796,7 +792,7 @@
                       <span>→</span>
                     </button>
                     <button class="btn btn-outline btn-block d-flex items-center justify-between text-sm p-md"
-                      onclick="App.navigateTo('curriculum'); window.Curriculum.switchTab('algorithms');">
+                      onclick="App.navigateTo('curriculum'); window.Curriculum.switchTab('algorithms');" type="button">
                       <span class="d-flex items-center gap-sm">
                         <svg class="icon-svg text-brand" viewBox="0 0 24 24">
                           <polygon points="12 2 2 22 22 22"></polygon>
@@ -806,7 +802,7 @@
                       <span>→</span>
                     </button>
                     <button class="btn btn-outline btn-block d-flex items-center justify-between text-sm p-md"
-                      onclick="App.navigateTo('curriculum'); window.Curriculum.switchTab('flashcards');">
+                      onclick="App.navigateTo('curriculum'); window.Curriculum.switchTab('flashcards');" type="button">
                       <span class="d-flex items-center gap-sm">
                         <svg class="icon-svg text-purple" viewBox="0 0 24 24">
                           <rect height="16" rx="2" width="18" x="3" y="4"></rect>
@@ -823,7 +819,7 @@
           </div>
           <!-- Main Dashboard Floating Action Button (Log Cash Flow & Quick Actions) -->
           <button aria-label="Log Cash Flow &amp; Quick Actions" class="mobile-fab dashboard-fab"
-            onclick="Dashboard.openLogCashFlowModal()" title="Log Cash Flow &amp; Quick Actions">
+            onclick="Dashboard.openLogCashFlowModal()" title="Log Cash Flow &amp; Quick Actions" type="button">
             <svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
               stroke-width="2.5" viewBox="0 0 24 24" width="24">
               <line x1="12" x2="12" y1="5" y2="19"></line>
@@ -831,7 +827,8 @@
             </svg>
           </button>
         </section>
-        <!-- 2. HABITS & TASKS VIEW -->
+
+<!-- 2. HABITS & TASKS VIEW -->
         <section class="view-panel hidden" id="view-habits">
           <div class="planner-grid">
             <!-- Habits Column -->
@@ -844,7 +841,7 @@
                     and track streaks.</p>
                 </div>
                 <button class="btn btn-primary btn-sm d-inline-flex items-center gap-sm text-sm p-sm"
-                  onclick="Habits.openCreateModal()">
+                  onclick="Habits.openCreateModal()" type="button">
                   + New Habit
                 </button>
               </div>
@@ -859,19 +856,18 @@
                   <h3 class="font-extrabold text-primary text-base">
                     Tasks &amp; Priorities</h3>
                   <p class="text-muted m-0 text-sm">Organize items by urgency and check them
-                    off
-                    when done.</p>
+                    off when done.</p>
                 </div>
                 <button class="btn btn-primary btn-sm d-inline-flex items-center gap-sm text-sm p-sm"
-                  onclick="Tasks.openCreateModal()">
+                  onclick="Tasks.openCreateModal()" type="button">
                   + New Task
                 </button>
               </div>
               <div class="task-filters d-flex gap-sm flex-wrap mb-lg">
-                <button class="filter-btn active" data-filter="all">All</button>
-                <button class="filter-btn" data-filter="high">High</button>
-                <button class="filter-btn" data-filter="pending">Pending</button>
-                <button class="filter-btn" data-filter="completed">Done</button>
+                <button class="filter-btn active" data-filter="all" type="button">All</button>
+                <button class="filter-btn" data-filter="high" type="button">High</button>
+                <button class="filter-btn" data-filter="pending" type="button">Pending</button>
+                <button class="filter-btn" data-filter="completed" type="button">Done</button>
               </div>
               <div class="tasks-container" id="tasks-list-container">
                 <!-- Tasks injected by JS -->
@@ -879,13 +875,15 @@
             </div>
           </div>
         </section>
-        <!-- 4. SCHEDULE VIEW -->
+
+<!-- 3. SCHEDULE VIEW -->
         <section class="view-panel hidden" id="view-schedule">
           <div class="timetable-grid" id="timetable-container">
             <!-- Timetable generated by JS -->
           </div>
         </section>
-        <!-- 5. NOTES & LIBRARY VIEW -->
+
+<!-- 4. NOTES & LIBRARY VIEW -->
         <section class="view-panel hidden" id="view-notes">
           <!-- Main Sub-Navigation Bar for Journal & Notes vs Library & Academic Journals -->
           <div class="notes-view-tabs d-flex gap-sm">
@@ -975,9 +973,9 @@
                   <textarea class="note-body-textarea flex-1" id="note-body-input"
                     placeholder="Start writing... your thoughts, class notes, reflections, or ideas."></textarea>
                   <div class="editor-actions d-flex justify-between items-center">
-                    <button class="btn btn-danger hidden text-sm p-sm" id="delete-note-btn">Delete
+                    <button class="btn btn-danger hidden text-sm p-sm" id="delete-note-btn" type="button">Delete
                       Note</button>
-                    <button class="btn btn-primary d-flex items-center gap-sm font-bold p-xl" id="save-note-btn">
+                    <button class="btn btn-primary d-flex items-center gap-sm font-bold p-xl" id="save-note-btn" type="button">
                       <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                         stroke-width="2.5" viewBox="0 0 24 24" width="14">
                         <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
@@ -1022,7 +1020,7 @@
 
                 <!-- Search & Filter Controls Row -->
                 <div class="d-flex flex-wrap gap-sm justify-between items-center">
-                  <div class="notes-search-wrapper flex-1" style="min-width: 200px;">
+                  <div class="notes-search-wrapper flex-1">
                     <input class="w-full text-sm" id="library-search-input" oninput="Notes.handleLibrarySearch(event)"
                       placeholder="Search title, author, journal, DOI..." type="text" />
                     <svg class="icon-svg text-muted" viewBox="0 0 24 24">
@@ -1054,19 +1052,20 @@
             </div>
           </div>
         </section>
-        <!-- 6. CURRICULUM LAB VIEW -->
+
+<!-- 5. CURRICULUM LAB VIEW -->
         <section class="view-panel hidden" id="view-curriculum">
           <div class="curriculum-layout">
             <!-- 3-Section Curriculum Navigation Bar -->
             <div class="curriculum-topbar">
-              <button class="curr-tab-btn active" data-tab="hub" onclick="window.Curriculum.switchTab('hub')">
+              <button class="curr-tab-btn active" data-tab="hub" onclick="window.Curriculum.switchTab('hub')" type="button">
                 <svg class="icon-svg" viewBox="0 0 24 24">
                   <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                   <polyline points="9 22 9 12 15 12 15 22"></polyline>
                 </svg>
                 <span>All Subject Catalog</span>
               </button>
-              <button class="curr-tab-btn" data-tab="general-sec" onclick="window.Curriculum.switchTab('general-sec')">
+              <button class="curr-tab-btn" data-tab="general-sec" onclick="window.Curriculum.switchTab('general-sec')" type="button">
                 <svg class="icon-svg" viewBox="0 0 24 24">
                   <rect height="7" rx="1.5" width="7" x="3" y="3"></rect>
                   <rect height="7" rx="1.5" width="7" x="14" y="3"></rect>
@@ -1075,8 +1074,7 @@
                 </svg>
                 <span>General &amp; Progress Directory</span>
               </button>
-              <button class="curr-tab-btn" data-tab="frontend-sec"
-                onclick="window.Curriculum.switchTab('frontend-sec')">
+              <button class="curr-tab-btn" data-tab="frontend-sec" onclick="window.Curriculum.switchTab('frontend-sec')" type="button">
                 <svg class="icon-svg" viewBox="0 0 24 24">
                   <rect height="14" rx="2" ry="2" width="20" x="2" y="3"></rect>
                   <line x1="8" x2="16" y1="21" y2="21"></line>
@@ -1084,7 +1082,7 @@
                 </svg>
                 <span>Frontend Development</span>
               </button>
-              <button class="curr-tab-btn" data-tab="backend-sec" onclick="window.Curriculum.switchTab('backend-sec')">
+              <button class="curr-tab-btn" data-tab="backend-sec" onclick="window.Curriculum.switchTab('backend-sec')" type="button">
                 <svg class="icon-svg" viewBox="0 0 24 24">
                   <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
                   <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
@@ -1498,19 +1496,19 @@
                     </button>
                     <h3>Performance &amp; Analytics Dashboard</h3>
                     <p class="text-muted">Monitor your course completion rate, weekly productivity metrics, learning
-                      velocity, and knowledge tracker curves.</p>
+                    velocity, and knowledge tracker curves.</p>
                   </div>
                   <div class="d-flex gap-sm flex-wrap">
                     <button class="btn btn-primary btn-sm d-inline-flex items-center gap-sm"
-                      onclick="window.Curriculum.openAddCourseModal()">
+                      onclick="window.Curriculum.openAddCourseModal()" type="button">
                       <svg class="icon-svg" viewBox="0 0 24 24">
-                        <line x1="12" x2="12" y1="5" y2="19"></line>
-                        <line x1="5" x2="19" y1="12" y2="12"></line>
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
                       </svg>
                       Add Course
                     </button>
                     <button class="btn btn-outline btn-sm d-inline-flex items-center gap-sm"
-                      onclick="window.Curriculum.openLogStudyModal()">
+                      onclick="window.Curriculum.openLogStudyModal()" type="button">
                       <svg class="icon-svg" viewBox="0 0 24 24">
                         <circle cx="12" cy="12" r="10"></circle>
                         <polyline points="12 6 12 12 16 14"></polyline>
@@ -1528,7 +1526,7 @@
                         <div class="font-bold text-secondary text-md">
                           Course Complete</div>
                         <button class="btn btn-outline btn-xs text-xs p-sm"
-                          onclick="window.Curriculum.openAddCourseModal()">Add Course</button>
+                          onclick="window.Curriculum.openAddCourseModal()" type="button">Add Course</button>
                       </div>
                       <div class="font-extrabold text-brand text-2xl" id="perf-course-percentage">
                         0%
@@ -1616,7 +1614,7 @@
                               class="text-muted">hours logged
                               total</span></div>
                         </div>
-                        <button class="btn btn-outline btn-sm" onclick="window.Curriculum.openLogStudyModal()"> Add
+                        <button class="btn btn-outline btn-sm" onclick="window.Curriculum.openLogStudyModal()" type="button"> Add
                           Study Session</button>
                       </div>
                       <!-- Study Logs Table / List -->
@@ -1629,7 +1627,8 @@
                   </div>
                 </div>
               </div>
-              <!-- RELATIONAL DATABASE SANDBOX -->
+
+<!-- RELATIONAL DATABASE SANDBOX -->
               <div class="curr-panel hidden" id="curr-db">
                 <div class="panel-header">
                   <button
@@ -1808,24 +1807,24 @@
                   <div class="card">
                     <h4>1. Choose Endpoint Action</h4>
                     <div class="action-btn-list gap-sm">
-                      <button class="backend-trigger-btn btn btn-outline btn-sm" data-action="get-session">GET
+                      <button class="backend-trigger-btn btn btn-outline btn-sm" data-action="get-session" type="button">GET
                         /api/session (Session)</button>
-                      <button class="backend-trigger-btn btn btn-outline btn-sm" data-action="get-tasks">GET /api/tasks
+                      <button class="backend-trigger-btn btn btn-outline btn-sm" data-action="get-tasks" type="button">GET /api/tasks
                         (Tasks)</button>
-                      <button class="backend-trigger-btn btn btn-outline btn-sm" data-action="get-habits">GET
+                      <button class="backend-trigger-btn btn btn-outline btn-sm" data-action="get-habits" type="button">GET
                         /api/habits (Habits)</button>
-                      <button class="backend-trigger-btn btn btn-outline btn-sm" data-action="get-notes">GET /api/notes
+                      <button class="backend-trigger-btn btn btn-outline btn-sm" data-action="get-notes" type="button">GET /api/notes
                         (Notes)</button>
-                      <button class="backend-trigger-btn btn btn-outline btn-sm" data-action="get-courses">GET
+                      <button class="backend-trigger-btn btn btn-outline btn-sm" data-action="get-courses" type="button">GET
                         /api/courses (Courses)</button>
-                      <button class="backend-trigger-btn btn btn-outline btn-sm" data-action="get-incomes">GET
+                      <button class="backend-trigger-btn btn btn-outline btn-sm" data-action="get-incomes" type="button">GET
                         /api/incomes (Incomes)</button>
-                      <button class="backend-trigger-btn btn btn-outline btn-sm" data-action="get-expenses">GET
+                      <button class="backend-trigger-btn btn btn-outline btn-sm" data-action="get-expenses" type="button">GET
                         /api/expenses (Expenses)</button>
-                      <button class="backend-trigger-btn btn btn-outline btn-sm" data-action="get-budget-summary">GET
+                      <button class="backend-trigger-btn btn btn-outline btn-sm" data-action="get-budget-summary" type="button">GET
                         /api/budget/summary (Cashflow)</button>
                       <button class="backend-trigger-btn btn btn-outline btn-sm col-span-full"
-                        data-action="get-schema">GET /api/curriculum/schema (Database Schema)</button>
+                        data-action="get-schema" type="button">GET /api/curriculum/schema (Database Schema)</button>
                     </div>
                   </div>
                   <div class="card">
@@ -1960,9 +1959,9 @@
                 <div class="card">
                   <div class="algo-controls-wrapper">
                     <div class="algo-controls">
-                      <button class="btn btn-outline" id="algo-generate-arr">Shuffle Array</button>
-                      <button class="btn btn-primary" id="algo-sort-bubble">Bubble Sort</button>
-                      <button class="btn btn-primary" id="algo-sort-quick">Quick Sort</button>
+                      <button class="btn btn-outline" id="algo-generate-arr" type="button">Shuffle Array</button>
+                      <button class="btn btn-primary" id="algo-sort-bubble" type="button">Bubble Sort</button>
+                      <button class="btn btn-primary" id="algo-sort-quick" type="button">Quick Sort</button>
                     </div>
                     <div class="algo-speed-control">
                       <label for="algo-speed">Speed:</label>
@@ -2052,14 +2051,14 @@
                         <div class="quiz-feedback-content" id="quiz-feedback-box">
                           <!-- Feedback description will go here -->
                         </div>
-                        <button class="btn btn-outline btn-block mt-xl" id="quiz-back-btn">Show
+                        <button class="btn btn-outline btn-block mt-xl" id="quiz-back-btn" type="button">Show
                           Question</button>
                       </div>
                     </div>
                   </div>
                   <div class="quiz-footer">
                     <span id="quiz-progress-text">Question 1/10</span>
-                    <button class="btn btn-primary" id="quiz-next-btn">Next Challenge →</button>
+                    <button class="btn btn-primary" id="quiz-next-btn" type="button">Next Challenge →</button>
                   </div>
                 </div>
               </div>
@@ -2288,7 +2287,7 @@
                           oninput="window.Curriculum.testRegex()" type="text"
                           value="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" />
                       </div>
-                      <div style="width: 90px;">
+                      <div class="regex-flags-wrapper">
                         <label class="text-xs font-semibold">Flags</label>
                         <input class="font-mono text-sm w-full" id="regex-flags-input"
                           oninput="window.Curriculum.testRegex()" type="text" value="gi" />
@@ -2307,8 +2306,7 @@
                 <div class="card">
                   <div class="card-header d-flex justify-between items-center">
                     <span class="font-bold text-xs text-secondary">MATCH ANALYSIS &amp; HIGHLIGHTS</span>
-                    <span class="priority-badge" id="regex-match-badge"
-                      style="background: rgba(16, 185, 129, 0.15); color: #10B981;">0 Matches</span>
+                    <span class="priority-badge badge-success-subtle" id="regex-match-badge">0 Matches</span>
                   </div>
                   <div class="card-body p-lg">
                     <div class="regex-highlight-box p-md mb-md" id="regex-highlight-output"></div>
@@ -2327,16 +2325,16 @@
                   </div>
                   <div class="d-flex gap-sm">
                     <button class="btn btn-outline btn-sm d-flex items-center gap-xs"
-                      onclick="Curriculum.loadCoursesIntoGPA()">
+                      onclick="Curriculum.loadCoursesIntoGPA()" type="button">
                       <svg fill="none" height="13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                         stroke-width="2.2" viewBox="0 0 24 24" width="13">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                         <polyline points="7 10 12 15 17 10"></polyline>
-                        <line x1="12" x2="12" y1="15" y2="3"></line>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
                       </svg>
                       Import Active Courses
                     </button>
-                    <button class="btn btn-primary btn-sm" onclick="Curriculum.addGPACourseRow()">
+                    <button class="btn btn-primary btn-sm" onclick="Curriculum.addGPACourseRow()" type="button">
                       Add Course
                     </button>
                   </div>
@@ -2419,7 +2417,8 @@
             </div>
           </div>
         </section>
-        <!-- 7. MONTHLY BUDGET & CASH FLOW VIEW -->
+
+<!-- 6. MONTHLY BUDGET & CASH FLOW VIEW -->
         <section class="view-panel hidden" id="view-budget">
           <!-- Top Bar: Title & Quick Header Actions -->
           <div class="budget-top-bar d-flex justify-between items-center flex-wrap gap-sm mb-md">
@@ -2457,16 +2456,15 @@
               <div class="d-flex justify-between items-start flex-wrap gap-sm mb-md">
                 <div>
                   <div class="text-muted font-bold text-xs">NET CASH FLOW</div>
-                  <div class="text-primary text-3xl font-extrabold" id="kpi-total-balance"
-                    style="letter-spacing: -0.02em; margin: 0.15rem 0;">0</div>
+                  <div class="text-primary text-3xl font-extrabold kpi-hero-balance" id="kpi-total-balance">0</div>
                   <div class="d-inline-flex items-center gap-xs">
                     <span class="priority-badge priority-low font-bold text-xs" id="kpi-balance-status">Healthy
                       Surplus</span>
                     <span class="text-muted text-xs font-mono" id="donut-percent-text">0%</span>
                   </div>
                 </div>
-                <div class="donut-chart-wrapper-mini" style="display:none;">
-                  <svg class="donut" viewBox="0 0 36 36" style="width:40px; height:40px;">
+                <div class="donut-chart-wrapper-mini hidden">
+                  <svg class="donut donut-mini-svg" viewBox="0 0 36 36">
                     <circle class="donut-ring" cx="18" cy="18" fill="transparent" r="15.915"
                       stroke="var(--border-color)" stroke-width="3"></circle>
                     <circle class="donut-segment" cx="18" cy="18" fill="transparent" id="donut-usage-segment" r="15.915"
@@ -2477,11 +2475,10 @@
               </div>
 
               <!-- 2-Column Inflow vs Outflow Mini Bar -->
-              <div class="grid-2col gap-md p-sm"
-                style="background: var(--bg-surface-alt); border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+              <div class="grid-2col gap-md p-sm budget-flow-strip">
                 <div class="d-flex justify-between items-center">
                   <div class="d-flex items-center gap-xs">
-                    <span style="color:#10B981; font-weight:800;">↑</span>
+                    <span class="text-income-arrow">↑</span>
                     <span class="text-muted text-xs font-semibold">Income:</span>
                   </div>
                   <span class="font-extrabold text-success text-sm font-mono" id="kpi-total-income">0</span>
@@ -2490,7 +2487,7 @@
                 </div>
                 <div class="d-flex justify-between items-center">
                   <div class="d-flex items-center gap-xs">
-                    <span style="color:#EF4444; font-weight:800;">↓</span>
+                    <span class="text-expense-arrow">↓</span>
                     <span class="text-muted text-xs font-semibold">Expense:</span>
                   </div>
                   <span class="font-extrabold text-danger text-sm font-mono" id="kpi-total-spent">0</span>
@@ -2502,7 +2499,7 @@
                 </div>
               </div>
 
-              <div class="text-muted text-xs mt-sm" id="donut-feedback-text" style="font-size: 0.76rem;">Ready to track:
+              <div class="text-muted text-xs mt-sm donut-feedback-text" id="donut-feedback-text">Ready to track:
                 Log daily expenses or income.</div>
             </div>
           </div>
@@ -2578,7 +2575,8 @@
       </div>
     </main>
   </div>
-  <!-- ===================================================================== -->
+
+<!-- ===================================================================== -->
   <!-- MOBILE MORE DRAWER / BOTTOM SHEET                                      -->
   <!-- ===================================================================== -->
   <div class="modal-overlay hidden" id="more-sheet-overlay" onclick="if(event.target === this) App.closeMoreDrawer()">
@@ -2677,6 +2675,7 @@
       </div>
     </div>
   </div>
+
   <!-- ===================================================================== -->
   <!-- BUDGET QUICK ACTIONS BOTTOM SHEET (mobile)                            -->
   <!-- ===================================================================== -->
@@ -2774,7 +2773,7 @@
           <h3 class="m-0 text-lg">Profile Settings</h3>
         </div>
         <button aria-label="Close profile" class="btn-icon d-flex items-center justify-center cursor-pointer text-xl"
-          onclick="App.closeProfileSettings()">×</button>
+          onclick="App.closeProfileSettings()" type="button">×</button>
       </div>
       <!-- Guest mode: sign in / register (shown when not authenticated) -->
       <div class="modal-body d-flex flex-col gap-md hidden" id="profile-guest">
@@ -2798,7 +2797,7 @@
             <input autocomplete="current-password" id="login-password" placeholder="••••••••" required=""
               type="password" />
           </div>
-          <button class="btn btn-primary btn-block font-bold" type="submit" style="min-height: 44px;">Sign In</button>
+          <button class="btn btn-primary btn-block btn-auth-submit" type="submit">Sign In</button>
           <p class="auth-switch m-0">Don't have an account? <a href="#" id="show-register-link">Create Account</a></p>
         </form>
         <form class="auth-form d-flex flex-col gap-md hidden" id="register-form">
@@ -2819,8 +2818,7 @@
             <input autocomplete="new-password" id="reg-password" minlength="6" placeholder="••••••••" required=""
               type="password" />
           </div>
-          <button class="btn btn-primary btn-block font-bold" type="submit" style="min-height: 44px;">Create
-            Account</button>
+          <button class="btn btn-primary btn-block btn-auth-submit" type="submit">Create Account</button>
           <p class="auth-switch m-0">Already have an account? <a href="#" id="show-login-link">Sign In</a></p>
         </form>
         <form class="auth-form d-flex flex-col gap-md hidden" id="forgot-form">
@@ -2848,8 +2846,7 @@
             <input autocomplete="new-password" id="forgot-confirm-password" minlength="6" placeholder="••••••••"
               required="" type="password" />
           </div>
-          <button class="btn btn-primary btn-block font-bold" type="submit" style="min-height: 44px;">Verify OTP &amp;
-            Reset Password</button>
+          <button class="btn btn-primary btn-block btn-auth-submit" type="submit">Verify OTP &amp; Reset Password</button>
           <p class="auth-switch m-0">Remember your password? <a href="#" id="forgot-back-login-link">Back to Sign In</a>
           </p>
         </form>
@@ -2858,12 +2855,10 @@
       <div class="modal-body d-flex flex-col gap-md" id="profile-signedin">
         <form class="auth-form d-flex flex-col gap-md" id="profile-settings-form">
           <!-- Current Info Display -->
-          <div class="d-flex items-center gap-lg p-sm"
-            style="background: var(--bg-surface-alt); border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+          <div class="d-flex items-center gap-lg p-sm profile-user-strip">
             <div class="avatar text-base" id="profile-avatar">U</div>
             <div>
-              <div class="font-bold text-primary text-base" id="profile-display-name">
-                User</div>
+              <div class="font-bold text-primary text-base" id="profile-display-name">User</div>
               <div class="text-muted text-xs">Student / Worker Account</div>
             </div>
           </div>
@@ -2886,8 +2881,7 @@
               <div class="d-flex gap-sm">
                 <input autocomplete="new-password" id="profile-password" minlength="6" placeholder="••••••••"
                   type="password" />
-                <button class="btn btn-secondary text-nowrap text-sm" id="profile-btn-send-otp" type="button"
-                  style="min-height: 42px; padding: 0 1rem; font-weight: 700;">Get OTP</button>
+                <button class="btn btn-secondary text-nowrap text-sm btn-profile-otp" id="profile-btn-send-otp" type="button">Get OTP</button>
               </div>
             </div>
             <div class="form-group" id="profile-otp-group">
@@ -2897,13 +2891,11 @@
                 type="text" />
             </div>
           </div>
-          <button class="btn btn-primary btn-block font-bold mt-xs" type="submit" style="min-height: 44px;">Save Account
-            Changes</button>
+          <button class="btn btn-primary btn-block btn-auth-submit mt-xs" type="submit">Save Account Changes</button>
         </form>
 
         <!-- Theme Preference Option -->
-        <div class="profile-section-card"
-          style="padding: 1.15rem; border: 1px solid var(--border-color); border-radius: var(--radius-lg); background: var(--bg-surface-alt);">
+        <div class="profile-section-card">
           <div class="font-bold text-primary d-flex items-center gap-sm mb-xs">
             <svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
               stroke-width="2.2" viewBox="0 0 24 24" width="15">
@@ -2912,9 +2904,8 @@
             Theme Preference
           </div>
           <p class="text-muted mb-md text-xs">Switch between light and dark visual aesthetics.</p>
-          <button class="theme-switch-btn w-full d-flex items-center justify-between cursor-pointer"
-            id="theme-toggle-btn" onclick="UI.toggleTheme()" title="Toggle Light / Dark Mode" type="button"
-            style="padding: 0.75rem 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); background: var(--bg-surface);">
+          <button class="theme-switch-btn w-full d-flex items-center justify-between cursor-pointer profile-theme-btn"
+            id="theme-toggle-btn" onclick="UI.toggleTheme()" title="Toggle Light / Dark Mode" type="button">
             <span class="d-flex items-center gap-sm font-semibold text-primary text-sm">
               <svg class="icon-svg text-brand" viewBox="0 0 24 24" id="profile-theme-svg">
                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
@@ -2926,8 +2917,7 @@
         </div>
 
         <!-- Data Backup & Restore Zone -->
-        <div class="profile-section-card"
-          style="padding: 1.15rem; border: 1px solid var(--border-color); border-radius: var(--radius-lg); background: var(--bg-surface-alt);">
+        <div class="profile-section-card">
           <div class="font-bold text-primary d-flex items-center gap-sm mb-xs">
             <svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
               stroke-width="2.2" viewBox="0 0 24 24" width="15">
@@ -2940,23 +2930,22 @@
           <p class="text-muted mb-md text-xs">Export your full routines, notes, budget logs, and courses as JSON or
             restore anytime.</p>
           <div class="d-grid grid-2col gap-sm">
-            <button class="btn btn-outline btn-sm d-flex items-center justify-center gap-sm font-bold"
-              onclick="App.exportBackup()" type="button" style="padding: 0.65rem 1rem; min-height: 42px;">
+            <button class="btn btn-outline btn-sm d-flex items-center justify-center gap-sm font-bold profile-backup-btn"
+              onclick="App.exportBackup()" type="button">
               <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                 stroke-width="2.2" viewBox="0 0 24 24" width="14">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                 <polyline points="7 10 12 15 17 10"></polyline>
-                <line x1="12" x2="12" y1="15" y2="3"></line>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
               </svg>
               Backup JSON
             </button>
-            <label class="btn btn-outline btn-sm d-flex items-center justify-center gap-sm font-bold cursor-pointer m-0"
-              style="padding: 0.65rem 1rem; min-height: 42px;">
+            <label class="btn btn-outline btn-sm d-flex items-center justify-center gap-sm font-bold cursor-pointer m-0 profile-backup-btn">
               <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                 stroke-width="2.2" viewBox="0 0 24 24" width="14">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                 <polyline points="17 8 12 3 7 8"></polyline>
-                <line x1="12" x2="12" y1="3" y2="15"></line>
+                <line x1="12" y1="12" x2="12" y2="3"></line>
               </svg>
               Restore Backup
               <input accept=".json,application/json" class="hidden" id="backup-file-input"
@@ -2967,12 +2956,12 @@
 
         <!-- Danger Zone -->
         <div class="mt-xs">
-          <button class="btn btn-danger btn-block d-flex items-center justify-center gap-sm font-bold"
-            id="profile-logout-btn" style="min-height: 44px;">
+          <button class="btn btn-danger btn-block d-flex items-center justify-center gap-sm font-bold btn-auth-submit"
+            id="profile-logout-btn" type="button">
             <svg class="icon-svg" viewBox="0 0 24 24">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
               <polyline points="16 17 21 12 16 7"></polyline>
-              <line x1="21" x2="9" y1="12" y2="12"></line>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
             </svg>
             Sign Out
           </button>
@@ -2980,7 +2969,7 @@
       </div>
     </div>
   </div>
-  </div>
+
   <!-- ===================================================================== -->
   <!-- COMMAND PALETTE MODAL (⌘K / Ctrl+K Spotlight)                          -->
   <!-- ===================================================================== -->
@@ -2988,10 +2977,9 @@
     onclick="if(event.target === this) CommandPalette.close()">
     <div class="command-palette-card">
       <div class="palette-input-wrapper">
-        <svg class="icon-svg text-brand" viewBox="0 0 24 24"
-          style="width: 18px; height: 18px; flex-shrink: 0; color: var(--primary);">
+        <svg class="icon-svg text-brand palette-icon" viewBox="0 0 24 24">
           <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" x2="16.65" y1="21" y2="16.65"></line>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>
         <input autocomplete="off" class="flex-1 text-primary text-base" id="command-palette-input"
           oninput="CommandPalette.onInputDebounced(this.value)" onkeydown="CommandPalette.handleKey(event)"
@@ -3021,6 +3009,7 @@
       </div>
     </div>
   </div>
+
   <!-- ===================================================================== -->
   <!-- POMODORO FOCUS TIMER MODAL                                            -->
   <!-- ===================================================================== -->
@@ -3028,13 +3017,13 @@
     <div class="modal-card text-center">
       <div class="modal-header justify-between">
         <div class="d-flex items-center gap-sm">
-          <svg class="icon-svg text-brand" viewBox="0 0 24 24" style="width:20px;height:20px;">
+          <svg class="icon-svg text-brand pomo-title-icon" viewBox="0 0 24 24">
             <circle cx="12" cy="12" r="10"></circle>
             <polyline points="12 6 12 12 16 14"></polyline>
           </svg>
           <h3 class="m-0 text-lg">Pomodoro Focus Session</h3>
         </div>
-        <button aria-label="Close timer" class="btn-icon" onclick="Timer.closeModal()">×</button>
+        <button aria-label="Close timer" class="btn-icon" onclick="Timer.closeModal()" type="button">×</button>
       </div>
       <div class="modal-body d-flex flex-col items-center">
         <!-- Mode Tabs -->
@@ -3071,7 +3060,8 @@
       </div>
     </div>
   </div>
-  <!-- ===================================================================== -->
+
+<!-- ===================================================================== -->
   <!-- BUDGET CASH FLOW & TARGET ENTRY MODAL (Mobile-First Bottom Sheet)    -->
   <!-- ===================================================================== -->
   <div class="modal-overlay hidden" id="budget-entry-modal"
@@ -3392,7 +3382,7 @@
                   stroke-width="2" viewBox="0 0 24 24" width="14">
                   <circle cx="12" cy="12" r="3"></circle>
                   <path
-                    d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                    d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
                   </path>
                 </svg>
                 Device Camera
@@ -3405,7 +3395,7 @@
           <div class="scanner-laser-box">
             <div class="scanner-laser-line"></div>
             <svg fill="none" height="28" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-              stroke-width="2" viewBox="0 0 24 24" width="28" style="color: var(--primary);">
+              stroke-width="2" viewBox="0 0 24 24" width="28" class="receipt-ocr-primary-icon">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
               <polyline points="14 2 14 8 20 8"></polyline>
             </svg>
@@ -3483,6 +3473,7 @@
       </div>
     </div>
   </div>
+
   <!-- ===================================================================== -->
   <!-- ADD ACADEMIC RESOURCE MODAL (Mobile-First Bottom Sheet)                 -->
   <!-- ===================================================================== -->
@@ -3567,6 +3558,7 @@
       </div>
     </div>
   </div>
+
   <!-- ===================================================================== -->
   <!-- ACADEMIC CITATION GENERATOR MODAL (APA, IEEE, MLA, BibTeX, Chicago)     -->
   <!-- ===================================================================== -->
@@ -3631,7 +3623,7 @@
             onclick="Notes.insertCitationToNote()" type="button">
             <svg fill="none" height="13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
               stroke-width="2.2" viewBox="0 0 24 24" width="13">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"></path>
               <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
             </svg>
             Insert to Note
@@ -3642,7 +3634,7 @@
               stroke-width="2.2" viewBox="0 0 24 24" width="13">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
               <polyline points="7 10 12 15 17 10"></polyline>
-              <line x1="12" x2="12" y1="15" y2="3"></line>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
             Download .bib
           </button>
@@ -3650,6 +3642,8 @@
       </div>
     </div>
   </div>
+
+  <!-- ===================================================================== -->
   <!-- MODALS (Dialog Overlay Windows)                                       -->
   <!-- ===================================================================== -->
   <div class="modal-overlay hidden" id="modal-overlay">
@@ -3659,18 +3653,21 @@
       </div>
       <div class="modal-header">
         <h3 id="modal-title">Create Item</h3>
-        <button aria-label="Close modal" class="btn-icon" id="modal-close-btn">×</button>
+        <button aria-label="Close modal" class="btn-icon" id="modal-close-btn" type="button">×</button>
       </div>
       <div class="modal-body" id="modal-body">
         <!-- Dynamic Form Content Injected by JS -->
       </div>
     </div>
   </div>
+
   <!-- TOAST NOTIFICATIONS -->
   <div class="toast-container" id="toast-container"></div>
+
   <!-- DEDICATED PRINT-ONLY FINANCIAL STATEMENT (Exports ONLY cashflow ledger) -->
   <div class="print-only" id="financial-print-statement"></div>
-  <!-- ===================================================================== -->
+
+<!-- ===================================================================== -->
   <!-- JAVASCRIPT MODULES                                                    -->
   <!-- ===================================================================== -->
   <!-- Bundled scripts: one deferred file (parses in parallel, executes in

@@ -1,0 +1,157 @@
+        <!-- 6. MONTHLY BUDGET & CASH FLOW VIEW -->
+        <section class="view-panel hidden" id="view-budget">
+          <!-- Top Bar: Title & Quick Header Actions -->
+          <div class="budget-top-bar d-flex justify-between items-center flex-wrap gap-sm mb-md">
+            <div>
+              <h2 class="font-extrabold text-primary m-0 d-flex items-center gap-xs text-xl">
+                <svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                  stroke-width="2.2" viewBox="0 0 24 24" width="20">
+                  <rect height="16" rx="2" width="22" x="1" y="4"></rect>
+                  <line x1="1" x2="23" y1="10" y2="10"></line>
+                </svg>
+                Monthly Budget
+              </h2>
+              <span class="text-muted text-xs font-semibold" id="budget-period-text">Current Month</span>
+            </div>
+            <div class="d-flex items-center gap-xs">
+              <button class="btn btn-outline btn-sm d-inline-flex items-center gap-xs font-bold text-xs p-md"
+                onclick="Budget.openReceiptScanner()" type="button">
+                <svg fill="none" height="13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                  stroke-width="2.2" viewBox="0 0 24 24" width="13">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                  <circle cx="12" cy="13" r="4"></circle>
+                </svg>
+                Scan Receipt
+              </button>
+              <button class="btn btn-outline btn-sm text-xs p-md" onclick="Budget.exportCSV()" title="Download CSV"
+                type="button">CSV</button>
+              <button class="btn btn-outline btn-sm text-xs p-md" onclick="Budget.printReport()" title="Print Report"
+                type="button">Print</button>
+            </div>
+          </div>
+
+          <!-- Hero Balance Card (Clean, Minimal, High-Impact) -->
+          <div class="card budget-hero-card mb-md">
+            <div class="card-body p-lg">
+              <div class="d-flex justify-between items-start flex-wrap gap-sm mb-md">
+                <div>
+                  <div class="text-muted font-bold text-xs">NET CASH FLOW</div>
+                  <div class="text-primary text-3xl font-extrabold kpi-hero-balance" id="kpi-total-balance">0</div>
+                  <div class="d-inline-flex items-center gap-xs">
+                    <span class="priority-badge priority-low font-bold text-xs" id="kpi-balance-status">Healthy
+                      Surplus</span>
+                    <span class="text-muted text-xs font-mono" id="donut-percent-text">0%</span>
+                  </div>
+                </div>
+                <div class="donut-chart-wrapper-mini hidden">
+                  <svg class="donut donut-mini-svg" viewBox="0 0 36 36">
+                    <circle class="donut-ring" cx="18" cy="18" fill="transparent" r="15.915"
+                      stroke="var(--border-color)" stroke-width="3"></circle>
+                    <circle class="donut-segment" cx="18" cy="18" fill="transparent" id="donut-usage-segment" r="15.915"
+                      stroke="url(#donut-gradient)" stroke-dasharray="0 100" stroke-dashoffset="25"
+                      stroke-linecap="round" stroke-width="3"></circle>
+                  </svg>
+                </div>
+              </div>
+
+              <!-- 2-Column Inflow vs Outflow Mini Bar -->
+              <div class="grid-2col gap-md p-sm budget-flow-strip">
+                <div class="d-flex justify-between items-center">
+                  <div class="d-flex items-center gap-xs">
+                    <span class="text-income-arrow">↑</span>
+                    <span class="text-muted text-xs font-semibold">Income:</span>
+                  </div>
+                  <span class="font-extrabold text-success text-sm font-mono" id="kpi-total-income">0</span>
+                  <span class="hidden" id="kpi-incomes-count">0 logs</span>
+                  <span class="hidden" id="donut-kpi-inflow">0</span>
+                </div>
+                <div class="d-flex justify-between items-center">
+                  <div class="d-flex items-center gap-xs">
+                    <span class="text-expense-arrow">↓</span>
+                    <span class="text-muted text-xs font-semibold">Expense:</span>
+                  </div>
+                  <span class="font-extrabold text-danger text-sm font-mono" id="kpi-total-spent">0</span>
+                  <span class="hidden" id="kpi-expenses-count">0 logs</span>
+                  <span class="hidden" id="donut-kpi-outflow">0</span>
+                  <span class="hidden" id="donut-kpi-savings">0%</span>
+                  <span class="hidden" id="income-micro-chart"></span>
+                  <span class="hidden" id="spent-micro-chart"></span>
+                </div>
+              </div>
+
+              <div class="text-muted text-xs mt-sm donut-feedback-text" id="donut-feedback-text">Ready to track:
+                Log daily expenses or income.</div>
+            </div>
+          </div>
+
+          <!-- 3 Quick Action Buttons (Big, Prominent, Clear) -->
+          <div class="budget-quick-action-bar mb-lg">
+            <button class="btn btn-action-expense font-bold text-sm" onclick="Budget.openEntryModal('expense')"
+              type="button">
+              <svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                stroke-width="2.5" viewBox="0 0 24 24" width="15">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <polyline points="19 12 12 19 5 12"></polyline>
+              </svg>
+              <span>- Log Expense</span>
+            </button>
+            <button class="btn btn-action-income font-bold text-sm" onclick="Budget.openEntryModal('income')"
+              type="button">
+              <svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                stroke-width="2.5" viewBox="0 0 24 24" width="15">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <polyline points="5 12 12 5 19 12"></polyline>
+              </svg>
+              <span>+ Log Income</span>
+            </button>
+            <button class="btn btn-action-budget font-bold text-sm" onclick="Budget.openEntryModal('budget')"
+              type="button">
+              <svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                stroke-width="2.5" viewBox="0 0 24 24" width="15">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="16"></line>
+                <line x1="8" x2="16" y1="12" y2="12"></line>
+              </svg>
+              <span>🎯 Set Target</span>
+            </button>
+          </div>
+
+          <!-- Main Content Grid (Recent Cash Flow + Category Targets) -->
+          <div class="budget-dashboard-grid mb-lg">
+            <!-- 1. Recent Cash Flow Ledger Card -->
+            <div class="card">
+              <div class="card-body p-lg">
+                <div class="d-flex flex-wrap justify-between items-center gap-xs mb-md">
+                  <h4 class="m-0 text-base font-bold">Recent Transactions</h4>
+                  <div class="transaction-filter-tabs d-flex gap-xs">
+                    <button class="btn-sm day-pill-btn active text-xs p-md" id="tx-filter-all"
+                      onclick="Budget.filterTransactions('all')" type="button">All</button>
+                    <button class="btn-sm day-pill-btn text-success text-xs p-md" id="tx-filter-incomes"
+                      onclick="Budget.filterTransactions('incomes')" type="button">▲ In</button>
+                    <button class="btn-sm day-pill-btn text-danger text-xs p-md" id="tx-filter-expenses"
+                      onclick="Budget.filterTransactions('expenses')" type="button">▼ Out</button>
+                  </div>
+                </div>
+                <div class="list-container" id="recent-transactions-list">
+                  <!-- Injected by JS -->
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. Category Targets Card -->
+            <div class="card">
+              <div class="card-body p-lg">
+                <div class="d-flex justify-between items-center gap-sm mb-md">
+                  <h4 class="m-0 text-base font-bold">Category Targets</h4>
+                  <span class="priority-badge priority-low text-xs" id="category-targets-summary">0 categories</span>
+                </div>
+                <div class="budget-category-grid" id="budget-category-cards">
+                  <!-- Injected by JS -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>

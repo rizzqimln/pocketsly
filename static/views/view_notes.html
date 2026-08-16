@@ -1,0 +1,169 @@
+        <!-- 4. NOTES & LIBRARY VIEW -->
+        <section class="view-panel hidden" id="view-notes">
+          <!-- Main Sub-Navigation Bar for Journal & Notes vs Library & Academic Journals -->
+          <div class="notes-view-tabs d-flex gap-sm">
+            <button class="day-pill-btn notes-main-tab active font-bold d-inline-flex items-center gap-sm text-md p-lg"
+              data-tab="notes" onclick="Notes.switchTab('notes')" type="button">
+              <svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                stroke-width="2.2" viewBox="0 0 24 24" width="15">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+              Journal &amp; Notes
+            </button>
+            <button class="day-pill-btn notes-main-tab font-bold d-inline-flex items-center gap-sm text-md p-lg"
+              data-tab="library" onclick="Notes.switchTab('library')" type="button">
+              <svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                stroke-width="2.2" viewBox="0 0 24 24" width="15">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              </svg>
+              Library &amp; Academic Journals
+            </button>
+          </div>
+          <!-- TAB 1: JOURNAL & NOTES PANE -->
+          <div id="notes-tab-editor-pane">
+            <!-- Notes Header & Filter Bar -->
+            <div class="notes-top-controls d-flex flex-col gap-md mb-lg">
+              <div class="d-flex gap-sm items-center justify-between flex-nowrap w-full">
+                <!-- Search Bar -->
+                <div class="notes-search-wrapper flex-1">
+                  <input class="w-full text-md p-0" id="notes-search-input"
+                    placeholder="Search notes by title or content..." type="text" />
+                  <svg class="icon-svg text-muted" viewBox="0 0 24 24">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" x2="16.65" y1="21" y2="16.65"></line>
+                  </svg>
+                </div>
+                <!-- New Note Action Button (Desktop & Mobile) -->
+                <button
+                  class="btn btn-primary btn-sm notes-add-btn d-inline-flex items-center gap-sm font-bold text-nowrap p-lg"
+                  onclick="Notes.startNewNote()" type="button">
+                  <span>+</span> New Note
+                </button>
+              </div>
+              <!-- Mood / Category Filter Pills -->
+              <div class="notes-tag-filter-bar d-flex gap-sm">
+                <button class="day-pill-btn note-filter-pill active" data-mood="all"
+                  onclick="Notes.setMoodFilter('all')" type="button">All</button>
+                <button class="day-pill-btn note-filter-pill" data-mood="productive"
+                  onclick="Notes.setMoodFilter('productive')" type="button">Productive</button>
+                <button class="day-pill-btn note-filter-pill" data-mood="happy" onclick="Notes.setMoodFilter('happy')"
+                  type="button">Positive</button>
+                <button class="day-pill-btn note-filter-pill" data-mood="neutral"
+                  onclick="Notes.setMoodFilter('neutral')" type="button">General</button>
+                <button class="day-pill-btn note-filter-pill" data-mood="tired" onclick="Notes.setMoodFilter('tired')"
+                  type="button">Review Later</button>
+                <button class="day-pill-btn note-filter-pill" data-mood="stressed"
+                  onclick="Notes.setMoodFilter('stressed')" type="button">Urgent</button>
+              </div>
+            </div>
+            <!-- Notes Master-Detail Layout -->
+            <div class="notes-layout" id="notes-main-layout">
+              <div class="notes-sidebar" id="notes-sidebar-list">
+                <!-- Notes list items rendered by JS -->
+              </div>
+              <div class="note-editor-card card" id="note-editor">
+                <div class="card-body d-flex flex-col h-full gap-md">
+                  <!-- Top Bar inside Editor: Back button (mobile) + Word Counter (all devices) -->
+                  <div class="notes-editor-header d-flex justify-between items-center">
+                    <button
+                      class="notes-mobile-back-btn btn btn-outline btn-sm d-inline-flex items-center gap-sm font-semibold"
+                      onclick="Notes.closeEditorOnMobile()" type="button">
+                      ← Back to Notes
+                    </button>
+                    <span class="text-muted text-xs" id="note-word-count">0 words • 0 chars</span>
+                  </div>
+                  <div class="d-flex gap-md items-center">
+                    <input class="note-title-input flex-1" id="note-title-input"
+                      placeholder="Untitled Reflection / Note" type="text" />
+                    <select class="text-sm p-md" id="note-mood-select">
+                      <option value="productive">Productive</option>
+                      <option value="happy">Positive</option>
+                      <option selected="" value="neutral">General</option>
+                      <option value="tired">Review Later</option>
+                      <option value="stressed">Urgent Note</option>
+                    </select>
+                  </div>
+                  <textarea class="note-body-textarea flex-1" id="note-body-input"
+                    placeholder="Start writing... your thoughts, class notes, reflections, or ideas."></textarea>
+                  <div class="editor-actions d-flex justify-between items-center">
+                    <button class="btn btn-danger hidden text-sm p-sm" id="delete-note-btn" type="button">Delete
+                      Note</button>
+                    <button class="btn btn-primary d-flex items-center gap-sm font-bold p-xl" id="save-note-btn" type="button">
+                      <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                        stroke-width="2.5" viewBox="0 0 24 24" width="14">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                        <polyline points="7 3 7 8 15 8"></polyline>
+                      </svg>
+                      Save Note
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- TAB 2: LIBRARY & ACADEMIC JOURNALS PANE -->
+          <div class="hidden" id="notes-tab-library-pane">
+            <!-- Library Header Toolbar -->
+            <div class="library-toolbar-card card mb-lg">
+              <div class="card-body p-lg">
+                <div class="d-flex justify-between items-center flex-wrap gap-md mb-md">
+                  <div>
+                    <h3 class="m-0 font-extrabold d-flex items-center gap-sm text-lg">
+                      <svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                        stroke-width="2.2" viewBox="0 0 24 24" width="20">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                      </svg>
+                      Library &amp; Research Journals
+                    </h3>
+                    <p class="text-muted text-xs m-0 mt-xs">Catalog of research articles, online books, journals, and
+                      papers with instant citations.</p>
+                  </div>
+                  <button class="btn btn-primary btn-sm d-inline-flex items-center gap-sm font-bold p-lg"
+                    onclick="Notes.openAddResourceModal()" type="button">
+                    <svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                      stroke-width="2.5" viewBox="0 0 24 24" width="15">
+                      <line x1="12" y1="5" x2="12" y2="19"></line>
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    + Add Resource / Paper
+                  </button>
+                </div>
+
+                <!-- Search & Filter Controls Row -->
+                <div class="d-flex flex-wrap gap-sm justify-between items-center">
+                  <div class="notes-search-wrapper flex-1">
+                    <input class="w-full text-sm" id="library-search-input" oninput="Notes.handleLibrarySearch(event)"
+                      placeholder="Search title, author, journal, DOI..." type="text" />
+                    <svg class="icon-svg text-muted" viewBox="0 0 24 24">
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <line x1="21" x2="16.65" y1="21" y2="16.65"></line>
+                    </svg>
+                  </div>
+                  <div class="resource-filter-pills d-flex gap-xs flex-wrap">
+                    <button class="day-pill-btn resource-filter-btn active" data-cat="all"
+                      onclick="Notes.filterResources('all')" type="button">All</button>
+                    <button class="day-pill-btn resource-filter-btn" data-cat="general"
+                      onclick="Notes.filterResources('general')" type="button">General</button>
+                    <button class="day-pill-btn resource-filter-btn" data-cat="frontend"
+                      onclick="Notes.filterResources('frontend')" type="button">Frontend</button>
+                    <button class="day-pill-btn resource-filter-btn" data-cat="backend"
+                      onclick="Notes.filterResources('backend')" type="button">Backend</button>
+                    <button class="day-pill-btn resource-filter-btn" data-cat="book"
+                      onclick="Notes.filterResources('book')" type="button">Books</button>
+                    <button class="day-pill-btn resource-filter-btn" data-cat="journal"
+                      onclick="Notes.filterResources('journal')" type="button">Journals</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Collected Resources List -->
+            <div class="d-flex flex-col gap-md" id="notes-resources-list-container">
+              <!-- Injected by JS -->
+            </div>
+          </div>
+        </section>

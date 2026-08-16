@@ -1,0 +1,47 @@
+        <!-- 2. HABITS & TASKS VIEW -->
+        <section class="view-panel hidden" id="view-habits">
+          <div class="planner-grid">
+            <!-- Habits Column -->
+            <div class="planner-column">
+              <div class="planner-header d-flex justify-between items-center flex-wrap gap-sm mb-lg">
+                <div>
+                  <h3 class="font-extrabold text-primary text-base">
+                    Habits &amp; Routines</h3>
+                  <p class="text-muted m-0 text-sm">Build consistency. Check off habits daily
+                    and track streaks.</p>
+                </div>
+                <button class="btn btn-primary btn-sm d-inline-flex items-center gap-sm text-sm p-sm"
+                  onclick="Habits.openCreateModal()" type="button">
+                  + New Habit
+                </button>
+              </div>
+              <div class="habits-container" id="habits-list-container">
+                <!-- Habit Cards injected by JS -->
+              </div>
+            </div>
+            <!-- Tasks Column -->
+            <div class="planner-column">
+              <div class="planner-header d-flex justify-between items-center flex-wrap gap-sm mb-lg">
+                <div>
+                  <h3 class="font-extrabold text-primary text-base">
+                    Tasks &amp; Priorities</h3>
+                  <p class="text-muted m-0 text-sm">Organize items by urgency and check them
+                    off when done.</p>
+                </div>
+                <button class="btn btn-primary btn-sm d-inline-flex items-center gap-sm text-sm p-sm"
+                  onclick="Tasks.openCreateModal()" type="button">
+                  + New Task
+                </button>
+              </div>
+              <div class="task-filters d-flex gap-sm flex-wrap mb-lg">
+                <button class="filter-btn active" data-filter="all" type="button">All</button>
+                <button class="filter-btn" data-filter="high" type="button">High</button>
+                <button class="filter-btn" data-filter="pending" type="button">Pending</button>
+                <button class="filter-btn" data-filter="completed" type="button">Done</button>
+              </div>
+              <div class="tasks-container" id="tasks-list-container">
+                <!-- Tasks injected by JS -->
+              </div>
+            </div>
+          </div>
+        </section>

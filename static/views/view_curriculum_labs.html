@@ -1,0 +1,789 @@
+              <!-- RELATIONAL DATABASE SANDBOX -->
+              <div class="curr-panel hidden" id="curr-db">
+                <div class="panel-header">
+                  <button
+                    class="btn btn-outline btn-sm back-to-hub-btn d-inline-flex items-center gap-sm mb-md text-xs p-md"
+                    onclick="window.Curriculum.switchTab('backend-sec')" type="button">
+                    <svg class="icon-svg" viewBox="0 0 24 24">
+                      <line x1="19" x2="5" y1="12" y2="12"></line>
+                      <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Back to Backend Section
+                  </button>
+                  <h3>Database Lab: Live SQL Playground</h3>
+                  <p class="text-muted">Directly interact with your active SQLite instance. Run queries against users,
+                    tasks, habits, and other tables.</p>
+                </div>
+                <div class="curr-db-grid">
+                  <div class="card schema-card">
+                    <div class="d-flex justify-between items-center mb-md p-sm">
+                      <h4 class="m-0 font-bold text-primary text-base">Database Schema</h4>
+                      <button class="btn btn-outline font-bold cursor-pointer text-xs p-sm" id="schema-toggle-btn"
+                        onclick="Curriculum.toggleSchemaCollapse()" type="button">Collapse</button>
+                    </div>
+                    <div class="schema-list-container" id="db-schema-viewer">
+                      <p class="text-muted">Fetching schema structure...</p>
+                    </div>
+                  </div>
+                  <div class="card query-card">
+                    <div class="d-flex justify-between items-center mb-md">
+                      <h4 class="m-0 d-flex items-center gap-sm">
+                        <svg fill="none" height="16" stroke="currentColor" stroke-linecap="round"
+                          stroke-linejoin="round" stroke-width="2.2" viewBox="0 0 24 24" width="16">
+                          <polyline points="4 17 10 11 4 5"></polyline>
+                          <line x1="12" x2="20" y1="19" y2="19"></line>
+                        </svg>
+                        Live SQL Console
+                      </h4>
+                      <span class="priority-badge priority-low text-xs">SQLite 3</span>
+                    </div>
+                    <!-- Quick Queries Horizontal Swipe Row -->
+                    <div class="sql-templates-wrapper mb-md">
+                      <div class="sql-templates-scroll d-flex gap-sm p-0">
+                        <span class="template-label font-bold text-muted text-nowrap text-xs">Quick Tables:</span>
+                        <button class="template-btn"
+                          data-sql="SELECT * FROM tasks WHERE done = 0 ORDER BY priority DESC LIMIT 10;"
+                          type="button">Tasks</button>
+                        <button class="template-btn" data-sql="SELECT * FROM habits LIMIT 10;"
+                          type="button">Habits</button>
+                        <button class="template-btn" data-sql="SELECT * FROM notes ORDER BY updated_at DESC LIMIT 10;"
+                          type="button">Notes</button>
+                        <button class="template-btn" data-sql="SELECT * FROM courses LIMIT 10;"
+                          type="button">Courses</button>
+                        <button class="template-btn"
+                          data-sql="SELECT * FROM incomes ORDER BY income_date DESC LIMIT 10;"
+                          type="button">Incomes</button>
+                        <button class="template-btn"
+                          data-sql="SELECT * FROM expenses ORDER BY expense_date DESC LIMIT 10;"
+                          type="button">Expenses</button>
+                        <button class="template-btn"
+                          data-sql="SELECT * FROM events ORDER BY day_of_week, start_time LIMIT 10;"
+                          type="button">Timetable</button>
+                        <button class="template-btn" data-sql="SELECT name FROM sqlite_master WHERE type='table';"
+                          type="button">Schema Tables</button>
+                      </div>
+                    </div>
+                    <!-- SQL Quick-Symbols Toolbar -->
+                    <div class="sql-symbol-toolbar d-flex gap-sm flex-wrap mb-0">
+                      <button class="sql-symbol-chip" onclick="Curriculum.insertSQLSymbol('SELECT ')"
+                        type="button">SELECT</button>
+                      <button class="sql-symbol-chip" onclick="Curriculum.insertSQLSymbol('FROM ')"
+                        type="button">FROM</button>
+                      <button class="sql-symbol-chip" onclick="Curriculum.insertSQLSymbol('WHERE ')"
+                        type="button">WHERE</button>
+                      <button class="sql-symbol-chip" onclick="Curriculum.insertSQLSymbol('* ')"
+                        type="button">*</button>
+                      <button class="sql-symbol-chip" onclick="Curriculum.insertSQLSymbol('JOIN ')"
+                        type="button">JOIN</button>
+                      <button class="sql-symbol-chip" onclick="Curriculum.insertSQLSymbol('ORDER BY ')"
+                        type="button">ORDER BY</button>
+                      <button class="sql-symbol-chip" onclick="Curriculum.insertSQLSymbol('LIMIT 10;')"
+                        type="button">LIMIT 10;</button>
+                      <button class="sql-symbol-chip" onclick="Curriculum.insertSQLSymbol(';')" type="button">;</button>
+                    </div>
+                    <!-- Multi-Line Editor Box -->
+                    <div class="sql-editor-container mb-md">
+                      <textarea class="sql-textarea" id="sql-query-input"
+                        placeholder="SELECT * FROM tasks WHERE done = 0 LIMIT 5;" spellcheck="false"></textarea>
+                    </div>
+                    <!-- Actions (Touch Targets min 44px) -->
+                    <div class="query-actions d-flex gap-md mb-lg">
+                      <button
+                        class="btn btn-primary flex-1 d-inline-flex items-center justify-center font-bold bento-icon-emerald"
+                        id="run-sql-btn" type="button">
+                        <svg fill="none" height="15" stroke="currentColor" stroke-linecap="round"
+                          stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="15">
+                          <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        </svg>
+                        Run Query
+                      </button>
+                      <button class="btn btn-outline d-inline-flex items-center justify-center gap-sm p-0"
+                        id="reset-sql-btn" type="button">
+                        <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round"
+                          stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="14">
+                          <polyline points="1 4 1 10 7 10"></polyline>
+                          <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                        </svg>
+                        Clear
+                      </button>
+                    </div>
+                    <!-- Results Output -->
+                    <div class="sql-results" id="sql-results-container">
+                      <p class="text-muted m-0 text-center p-2xl">Ready to execute. Pick a table above or write your
+                        SQL query.</p>
+                    </div>
+                  </div>
+                  <!-- Alternative Interactive SQL Playgrounds -->
+                  <div class="card mt-xl col-span-full dash-financial-gradient">
+                    <div class="card-header">
+                      <div class="d-flex items-center gap-sm">
+                        <svg class="icon-svg icon-md icon-emerald" viewBox="0 0 24 24">
+                          <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                          <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+                        </svg>
+                        <h4 class="m-0 text-base">Alternative Online SQL Playgrounds &amp; Sandboxes</h4>
+                      </div>
+                      <span class="priority-badge priority-low text-xs">External Sandboxes</span>
+                    </div>
+                    <div class="card-body">
+                      <div class="grid-auto-fit">
+                        <a class="card hub-card p-lg" href="https://sqliteonline.com/" target="_blank">
+                          <div class="font-bold text-success mb-xs text-base">
+                            SQLite Online Playground →</div>
+                          <p class="text-muted m-0 text-sm">Full-featured in-browser SQLite,
+                            PostgreSQL, and MariaDB query sandbox with visual table editor.</p>
+                        </a>
+                        <a class="card hub-card p-lg" href="https://sqlime.org/" target="_blank">
+                          <div class="font-bold mb-xs text-base">
+                            SQLime In-Browser SQLite →</div>
+                          <p class="text-muted m-0 text-sm">Minimalist SQLite playground
+                            running client-side with database file and CSV import/export.</p>
+                        </a>
+                        <a class="card hub-card p-lg" href="https://sqlzoo.net/" target="_blank">
+                          <div class="font-bold text-warning mb-xs text-base">
+                            SQLZoo Interactive Challenges →</div>
+                          <p class="text-muted m-0 text-sm">Guided SQL quizzes and interactive
+                            problem sandboxes for JOINs, nested SELECTs, and aggregates.</p>
+                        </a>
+                        <a class="card hub-card p-lg"
+                          href="https://www.w3schools.com/sql/trysql.asp?filename=trysql_select_all" target="_blank">
+                          <div class="font-bold text-purple">
+                            W3Schools SQL TryIt Editor →</div>
+                          <p class="text-muted m-0 text-sm">Pre-loaded Northwind database
+                            sandbox to practice standard SQL queries immediately in your browser.</p>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- BACKEND DEVELOPMENT CONCEPTS -->
+              <div class="curr-panel hidden" id="curr-backend">
+                <div class="panel-header">
+                  <button
+                    class="btn btn-outline btn-sm back-to-hub-btn d-inline-flex items-center gap-sm mb-md text-xs p-md"
+                    onclick="window.Curriculum.switchTab('backend-sec')" type="button">
+                    <svg class="icon-svg" viewBox="0 0 24 24">
+                      <line x1="19" x2="5" y1="12" y2="12"></line>
+                      <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Back to Backend Section
+                  </button>
+                  <h3>Backend Architecture: API Flow Explorer</h3>
+                  <p class="text-muted">Master client-server communication. Trigger server actions or request details
+                    and inspect raw JSON outputs and HTTP request configurations.</p>
+                </div>
+                <div class="backend-explorer-grid">
+                  <div class="card">
+                    <h4>1. Choose Endpoint Action</h4>
+                    <div class="action-btn-list gap-sm">
+                      <button class="backend-trigger-btn btn btn-outline btn-sm" data-action="get-session" type="button">GET
+                        /api/session (Session)</button>
+                      <button class="backend-trigger-btn btn btn-outline btn-sm" data-action="get-tasks" type="button">GET /api/tasks
+                        (Tasks)</button>
+                      <button class="backend-trigger-btn btn btn-outline btn-sm" data-action="get-habits" type="button">GET
+                        /api/habits (Habits)</button>
+                      <button class="backend-trigger-btn btn btn-outline btn-sm" data-action="get-notes" type="button">GET /api/notes
+                        (Notes)</button>
+                      <button class="backend-trigger-btn btn btn-outline btn-sm" data-action="get-courses" type="button">GET
+                        /api/courses (Courses)</button>
+                      <button class="backend-trigger-btn btn btn-outline btn-sm" data-action="get-incomes" type="button">GET
+                        /api/incomes (Incomes)</button>
+                      <button class="backend-trigger-btn btn btn-outline btn-sm" data-action="get-expenses" type="button">GET
+                        /api/expenses (Expenses)</button>
+                      <button class="backend-trigger-btn btn btn-outline btn-sm" data-action="get-budget-summary" type="button">GET
+                        /api/budget/summary (Cashflow)</button>
+                      <button class="backend-trigger-btn btn btn-outline btn-sm col-span-full"
+                        data-action="get-schema" type="button">GET /api/curriculum/schema (Database Schema)</button>
+                    </div>
+                  </div>
+                  <div class="card">
+                    <h4>2. Live HTTP Sandbox Inspector</h4>
+                    <div class="inspector-output" id="backend-inspector-output">
+                      <pre><code class="language-json">{ "info": "Select an endpoint action to inspect simulated payload and details" }</code></pre>
+                    </div>
+                  </div>
+                  <!-- Alternative Interactive API & Backend Sandboxes -->
+                  <div class="card mt-xl col-span-full">
+                    <div class="card-header">
+                      <div class="d-flex items-center gap-sm">
+                        <svg class="icon-svg icon-md icon-amber" viewBox="0 0 24 24">
+                          <rect height="8" rx="2" width="20" x="2" y="2"></rect>
+                          <rect height="8" rx="2" width="20" x="2" y="14"></rect>
+                        </svg>
+                        <h4 class="m-0 text-base">Alternative REST API Testers &amp; Mock Sandboxes</h4>
+                      </div>
+                      <span class="priority-badge priority-low text-xs">API Tools</span>
+                    </div>
+                    <div class="card-body">
+                      <div class="grid-auto-fit">
+                        <a class="card hub-card p-lg" href="https://reqbin.com/" target="_blank">
+                          <div class="font-bold text-warning">
+                            ReqBin Online REST Client →</div>
+                          <p class="text-muted m-0 text-sm">Online REST &amp; SOAP API testing
+                            tool. Send GET/POST requests and inspect headers, status, and JSON.</p>
+                        </a>
+                        <a class="card hub-card p-lg" href="https://jsonplaceholder.typicode.com/" target="_blank">
+                          <div class="font-bold text-success">
+                            JSONPlaceholder Mock API →</div>
+                          <p class="text-muted m-0 text-sm">Free fake REST API with mock
+                            endpoints for posts, comments, albums, and users for prototyping.</p>
+                        </a>
+                        <a class="card hub-card p-lg" href="https://www.postman.com/" target="_blank">
+                          <div class="font-bold text-pink">
+                            Postman Web Platform →</div>
+                          <p class="text-muted m-0 text-sm">Industry standard platform for
+                            building, mocking, documenting, and testing full-stack APIs.</p>
+                        </a>
+                        <a class="card hub-card p-lg" href="https://httpbin.org/" target="_blank">
+                          <div class="font-bold">
+                            HTTPBin Request Inspector →</div>
+                          <p class="text-muted m-0 text-sm">Dedicated HTTP request &amp;
+                            response service for debugging status codes, redirects, and auth.</p>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- ACADEMIC & FACULTY MANAGEMENT -->
+              <div class="curr-panel hidden" id="curr-academic">
+                <div class="panel-header">
+                  <button
+                    class="btn btn-outline btn-sm back-to-hub-btn d-inline-flex items-center gap-sm mb-md text-xs p-md"
+                    onclick="window.Curriculum.switchTab('hub')" type="button">
+                    <svg class="icon-svg" viewBox="0 0 24 24">
+                      <line x1="19" x2="5" y1="12" y2="12"></line>
+                      <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Back to Catalog
+                  </button>
+                  <h3>Academic &amp; Faculty Management</h3>
+                  <p class="text-muted">Add courses, classes, professors, or lecturers to organize your study program
+                    structure.</p>
+                </div>
+                <div class="academic-grid">
+                  <div class="card">
+                    <h4>Add New Course / Study</h4>
+                    <form class="auth-form d-flex flex-col gap-md mt-lg" id="add-course-form">
+                      <div class="form-group">
+                        <label>Course Code</label>
+                        <input id="course-code" placeholder="e.g. IF-101" required="" type="text" />
+                      </div>
+                      <div class="form-group">
+                        <label>Course Name</label>
+                        <input id="course-name" placeholder="e.g. Pemrograman Dasar" required="" type="text" />
+                      </div>
+                      <div class="form-group">
+                        <label>Credits (SKS)</label>
+                        <input id="course-credits" min="1" required="" type="number" value="3" />
+                      </div>
+                      <button class="btn btn-primary" type="submit">Save Course</button>
+                    </form>
+                    <hr />
+                    <h4>Add Lecturer / Professor</h4>
+                    <form class="auth-form d-flex flex-col gap-md" id="add-lecturer-form">
+                      <div class="form-group">
+                        <label>Lecturer Name</label>
+                        <input id="lecturer-name" placeholder="e.g. Dr. Jane Doe" required="" type="text" />
+                      </div>
+                      <div class="form-group">
+                        <label>Email</label>
+                        <input id="lecturer-email" placeholder="e.g. janedoe@faculty.edu" type="email" />
+                      </div>
+                      <div class="form-group">
+                        <label>Office / Room</label>
+                        <input id="lecturer-office" placeholder="e.g. Gedung B R.204" type="text" />
+                      </div>
+                      <button class="btn btn-primary" type="submit">Save Lecturer</button>
+                    </form>
+                  </div>
+                  <div class="card">
+                    <h4>Active Lecture Studies</h4>
+                    <div class="list-container mt-lg" id="active-courses-list">
+                      <p class="text-muted">Loading study program list...</p>
+                    </div>
+                    <h4>Lecturer Directory</h4>
+                    <div class="list-container mt-lg" id="active-lecturers-list">
+                      <p class="text-muted">Loading lecturer directory...</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- ALGORITHMS AND STRUCTURES -->
+              <div class="curr-panel hidden" id="curr-algorithms">
+                <div class="panel-header">
+                  <button
+                    class="btn btn-outline btn-sm back-to-hub-btn d-inline-flex items-center gap-sm mb-md text-xs p-md"
+                    onclick="window.Curriculum.switchTab('hub')" type="button">
+                    <svg class="icon-svg" viewBox="0 0 24 24">
+                      <line x1="19" x2="5" y1="12" y2="12"></line>
+                      <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Back to Catalog
+                  </button>
+                  <h3>Algorithms Lab: Visualizer</h3>
+                  <p class="text-muted">Understand how data structures and searching/sorting algorithms work
+                    step-by-step. Let's trace sorting of a simulated array.</p>
+                </div>
+                <div class="card">
+                  <div class="algo-controls-wrapper">
+                    <div class="algo-controls">
+                      <button class="btn btn-outline" id="algo-generate-arr" type="button">Shuffle Array</button>
+                      <button class="btn btn-primary" id="algo-sort-bubble" type="button">Bubble Sort</button>
+                      <button class="btn btn-primary" id="algo-sort-quick" type="button">Quick Sort</button>
+                    </div>
+                    <div class="algo-speed-control">
+                      <label for="algo-speed">Speed:</label>
+                      <input id="algo-speed" max="600" min="50" step="50" type="range" value="150" />
+                      <span id="algo-speed-val">150ms</span>
+                    </div>
+                  </div>
+                  <div class="algo-visualizer-box">
+                    <div class="bars-container" id="algo-bars-container"></div>
+                  </div>
+                  <div class="algo-log text-muted" id="algo-steps-log">
+                    Click Shuffle Array or select a sort method to visualize array element positioning in modern UI
+                    rendering.
+                  </div>
+                </div>
+                <!-- Alternative Interactive Algorithm Visualizers & Sandboxes -->
+                <div class="card mt-xl dash-curriculum-gradient">
+                  <div class="card-header">
+                    <div class="d-flex items-center gap-sm">
+                      <svg class="icon-svg icon-md icon-brand" viewBox="0 0 24 24">
+                        <polygon points="12 2 2 22 22 22"></polygon>
+                      </svg>
+                      <h4 class="m-0 text-base">Alternative Algorithm Visualizers &amp; Code Sandboxes
+                      </h4>
+                    </div>
+                    <span class="priority-badge priority-low text-xs">DSA Tools</span>
+                  </div>
+                  <div class="card-body">
+                    <div class="grid-auto-fit">
+                      <a class="card hub-card p-lg" href="https://visualgo.net/" target="_blank">
+                        <div class="font-bold text-brand">
+                          VisuAlgo Interactive Visualizer →</div>
+                        <p class="text-muted m-0 text-sm">Famous CS visualizer for Sorting,
+                          Binary Trees, Graphs, Recursion, and Dynamic Programming.</p>
+                      </a>
+                      <a class="card hub-card p-lg" href="https://algorithm-visualizer.org/" target="_blank">
+                        <div class="font-bold text-success">
+                          Algorithm Visualizer (Open Source) →</div>
+                        <p class="text-muted m-0 text-sm">Interactive visualization library
+                          that visualizes code written in JS, C++, and Java directly.</p>
+                      </a>
+                      <a class="card hub-card p-lg" href="https://codepen.io/pen/" target="_blank">
+                        <div class="font-bold text-pink">
+                          CodePen Frontend Sandbox →</div>
+                        <p class="text-muted m-0 text-sm">Live browser HTML, CSS, and JS
+                          editor with instant preview and modern frontend libraries.</p>
+                      </a>
+                      <a class="card hub-card p-lg" href="https://neetcode.io/roadmap" target="_blank">
+                        <div class="font-bold text-warning">
+                          NeetCode Interactive DSA Roadmap →</div>
+                        <p class="text-muted m-0 text-sm">Structured roadmap with visual
+                          concept breakdowns for Arrays, Two Pointers, Trees, and DP.</p>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- ROADMAP QUIZZES / FLASHCARDS -->
+              <div class="curr-panel hidden" id="curr-flashcards">
+                <div class="panel-header">
+                  <button
+                    class="btn btn-outline btn-sm back-to-hub-btn d-inline-flex items-center gap-sm mb-md text-xs p-md"
+                    onclick="window.Curriculum.switchTab('hub')" type="button">
+                    <svg class="icon-svg" viewBox="0 0 24 24">
+                      <line x1="19" x2="5" y1="12" y2="12"></line>
+                      <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Back to Catalog
+                  </button>
+                  <h3>Academic Roadmap Quizzer</h3>
+                  <p class="text-muted">Interactive review flashcards tailored to CS / SE 1st-semester fundamental
+                    curriculum.</p>
+                </div>
+                <div class="quiz-container">
+                  <div class="quiz-card-wrapper">
+                    <div class="quiz-card-3d" id="quiz-card-3d">
+                      <!-- Front Face -->
+                      <div class="card quiz-card-face quiz-card-front">
+                        <div class="quiz-question" id="quiz-question-text">Loading question...</div>
+                        <div class="quiz-options-container" id="quiz-options-box">
+                          <!-- Options will go here -->
+                        </div>
+                      </div>
+                      <!-- Back Face -->
+                      <div class="card quiz-card-face quiz-card-back">
+                        <h4 class="quiz-badge" id="quiz-result-badge">Result</h4>
+                        <div class="quiz-feedback-content" id="quiz-feedback-box">
+                          <!-- Feedback description will go here -->
+                        </div>
+                        <button class="btn btn-outline btn-block mt-xl" id="quiz-back-btn" type="button">Show
+                          Question</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="quiz-footer">
+                    <span id="quiz-progress-text">Question 1/10</span>
+                    <button class="btn btn-primary" id="quiz-next-btn" type="button">Next Challenge →</button>
+                  </div>
+                </div>
+              </div>
+              <!-- 8. CSS FLEXBOX & GRID VISUALIZER LAB -->
+              <div class="curr-panel hidden" id="curr-flexbox">
+                <div class="panel-header d-flex justify-between items-start flex-wrap gap-md">
+                  <div>
+                    <button
+                      class="btn btn-outline btn-sm back-to-hub-btn d-inline-flex items-center gap-sm mb-sm text-xs p-md"
+                      onclick="window.Curriculum.switchTab('hub')" type="button">
+                      <svg class="icon-svg" viewBox="0 0 24 24">
+                        <line x1="19" x2="5" y1="12" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                      </svg>
+                      Back to Catalog
+                    </button>
+                    <h3>CSS Flexbox &amp; Grid Visualizer Lab</h3>
+                    <p class="text-muted">Interactively manipulate modern CSS layout primitives and preview changes live
+                      on stage.</p>
+                  </div>
+                  <div class="d-flex gap-sm">
+                    <button class="btn btn-primary btn-sm" onclick="window.Curriculum.addFlexItem()" type="button">+ Add
+                      Box</button>
+                    <button class="btn btn-outline btn-sm" onclick="window.Curriculum.removeFlexItem()" type="button">-
+                      Remove Box</button>
+                  </div>
+                </div>
+
+                <div class="flex-lab-layout">
+                  <!-- Control Settings Sidebar -->
+                  <div class="card flex-controls-card">
+                    <div class="card-body">
+                      <h4 class="font-bold text-sm mb-md text-primary">Container Properties</h4>
+
+                      <div class="form-group mb-sm">
+                        <label class="text-xs font-semibold">flex-direction</label>
+                        <select class="w-full" id="flex-dir-select" onchange="window.Curriculum.updateFlexStage()">
+                          <option value="row">row (default)</option>
+                          <option value="row-reverse">row-reverse</option>
+                          <option value="column">column</option>
+                          <option value="column-reverse">column-reverse</option>
+                        </select>
+                      </div>
+
+                      <div class="form-group mb-sm">
+                        <label class="text-xs font-semibold">justify-content</label>
+                        <select class="w-full" id="flex-justify-select" onchange="window.Curriculum.updateFlexStage()">
+                          <option value="flex-start">flex-start</option>
+                          <option value="center">center</option>
+                          <option value="flex-end">flex-end</option>
+                          <option value="space-between">space-between</option>
+                          <option value="space-around">space-around</option>
+                          <option value="space-evenly">space-evenly</option>
+                        </select>
+                      </div>
+
+                      <div class="form-group mb-sm">
+                        <label class="text-xs font-semibold">align-items</label>
+                        <select class="w-full" id="flex-align-select" onchange="window.Curriculum.updateFlexStage()">
+                          <option value="stretch">stretch</option>
+                          <option value="center">center</option>
+                          <option value="flex-start">flex-start</option>
+                          <option value="flex-end">flex-end</option>
+                          <option value="baseline">baseline</option>
+                        </select>
+                      </div>
+
+                      <div class="form-group mb-sm">
+                        <label class="text-xs font-semibold">flex-wrap</label>
+                        <select class="w-full" id="flex-wrap-select" onchange="window.Curriculum.updateFlexStage()">
+                          <option value="nowrap">nowrap</option>
+                          <option value="wrap">wrap</option>
+                          <option value="wrap-reverse">wrap-reverse</option>
+                        </select>
+                      </div>
+
+                      <div class="form-group mb-sm">
+                        <div class="d-flex justify-between items-center mb-xs">
+                          <label class="text-xs font-semibold m-0">gap</label>
+                          <span class="text-xs font-bold text-brand" id="flex-gap-val">12px</span>
+                        </div>
+                        <input class="w-full" id="flex-gap-slider" max="28" min="0"
+                          oninput="window.Curriculum.updateFlexStage()" step="2" type="range" value="12" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Live Interactive Stage & Generated CSS Snippet -->
+                  <div class="d-flex flex-col gap-md flex-1">
+                    <div class="card flex-stage-card">
+                      <div class="card-header d-flex justify-between items-center">
+                        <span class="font-bold text-xs text-muted">LIVE VIEWPORT STAGE</span>
+                        <span class="priority-badge priority-low text-xs" id="flex-item-count-badge">4 Items</span>
+                      </div>
+                      <div class="card-body p-lg">
+                        <div class="flex-interactive-stage" id="flex-interactive-stage">
+                          <div class="flex-stage-box box-1"><span>Box 1</span></div>
+                          <div class="flex-stage-box box-2"><span>Box 2</span></div>
+                          <div class="flex-stage-box box-3"><span>Box 3</span></div>
+                          <div class="flex-stage-box box-4"><span>Box 4</span></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Code Snippet Output Box -->
+                    <div class="card flex-code-card">
+                      <div class="card-header d-flex justify-between items-center">
+                        <span class="font-mono text-xs text-primary font-bold">Generated CSS Rules</span>
+                        <button class="btn btn-outline btn-xs" onclick="window.Curriculum.copyFlexCSS()"
+                          type="button">📋 Copy CSS</button>
+                      </div>
+                      <div class="card-body p-md">
+                        <pre class="flex-css-snippet font-mono text-xs m-0" id="flex-css-snippet"></pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 9. JAVASCRIPT ARRAY & FUNCTIONAL LAB -->
+              <div class="curr-panel hidden" id="curr-jslab">
+                <div class="panel-header d-flex justify-between items-start flex-wrap gap-md">
+                  <div>
+                    <button
+                      class="btn btn-outline btn-sm back-to-hub-btn d-inline-flex items-center gap-sm mb-sm text-xs p-md"
+                      onclick="window.Curriculum.switchTab('hub')" type="button">
+                      <svg class="icon-svg" viewBox="0 0 24 24">
+                        <line x1="19" x2="5" y1="12" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                      </svg>
+                      Back to Catalog
+                    </button>
+                    <h3>JavaScript Functional &amp; Array Lab</h3>
+                    <p class="text-muted">Master .map(), .filter(), .reduce(), and data pipelines with live code
+                      execution and visual data flow.</p>
+                  </div>
+                </div>
+
+                <div class="card mb-md">
+                  <div class="card-body p-lg">
+                    <div class="d-flex gap-xs flex-wrap mb-md" id="js-method-pills">
+                      <button class="day-pill-btn active" onclick="window.Curriculum.selectJSMethod('map')"
+                        type="button">.map()</button>
+                      <button class="day-pill-btn" onclick="window.Curriculum.selectJSMethod('filter')"
+                        type="button">.filter()</button>
+                      <button class="day-pill-btn" onclick="window.Curriculum.selectJSMethod('reduce')"
+                        type="button">.reduce()</button>
+                      <button class="day-pill-btn" onclick="window.Curriculum.selectJSMethod('find')"
+                        type="button">.find()</button>
+                      <button class="day-pill-btn" onclick="window.Curriculum.selectJSMethod('sort')"
+                        type="button">.sort()</button>
+                    </div>
+
+                    <div class="form-group mb-sm">
+                      <label class="text-xs font-semibold">Initial Array (JSON format)</label>
+                      <input class="font-mono text-sm w-full" id="js-input-array" type="text"
+                        value="[12, 45, 68, 23, 89, 34, 90]" />
+                    </div>
+
+                    <div class="form-group mb-md">
+                      <label class="text-xs font-semibold">Callback Expression</label>
+                      <input class="font-mono text-sm w-full" id="js-callback-expr" type="text" value="x => x * 2" />
+                    </div>
+
+                    <button class="btn btn-primary btn-sm d-inline-flex items-center gap-xs font-bold"
+                      onclick="window.Curriculum.runJSLab()" type="button">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                      </svg>
+                      Execute Transformation
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Execution Output Flow -->
+                <div class="card">
+                  <div class="card-header">
+                    <span class="font-bold text-xs text-secondary">PIPELINE EXECUTION RESULT</span>
+                  </div>
+                  <div class="card-body p-lg" id="js-lab-result-view">
+                    <!-- Populated by JS -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- 10. REGEX PATTERN VALIDATOR LAB -->
+              <div class="curr-panel hidden" id="curr-regexlab">
+                <div class="panel-header d-flex justify-between items-start flex-wrap gap-md">
+                  <div>
+                    <button
+                      class="btn btn-outline btn-sm back-to-hub-btn d-inline-flex items-center gap-sm mb-sm text-xs p-md"
+                      onclick="window.Curriculum.switchTab('hub')" type="button">
+                      <svg class="icon-svg" viewBox="0 0 24 24">
+                        <line x1="19" x2="5" y1="12" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                      </svg>
+                      Back to Catalog
+                    </button>
+                    <h3>Interactive Regex Pattern Validator</h3>
+                    <p class="text-muted">Test regular expressions against dynamic strings with real-time match
+                      highlighting and capture analysis.</p>
+                  </div>
+                </div>
+
+                <div class="card mb-md">
+                  <div class="card-body p-lg">
+                    <div class="d-flex gap-xs flex-wrap mb-md">
+                      <span class="text-xs font-bold text-muted self-center mr-xs">Presets:</span>
+                      <button class="preset-chip" onclick="window.Curriculum.setRegexPreset('email')"
+                        type="button">Email</button>
+                      <button class="preset-chip" onclick="window.Curriculum.setRegexPreset('date')" type="button">Date
+                        (YYYY-MM-DD)</button>
+                      <button class="preset-chip" onclick="window.Curriculum.setRegexPreset('phone')"
+                        type="button">Phone / Mobile</button>
+                      <button class="preset-chip" onclick="window.Curriculum.setRegexPreset('hex')" type="button">Hex
+                        Color</button>
+                      <button class="preset-chip" onclick="window.Curriculum.setRegexPreset('nim')" type="button">NIM /
+                        Student ID</button>
+                    </div>
+
+                    <div class="d-flex gap-sm mb-sm">
+                      <div class="flex-1">
+                        <label class="text-xs font-semibold">Regular Expression Pattern</label>
+                        <input class="font-mono text-sm w-full" id="regex-pattern-input"
+                          oninput="window.Curriculum.testRegex()" type="text"
+                          value="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" />
+                      </div>
+                      <div class="regex-flags-wrapper">
+                        <label class="text-xs font-semibold">Flags</label>
+                        <input class="font-mono text-sm w-full" id="regex-flags-input"
+                          oninput="window.Curriculum.testRegex()" type="text" value="gi" />
+                      </div>
+                    </div>
+
+                    <div class="form-group mb-sm">
+                      <label class="text-xs font-semibold">Test Input Text</label>
+                      <textarea class="font-mono text-sm w-full" id="regex-test-text"
+                        oninput="window.Curriculum.testRegex()"
+                        rows="4">Contact our student admin at support@pocketsly.edu or alex.turner@campus.ac.id for assistance with semester enrollment.</textarea>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card">
+                  <div class="card-header d-flex justify-between items-center">
+                    <span class="font-bold text-xs text-secondary">MATCH ANALYSIS &amp; HIGHLIGHTS</span>
+                    <span class="priority-badge badge-success-subtle" id="regex-match-badge">0 Matches</span>
+                  </div>
+                  <div class="card-body p-lg">
+                    <div class="regex-highlight-box p-md mb-md" id="regex-highlight-output"></div>
+                    <div id="regex-matches-list"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 7. GPA & TARGET GRADE SIMULATOR -->
+              <div class="curr-panel hidden" id="curr-gpa">
+                <div class="panel-header d-flex justify-between items-start flex-wrap gap-lg">
+                  <div>
+                    <h3>GPA &amp; Target Grade Simulator</h3>
+                    <p class="text-muted">Calculate semester grade point average (IPS) and simulate target cumulative
+                      GPA requirements.</p>
+                  </div>
+                  <div class="d-flex gap-sm">
+                    <button class="btn btn-outline btn-sm d-flex items-center gap-xs"
+                      onclick="Curriculum.loadCoursesIntoGPA()" type="button">
+                      <svg fill="none" height="13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                        stroke-width="2.2" viewBox="0 0 24 24" width="13">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                      </svg>
+                      Import Active Courses
+                    </button>
+                    <button class="btn btn-primary btn-sm" onclick="Curriculum.addGPACourseRow()" type="button">
+                      Add Course
+                    </button>
+                  </div>
+                </div>
+                <div class="gpa-calc-grid gap-xl">
+                  <!-- Course Grades Table Card -->
+                  <div class="card">
+                    <div class="card-body">
+                      <h4 class="text-base">Course Grades &amp; SKS Credits</h4>
+                      <div>
+                        <table class="w-full text-md">
+                          <thead>
+                            <tr class="text-muted">
+                              <th class="p-sm">Course Name</th>
+                              <th class="text-center p-sm">Credits</th>
+                              <th class="p-sm">Grade</th>
+                              <th class="text-center p-sm"></th>
+                            </tr>
+                          </thead>
+                          <tbody id="gpa-courses-tbody">
+                            <!-- Courses injected by JS -->
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- GPA Summary & Target Simulator -->
+                  <div class="d-flex flex-col">
+                    <!-- Target Simulator Card -->
+                    <div class="card">
+                      <div class="card-body">
+                        <h4 class="text-base">Target GPA Simulator</h4>
+                        <p class="text-muted mb-lg text-base">Find what GPA you need on future semesters to graduate
+                          with your
+                          target honors.</p>
+                        <div class="gap-md">
+                          <div>
+                            <label class="font-semibold text-muted text-xs">Current GPA</label>
+                            <input class="w-full p-md" id="target-curr-gpa" max="4" min="0"
+                              oninput="Curriculum.calculateTargetGPA()" step="0.01" type="number" value="3.50" />
+                          </div>
+                          <div>
+                            <label class="font-semibold text-muted text-xs">Completed SKS</label>
+                            <input class="w-full p-md" id="target-curr-credits" min="0"
+                              oninput="Curriculum.calculateTargetGPA()" type="number" value="40" />
+                          </div>
+                          <div>
+                            <label class="font-semibold text-brand text-xs">Goal Target GPA</label>
+                            <input class="w-full font-bold p-md" id="target-goal-gpa" max="4" min="0"
+                              oninput="Curriculum.calculateTargetGPA()" step="0.01" type="number" value="3.75" />
+                          </div>
+                          <div>
+                            <label class="font-semibold text-brand text-xs">Remaining SKS</label>
+                            <input class="w-full font-bold p-md" id="target-future-credits" min="1"
+                              oninput="Curriculum.calculateTargetGPA()" type="number" value="40" />
+                          </div>
+                        </div>
+                        <div class="mt-md" id="target-gpa-result">
+                          <!-- Simulation result injected by JS -->
+                        </div>
+                      </div>
+                    </div>
+                    <!-- KPI Score Card -->
+                    <div class="card bento-icon-indigo dash-curriculum-gradient">
+                      <div class="card-body text-center p-2xl">
+                        <div class="font-extrabold text-brand">Semester GPA (IPS)</div>
+                        <div class="text-primary text-2xl font-extrabold" id="gpa-score-display">3.80</div>
+                        <div class="font-bold text-success mb-md text-xs" id="gpa-standing-badge">Summa Cum Laude</div>
+                        <div class="d-flex justify-center gap-xl text-muted">
+                          <div>Total Credits: <strong class="text-primary" id="gpa-total-credits-display">13
+                              SKS</strong></div>
+                          <div>Total Points: <strong class="text-primary" id="gpa-total-points-display">49.4
+                              Pts</strong></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>

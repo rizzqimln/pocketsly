@@ -1,0 +1,574 @@
+        <!-- 5. CURRICULUM LAB VIEW -->
+        <section class="view-panel hidden" id="view-curriculum">
+          <div class="curriculum-layout">
+            <!-- 3-Section Curriculum Navigation Bar -->
+            <div class="curriculum-topbar">
+              <button class="curr-tab-btn active" data-tab="hub" onclick="window.Curriculum.switchTab('hub')" type="button">
+                <svg class="icon-svg" viewBox="0 0 24 24">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                  <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <span>All Subject Catalog</span>
+              </button>
+              <button class="curr-tab-btn" data-tab="general-sec" onclick="window.Curriculum.switchTab('general-sec')" type="button">
+                <svg class="icon-svg" viewBox="0 0 24 24">
+                  <rect height="7" rx="1.5" width="7" x="3" y="3"></rect>
+                  <rect height="7" rx="1.5" width="7" x="14" y="3"></rect>
+                  <rect height="7" rx="1.5" width="7" x="14" y="14"></rect>
+                  <rect height="7" rx="1.5" width="7" x="3" y="14"></rect>
+                </svg>
+                <span>General &amp; Progress Directory</span>
+              </button>
+              <button class="curr-tab-btn" data-tab="frontend-sec" onclick="window.Curriculum.switchTab('frontend-sec')" type="button">
+                <svg class="icon-svg" viewBox="0 0 24 24">
+                  <rect height="14" rx="2" ry="2" width="20" x="2" y="3"></rect>
+                  <line x1="8" x2="16" y1="21" y2="21"></line>
+                  <line x1="12" x2="12" y1="17" y2="21"></line>
+                </svg>
+                <span>Frontend Development</span>
+              </button>
+              <button class="curr-tab-btn" data-tab="backend-sec" onclick="window.Curriculum.switchTab('backend-sec')" type="button">
+                <svg class="icon-svg" viewBox="0 0 24 24">
+                  <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                  <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+                  <path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"></path>
+                </svg>
+                <span>Backend Development</span>
+              </button>
+              <!-- Active Tab Indicator -->
+              <div class="curr-active-pill" id="curr-active-indicator">
+                <span class="active-dot"></span>
+                <span id="curr-active-tab-name">Subject Catalog</span>
+              </div>
+            </div>
+            <!-- Subject Views -->
+            <div class="curriculum-main">
+              <!-- 0. CURRICULUM SUBJECT HUB -->
+              <div class="curr-panel" id="curr-hub">
+                <div class="panel-header">
+                  <h3>Curriculum Subject Catalog</h3>
+                  <p class="text-muted">Welcome to your CS learning center. Choose a laboratory sandbox below to start
+                    exploring computer science concepts live.</p>
+                </div>
+                <div class="hub-sections d-flex flex-col mt-xl gap-xl">
+                  <!-- Section 1: General & Academic Directory -->
+                  <div class="curr-catalog-section" id="curr-sec-general">
+                    <h4 class="bento-section-title">
+                      <svg class="icon-svg" viewBox="0 0 24 24">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                        <path d="M2 17l10 5 10-5"></path>
+                        <path d="M2 12l10 5 10-5"></path>
+                      </svg>
+                      General &amp; Progress Directory
+                    </h4>
+                    <div class="bento-grid">
+                      <!-- Performance Card (Featured 2-Span Tile) -->
+                      <div class="card bento-tile bento-tile-featured"
+                        onclick="window.Curriculum.switchTab('performance')">
+                        <div class="bento-header">
+                          <span class="bento-icon-box text-brand">
+                            <svg class="icon-svg" viewBox="0 0 24 24">
+                              <path d="M18 20V10M12 20V4M6 20v-6"></path>
+                            </svg>
+                          </span>
+                          <div class="bento-meta-group">
+                            <span class="priority-badge priority-high">Dashboard</span>
+                            <span class="bento-arrow">↗</span>
+                          </div>
+                        </div>
+                        <h4 class="bento-title">Performance &amp; Analytics</h4>
+                        <p class="bento-desc">Monitor course completion velocity, active tasks, habits, and study
+                          analytics.</p>
+                        <div class="bento-tags-row">
+                          <span class="bento-tag">Study Velocity</span>
+                          <span class="bento-tag">Goal Tracker</span>
+                        </div>
+                      </div>
+                      <!-- Academic Card -->
+                      <div class="card bento-tile" onclick="window.Curriculum.switchTab('academic')">
+                        <div class="bento-header">
+                          <span class="bento-icon-box text-pink">
+                            <svg class="icon-svg" viewBox="0 0 24 24">
+                              <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                              <path d="M2 17l10 5 10-5"></path>
+                              <path d="M2 12l10 5 10-5"></path>
+                            </svg>
+                          </span>
+                          <div class="bento-meta-group">
+                            <span class="priority-badge priority-high">Syllabus</span>
+                            <span class="bento-arrow">↗</span>
+                          </div>
+                        </div>
+                        <h4 class="bento-title">Academic &amp; Faculty</h4>
+                        <p class="bento-desc">Manage semester courses, credit hours (SKS), lecturers, and office hours.
+                        </p>
+                        <div class="bento-tags-row">
+                          <span class="bento-tag">SKS Log</span>
+                          <span class="bento-tag">Faculty Directory</span>
+                        </div>
+                      </div>
+                      <!-- Library Card (Navigates to Journal & Notes -> Library tab) -->
+                      <div class="card bento-tile" onclick="Notes.openLibrary()">
+                        <div class="bento-header">
+                          <span class="bento-icon-box bento-icon-indigo">
+                            <svg class="icon-svg" viewBox="0 0 24 24">
+                              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                            </svg>
+                          </span>
+                          <div class="bento-meta-group">
+                            <span class="priority-badge priority-medium">Library</span>
+                            <span class="bento-arrow">↗</span>
+                          </div>
+                        </div>
+                        <h4 class="bento-title">Library &amp; Academic Journals</h4>
+                        <p class="bento-desc">Curated books, research papers, and academic reference catalog in Journal
+                          &amp; Notes.</p>
+                        <div class="bento-tags-row">
+                          <span class="bento-tag">Online Books</span>
+                          <span class="bento-tag">Research Journals</span>
+                        </div>
+                      </div>
+                      <!-- GPA Simulator Card -->
+                      <div class="card bento-tile" onclick="window.Curriculum.switchTab('gpa')">
+                        <div class="bento-header">
+                          <span class="bento-icon-box text-success">
+                            <svg class="icon-svg" viewBox="0 0 24 24">
+                              <circle cx="12" cy="12" r="10"></circle>
+                              <polyline points="12 6 12 12 14 14"></polyline>
+                            </svg>
+                          </span>
+                          <div class="bento-meta-group">
+                            <span class="priority-badge priority-low">Calculator</span>
+                            <span class="bento-arrow">↗</span>
+                          </div>
+                        </div>
+                        <h4 class="bento-title">GPA &amp; Target Simulator</h4>
+                        <p class="bento-desc">Calculate semester IPK/GPA and simulate target grades for graduation
+                          honors.</p>
+                        <div class="bento-tags-row">
+                          <span class="bento-tag">IPK Target</span>
+                          <span class="bento-tag">Simulator</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Section 2: Frontend Development -->
+                  <div class="curr-catalog-section" id="curr-sec-frontend">
+                    <h4 class="bento-section-title text-brand">
+                      <svg class="icon-svg" viewBox="0 0 24 24">
+                        <polygon points="12 2 2 22 22 22"></polygon>
+                      </svg>
+                      Frontend Development Labs &amp; Materials
+                    </h4>
+                    <div class="bento-grid">
+                      <!-- freeCodeCamp Responsive Web Design -->
+                      <a class="card bento-tile bento-link-tile"
+                        href="https://www.freecodecamp.org/learn/responsive-web-design-v9/" target="_blank">
+                        <div class="bento-header">
+                          <span class="bento-icon-box bento-icon-cyan">
+                            <svg class="icon-svg" viewBox="0 0 24 24">
+                              <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                            </svg>
+                          </span>
+                          <div class="bento-meta-group">
+                            <span class="priority-badge priority-high">freeCodeCamp</span>
+                            <span class="bento-arrow">↗</span>
+                          </div>
+                        </div>
+                        <h4 class="bento-title">Responsive Web Design</h4>
+                        <p class="bento-desc">Interactive HTML5, CSS3, Flexbox, and CSS Grid certification course.</p>
+                        <div class="bento-tags-row">
+                          <span class="bento-tag">HTML/CSS</span>
+                          <span class="bento-tag">Responsive UI</span>
+                        </div>
+                      </a>
+                      <!-- DSA Visualizer Card -->
+                      <div class="card bento-tile" onclick="window.Curriculum.switchTab('algorithms')">
+                        <div class="bento-header">
+                          <span class="bento-icon-box bento-icon-cyan">
+                            <svg class="icon-svg" viewBox="0 0 24 24">
+                              <line x1="18" x2="18" y1="20" y2="10"></line>
+                              <line x1="12" x2="12" y1="20" y2="4"></line>
+                              <line x1="6" x2="6" y1="20" y2="14"></line>
+                            </svg>
+                          </span>
+                          <div class="bento-meta-group">
+                            <span class="priority-badge priority-high">Visualizer</span>
+                            <span class="bento-arrow">↗</span>
+                          </div>
+                        </div>
+                        <h4 class="bento-title">Data Structures &amp; Algorithms</h4>
+                        <p class="bento-desc">Live sorting visualizer for Bubble Sort, Quick Sort, and binary search.
+                        </p>
+                        <div class="bento-tags-row">
+                          <span class="bento-tag">Live Visualizer</span>
+                          <span class="bento-tag">Big-O Analysis</span>
+                        </div>
+                      </div>
+                      <!-- Flashcards & Quiz -->
+                      <div class="card bento-tile" onclick="window.Curriculum.switchTab('flashcards')">
+                        <div class="bento-header">
+                          <span class="bento-icon-box text-purple">
+                            <svg class="icon-svg" viewBox="0 0 24 24">
+                              <rect height="18" rx="2" ry="2" width="18" x="3" y="3"></rect>
+                              <line x1="9" x2="15" y1="9" y2="9"></line>
+                              <line x1="9" x2="15" y1="13" y2="13"></line>
+                            </svg>
+                          </span>
+                          <div class="bento-meta-group">
+                            <span class="priority-badge priority-low">Quiz</span>
+                            <span class="bento-arrow">↗</span>
+                          </div>
+                        </div>
+                        <h4 class="bento-title">Flashcards &amp; Quiz</h4>
+                        <p class="bento-desc">Spaced repetition flashcards testing core CS concepts and web
+                          architecture.</p>
+                        <div class="bento-tags-row">
+                          <span class="bento-tag">Spaced Repetition</span>
+                          <span class="bento-tag">Self-Test</span>
+                        </div>
+                      </div>
+                      <!-- The Odin Project Foundations -->
+                      <a class="card bento-tile bento-link-tile"
+                        href="https://www.theodinproject.com/paths/foundations/courses/foundations" target="_blank">
+                        <div class="bento-header">
+                          <span class="bento-icon-box text-pink">
+                            <svg class="icon-svg" viewBox="0 0 24 24">
+                              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                            </svg>
+                          </span>
+                          <div class="bento-meta-group">
+                            <span class="priority-badge priority-high">The Odin Project</span>
+                            <span class="bento-arrow">↗</span>
+                          </div>
+                        </div>
+                        <h4 class="bento-title">Odin Foundations &amp; JS</h4>
+                        <p class="bento-desc">Fullstack curriculum covering Git, HTML5, CSS, and modern JS.</p>
+                        <div class="bento-tags-row">
+                          <span class="bento-tag">Git &amp; CLI</span>
+                          <span class="bento-tag">DOM Scripting</span>
+                        </div>
+                      </a>
+                      <!-- 1. Interactive Flexbox & Grid Sandbox -->
+                      <div class="card bento-tile" onclick="window.Curriculum.switchTab('flexbox')">
+                        <div class="bento-header">
+                          <span class="bento-icon-box text-purple">
+                            <svg class="icon-svg" viewBox="0 0 24 24">
+                              <rect height="18" rx="2" width="18" x="3" y="3"></rect>
+                              <line x1="3" x2="21" y1="9" y2="9"></line>
+                              <line x1="9" x2="9" y1="21" y2="9"></line>
+                            </svg>
+                          </span>
+                          <div class="bento-meta-group">
+                            <span class="priority-badge priority-high">Live Lab</span>
+                            <span class="bento-arrow">↗</span>
+                          </div>
+                        </div>
+                        <h4 class="bento-title">CSS Flexbox &amp; Grid Visualizer</h4>
+                        <p class="bento-desc">Interactive live CSS stage to tweak direction, alignment, justify-content,
+                          and copy snippets.</p>
+                        <div class="bento-tags-row">
+                          <span class="bento-tag">CSS Flexbox</span>
+                          <span class="bento-tag">CSS Grid</span>
+                          <span class="bento-tag">Live Stage</span>
+                        </div>
+                      </div>
+                      <!-- 2. JS Array Methods Lab -->
+                      <div class="card bento-tile" onclick="window.Curriculum.switchTab('jslab')">
+                        <div class="bento-header">
+                          <span class="bento-icon-box text-warning">
+                            <svg class="icon-svg" viewBox="0 0 24 24">
+                              <polyline points="16 18 22 12 16 6"></polyline>
+                              <polyline points="8 6 2 12 8 18"></polyline>
+                            </svg>
+                          </span>
+                          <div class="bento-meta-group">
+                            <span class="priority-badge priority-low">Live Code</span>
+                            <span class="bento-arrow">↗</span>
+                          </div>
+                        </div>
+                        <h4 class="bento-title">JS Array &amp; Functional Lab</h4>
+                        <p class="bento-desc">Interactive pipeline for .map(), .filter(), .reduce(), and data
+                          transformations.</p>
+                        <div class="bento-tags-row">
+                          <span class="bento-tag">Array Methods</span>
+                          <span class="bento-tag">Functional JS</span>
+                        </div>
+                      </div>
+                      <!-- 3. Regex Validator Lab -->
+                      <div class="card bento-tile" onclick="window.Curriculum.switchTab('regexlab')">
+                        <div class="bento-header">
+                          <span class="bento-icon-box bento-icon-cyan">
+                            <svg class="icon-svg" viewBox="0 0 24 24">
+                              <circle cx="12" cy="12" r="10"></circle>
+                              <line x1="12" x2="12" y1="8" y2="12"></line>
+                              <line x1="12" x2="12.01" y1="16" y2="16"></line>
+                            </svg>
+                          </span>
+                          <div class="bento-meta-group">
+                            <span class="priority-badge priority-high">Tester</span>
+                            <span class="bento-arrow">↗</span>
+                          </div>
+                        </div>
+                        <h4 class="bento-title">Regex Pattern Validator</h4>
+                        <p class="bento-desc">Test real-time Regular Expressions with instant match highlighting and
+                          group capture.</p>
+                        <div class="bento-tags-row">
+                          <span class="bento-tag">RegEx</span>
+                          <span class="bento-tag">Input Validation</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Section 3: Backend & Databases -->
+                  <div class="curr-catalog-section" id="curr-sec-backend">
+                    <h4 class="bento-section-title text-success">
+                      <svg class="icon-svg" viewBox="0 0 24 24">
+                        <rect height="8" rx="2" ry="2" width="20" x="2" y="2"></rect>
+                        <rect height="8" rx="2" ry="2" width="20" x="2" y="14"></rect>
+                      </svg>
+                      Backend &amp; Database Labs &amp; Materials
+                    </h4>
+                    <div class="bento-grid">
+                      <!-- Relational DB & SQL Playground (Featured 2-Span Tile) -->
+                      <div class="card bento-tile bento-tile-featured" onclick="window.Curriculum.switchTab('db')">
+                        <div class="bento-header">
+                          <span class="bento-icon-box text-success">
+                            <svg class="icon-svg" viewBox="0 0 24 24">
+                              <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                              <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+                              <path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"></path>
+                            </svg>
+                          </span>
+                          <div class="bento-meta-group">
+                            <span class="priority-badge priority-medium">SQL Sandbox</span>
+                            <span class="bento-arrow">↗</span>
+                          </div>
+                        </div>
+                        <h4 class="bento-title">Relational Database &amp; SQL Lab</h4>
+                        <p class="bento-desc">Write and run live queries against SQLite with schema inspection and
+                          results grid.</p>
+                        <div class="bento-tags-row">
+                          <span class="bento-tag">SQLite Studio</span>
+                          <span class="bento-tag">Query Runner</span>
+                        </div>
+                      </div>
+                      <!-- Backend API Explorer -->
+                      <div class="card bento-tile" onclick="window.Curriculum.switchTab('backend')">
+                        <div class="bento-header">
+                          <span class="bento-icon-box text-warning">
+                            <svg class="icon-svg" viewBox="0 0 24 24">
+                              <rect height="8" rx="2" ry="2" width="20" x="2" y="2"></rect>
+                              <rect height="8" rx="2" ry="2" width="20" x="2" y="14"></rect>
+                              <line x1="6" x2="6.01" y1="6" y2="6"></line>
+                              <line x1="6" x2="6.01" y1="18" y2="18"></line>
+                            </svg>
+                          </span>
+                          <div class="bento-meta-group">
+                            <span class="priority-badge priority-low">API Explorer</span>
+                            <span class="bento-arrow">↗</span>
+                          </div>
+                        </div>
+                        <h4 class="bento-title">Backend API Explorer</h4>
+                        <p class="bento-desc">Simulate client-server requests and inspect live JSON response payloads.
+                        </p>
+                        <div class="bento-tags-row">
+                          <span class="bento-tag">REST Endpoints</span>
+                          <span class="bento-tag">JSON Payloads</span>
+                        </div>
+                      </div>
+                      <!-- freeCodeCamp Relational Database -->
+                      <a class="card bento-tile bento-link-tile"
+                        href="https://www.freecodecamp.org/learn/relational-databases-v9/" target="_blank">
+                        <div class="bento-header">
+                          <span class="bento-icon-box text-success">
+                            <svg class="icon-svg" viewBox="0 0 24 24">
+                              <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                              <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+                            </svg>
+                          </span>
+                          <div class="bento-meta-group">
+                            <span class="priority-badge priority-high">freeCodeCamp</span>
+                            <span class="bento-arrow">↗</span>
+                          </div>
+                        </div>
+                        <h4 class="bento-title">Relational DB Certification</h4>
+                        <p class="bento-desc">Interactive terminal track for PostgreSQL, SQLite, and normalization.</p>
+                        <div class="bento-tags-row">
+                          <span class="bento-tag">PostgreSQL</span>
+                          <span class="bento-tag">Schema Design</span>
+                        </div>
+                      </a>
+                      <!-- Odin Node Backend -->
+                      <a class="card bento-tile bento-link-tile"
+                        href="https://www.theodinproject.com/paths/full-stack-javascript" target="_blank">
+                        <div class="bento-header">
+                          <span class="bento-icon-box text-warning">
+                            <svg class="icon-svg" viewBox="0 0 24 24">
+                              <rect height="8" rx="2" ry="2" width="20" x="2" y="2"></rect>
+                            </svg>
+                          </span>
+                          <div class="bento-meta-group">
+                            <span class="priority-badge priority-high">The Odin Project</span>
+                            <span class="bento-arrow">↗</span>
+                          </div>
+                        </div>
+                        <h4 class="bento-title">Node &amp; Express Backend</h4>
+                        <p class="bento-desc">Build REST APIs, auth controllers, database models, and security
+                          middleware.</p>
+                        <div class="bento-tags-row">
+                          <span class="bento-tag">Node.js</span>
+                          <span class="bento-tag">JWT Auth</span>
+                        </div>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- PERFORMANCE & ANALYTICS OVERVIEW -->
+              <div class="curr-panel hidden" id="curr-performance">
+                <div class="panel-header d-flex justify-between items-start flex-wrap gap-lg">
+                  <div>
+                    <button
+                      class="btn btn-outline btn-sm back-to-hub-btn d-inline-flex items-center gap-sm mb-md text-xs p-md"
+                      onclick="window.Curriculum.switchTab('hub')" type="button">
+                      <svg class="icon-svg" viewBox="0 0 24 24">
+                        <line x1="19" x2="5" y1="12" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                      </svg>
+                      Back to Catalog
+                    </button>
+                    <h3>Performance &amp; Analytics Dashboard</h3>
+                    <p class="text-muted">Monitor your course completion rate, weekly productivity metrics, learning
+                    velocity, and knowledge tracker curves.</p>
+                  </div>
+                  <div class="d-flex gap-sm flex-wrap">
+                    <button class="btn btn-primary btn-sm d-inline-flex items-center gap-sm"
+                      onclick="window.Curriculum.openAddCourseModal()" type="button">
+                      <svg class="icon-svg" viewBox="0 0 24 24">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                      </svg>
+                      Add Course
+                    </button>
+                    <button class="btn btn-outline btn-sm d-inline-flex items-center gap-sm"
+                      onclick="window.Curriculum.openLogStudyModal()" type="button">
+                      <svg class="icon-svg" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                      </svg>
+                      Log Study Hours
+                    </button>
+                  </div>
+                </div>
+                <!-- Performance Grid -->
+                <div class="perf-grid mb-xl">
+                  <!-- Course complete card -->
+                  <div class="card">
+                    <div class="card-body">
+                      <div class="d-flex justify-between items-center mb-sm">
+                        <div class="font-bold text-secondary text-md">
+                          Course Complete</div>
+                        <button class="btn btn-outline btn-xs text-xs p-sm"
+                          onclick="window.Curriculum.openAddCourseModal()" type="button">Add Course</button>
+                      </div>
+                      <div class="font-extrabold text-brand text-2xl" id="perf-course-percentage">
+                        0%
+                      </div>
+                      <div class="d-flex flex-col gap-md mt-lg" id="perf-course-progress-list">
+                        <!-- Render dynamic course progress bars here -->
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Overall productivity card -->
+                  <div class="card">
+                    <div class="card-body">
+                      <div class="d-flex justify-between items-center mb-sm">
+                        <div class="font-bold text-secondary text-md">
+                          Overall Productivity</div>
+                      </div>
+                      <div class="font-extrabold text-success text-2xl" id="perf-productivity-hours">0 <span
+                          class="text-muted text-base">hours/week</span></div>
+                      <p class="text-muted mt-xs text-sm" id="perf-theory-practice-breakdown">0
+                        h theory • 0 h practice
+                      </p>
+                      <!-- Activity Heatmap matrix -->
+                      <div class="font-bold text-secondary mb-xl mt-xl text-sm">
+                        Activity Velocity (Last 4 Weeks)</div>
+                      <div class="heatmap-container" id="perf-heatmap-grid">
+                        <!-- 28 heatmap blocks dynamically generated -->
+                      </div>
+                      <div class="heatmap-legend-row">
+                        <span>Less</span>
+                        <div class="d-flex items-center gap-xs">
+                          <span class="heatmap-legend-block heatmap-legend-0"></span>
+                          <span class="heatmap-legend-block heatmap-legend-1"></span>
+                          <span class="heatmap-legend-block heatmap-legend-2"></span>
+                          <span class="heatmap-legend-block heatmap-legend-3"></span>
+                          <span class="heatmap-legend-block heatmap-legend-4"></span>
+                        </div>
+                        <span>More</span>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Homeworks score card -->
+                  <div class="card">
+                    <div class="card-body">
+                      <div class="font-bold text-secondary mb-md text-md">
+                        Tasks &amp; Quiz Mastery</div>
+                      <div class="font-extrabold text-brand text-2xl" id="perf-homeworks-percentage">
+                        85%</div>
+                      <div class="d-flex gap-md font-semibold mt-xs text-sm" id="perf-tasks-status-row">
+                        <span class="text-warning" id="perf-pending-tasks">0 pending</span>
+                        <span id="perf-done-tasks">0 completed</span>
+                      </div>
+                      <!-- Knowledge Tracker Area Chart -->
+                      <div class="font-bold text-secondary mb-md mt-lg text-sm">
+                        Knowledge Tracker</div>
+                      <div class="perf-area-chart-container">
+                        <svg preserveAspectRatio="none" viewBox="0 0 100 40">
+                          <defs>
+                            <linearGradient id="chart-grad-perf" x1="0" x2="0" y1="0" y2="1">
+                              <stop offset="0%" stop-color="var(--primary)" stop-opacity="0.25"></stop>
+                              <stop offset="100%" stop-color="var(--primary)" stop-opacity="0.0"></stop>
+                            </linearGradient>
+                          </defs>
+                          <path d="M 0 35 Q 15 20 30 28 T 60 12 T 90 22 T 100 8 L 100 40 L 0 40 Z"
+                            fill="url(#chart-grad-perf)"></path>
+                          <path d="M 0 35 Q 15 20 30 28 T 60 12 T 90 22 T 100 8" fill="none" stroke="var(--primary)"
+                            stroke-linecap="round" stroke-width="2"></path>
+                          <line stroke="var(--border-focus)" stroke-dasharray="2 2" stroke-width="0.75" x1="0" x2="100"
+                            y1="23" y2="23"></line>
+                        </svg>
+                        <div class="d-flex justify-between text-muted mt-xs text-xs">
+                          <span>Proficient threshold</span>
+                          <span>Mastered</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Study History & Activity Log Management (Bottom Card) -->
+                  <div class="card col-span-full">
+                    <div class="card-body">
+                      <div class="d-flex justify-between items-center flex-wrap gap-sm mb-lg">
+                        <div>
+                          <div class="font-bold text-secondary text-md">
+                            Productivity &amp; Study Logs</div>
+                          <div class="font-extrabold text-success mt-xl text-xl" id="perf-monthly-hours-total">0 <span
+                              class="text-muted">hours logged
+                              total</span></div>
+                        </div>
+                        <button class="btn btn-outline btn-sm" onclick="window.Curriculum.openLogStudyModal()" type="button"> Add
+                          Study Session</button>
+                      </div>
+                      <!-- Study Logs Table / List -->
+                      <div id="perf-study-logs-container">
+                        <p class="text-muted text-center text-md p-2xl">No
+                          study sessions logged yet. Click "Add Study Session" above to track your practice &amp; theory
+                          hours.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>

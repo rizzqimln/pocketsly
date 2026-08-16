@@ -1,0 +1,307 @@
+  <!-- ===================================================================== -->
+  <!-- LANDING PAGE (public entry, replaces login-first gate)                -->
+  <!-- ===================================================================== -->
+  <div class="landing" id="landing-container">
+    <!-- Sticky glass navbar -->
+    <header class="ld-nav">
+      <div class="container ld-nav-inner">
+        <a class="ld-logo" href="#landing-container">
+          <span class="ld-logo-mark">P</span>
+          Pocketsly
+        </a>
+        <nav class="ld-nav-links" aria-label="Landing navigation">
+          <a href="#features">Features</a>
+          <a href="#how">How it works</a>
+          <a href="#get-started">Get Started</a>
+        </nav>
+        <div class="ld-nav-actions">
+          <span class="ld-user-chip hidden" id="landing-user-chip">
+            <span class="ld-avatar" id="landing-user-avatar">U</span>
+            <span id="landing-username">User</span>
+          </span>
+          <a class="ld-btn ld-btn-ghost hidden" href="#" id="landing-continue-btn"
+            onclick="Auth.continueToApp()">Continue to Dashboard</a>
+          <button class="ld-btn ld-btn-primary" id="landing-signin-btn" onclick="App.openProfileSettings()"
+            type="button">Sign In / Get Started</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="ld-hero">
+      <div class="container ld-hero-inner">
+        <span class="ld-eyebrow"><span class="ld-eyebrow-dot"></span> Your student life, orchestrated</span>
+        <h1>One rhythm for <span class="accent">habits, study, and money</span>.</h1>
+        <p class="lede">
+          Pocketsly is a daily routine &amp; productivity suite — habits, timetables,
+          journaling, curriculum tracking, and budget in a single app. No setup walls:
+          explore first, sign in later.
+        </p>
+        <div class="ld-hero-cta">
+          <button class="ld-btn ld-btn-primary ld-btn-big" onclick="App.openProfileSettings()" type="button">Get Started
+            — it's free</button>
+          <button class="ld-btn ld-btn-ghost ld-btn-big" onclick="App.requestInstall()" type="button">
+            <svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+              stroke-width="2.2" viewBox="0 0 24 24" width="18">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Install App
+          </button>
+        </div>
+        <div class="ld-hero-proof">
+          <div class="ld-proof-item"><b>5</b><span>integrated modules</span></div>
+          <div class="ld-proof-item"><b>3</b><span>recovery channels</span></div>
+          <div class="ld-proof-item"><b>100%</b><span>offline-capable</span></div>
+        </div>
+        <div class="ld-mockup" aria-hidden="true">
+          <div class="ld-mockup-bar">
+            <span class="ld-mockup-dot"></span>
+            <span class="ld-mockup-dot"></span>
+            <span class="ld-mockup-dot"></span>
+          </div>
+          <div class="ld-mockup-body">
+            <div class="ld-mock-tile">
+              <div class="tile-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                  stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg></div>
+              <div class="tile-line"></div>
+              <div class="tile-line short"></div>
+              <div class="tile-line success tile-line-80"></div>
+            </div>
+            <div class="ld-mock-tile">
+              <div class="tile-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                  stroke-width="2.2">
+                  <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg></div>
+              <div class="tile-line"></div>
+              <div class="tile-line warn tile-line-65"></div>
+            </div>
+            <div class="ld-mock-tile">
+              <div class="tile-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                  stroke-width="2.2">
+                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                </svg></div>
+              <div class="tile-line"></div>
+              <div class="tile-line short"></div>
+            </div>
+            <div class="ld-mock-tile">
+              <div class="tile-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                  stroke-width="2.2">
+                  <line x1="12" y1="1" x2="12" y2="23"></line>
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg></div>
+              <div class="tile-line"></div>
+              <div class="tile-line success tile-line-70"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bento features -->
+    <section class="ld-section" id="features">
+      <div class="container">
+        <div class="ld-section-head">
+          <h2>Everything you need, in one place</h2>
+          <p>Six purpose-built tools that share one rhythm — your data stays synced across every module.</p>
+        </div>
+        <div class="ld-bento">
+          <div class="ld-cell cell-2x2 ld-cell-glass">
+            <div class="cell-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+                stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <circle cx="12" cy="12" r="6"></circle>
+                <circle cx="12" cy="12" r="2"></circle>
+              </svg></div>
+            <h3>Habits &amp; Tasks</h3>
+            <p>Build consistent routines with daily habit tracking, priorities, and due dates. Log completion with one
+              tap and watch streaks grow.</p>
+            <div class="cell-stat">14<small> consecutive days</small></div>
+          </div>
+          <div class="ld-cell cell-w4">
+            <div class="cell-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+                stroke-width="2.2">
+                <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg></div>
+            <h3>Weekly Timetable</h3>
+            <p>Block out classes, focus work, and personal routines in a color-coded weekly schedule.</p>
+          </div>
+          <div class="ld-cell cell-w4">
+            <div class="cell-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+                stroke-width="2.2">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              </svg></div>
+            <h3>Journal &amp; Notes</h3>
+            <p>Capture daily reflections and lecture notes, tagged with mood to spot your energy patterns.</p>
+          </div>
+          <div class="ld-cell cell-w4">
+            <div class="cell-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+                stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="6" width="20" height="12" rx="2"></rect>
+                <path d="M2 10h20"></path>
+              </svg></div>
+            <h3>Receipt Scanner</h3>
+            <p>Snap a receipt and let OCR extract merchant, amount, and date — on-device or via server.</p>
+          </div>
+          <div class="ld-cell cell-w3">
+            <div class="cell-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+                stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+              </svg></div>
+            <h3>Curriculum Lab</h3>
+            <p>Track courses, credits, lecturers, and study logs — even run live SQL practice.</p>
+          </div>
+          <div class="ld-cell cell-w3">
+            <div class="cell-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+                stroke-width="2.2">
+                <line x1="12" y1="1" x2="12" y2="23"></line>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+              </svg></div>
+            <h3>Monthly Budget</h3>
+            <p>Allocate category limits, log incomes and expenses, and monitor spend against budget live.</p>
+          </div>
+          <div class="ld-cell cell-w3">
+            <div class="cell-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+                stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="13" r="8"></circle>
+                <path d="M12 9v4l2 2"></path>
+                <path d="M5 3 2 6"></path>
+                <path d="m22 6-3-3"></path>
+              </svg></div>
+            <h3>Focus Timer</h3>
+            <p>Pomodoro and focus sessions wired into your study-log for honest hour tracking.</p>
+          </div>
+          <div class="ld-cell cell-w3">
+            <div class="cell-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+                stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg></div>
+            <h3>Private &amp; Portable</h3>
+            <p>Cookie sessions, per-account data, and one-click JSON backup &amp; restore.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="ld-section" id="how">
+      <div class="container">
+        <div class="ld-section-head">
+          <h2>Start in three steps</h2>
+          <p>From first click to full routine in under a minute.</p>
+        </div>
+        <div class="ld-steps">
+          <div class="ld-step">
+            <div class="ld-step-num">01</div>
+            <h3>Explore the app</h3>
+            <p>Open Pocketsly and browse every module freely — no sign-up wall on the first visit.</p>
+          </div>
+          <div class="ld-step">
+            <div class="ld-step-num">02</div>
+            <h3>Sign in from Profile</h3>
+            <p>When you're ready to sync, open Profile and create an account or sign in.</p>
+          </div>
+          <div class="ld-step">
+            <div class="ld-step-num">03</div>
+            <h3>Build your rhythm</h3>
+            <p>Add habits, block your timetable, log expenses, and let Pocketsly keep the rhythm.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Install & offline -->
+    <section class="ld-section" id="install">
+      <div class="container">
+        <div class="ld-section-head">
+          <h2>Get Pocketsly on your phone</h2>
+          <p>Free, private, and works offline. Anyone can install it on their own device in under a minute — no app
+            store needed.</p>
+        </div>
+        <div class="ld-install-grid">
+          <div class="ld-install-card">
+            <div class="cell-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="5" y="2" width="14" height="20" rx="2"></rect>
+                <line x1="12" y1="18" x2="12.01" y2="18"></line>
+              </svg></div>
+            <h3>Android</h3>
+            <ol>
+              <li>Open Pocketsly in Chrome</li>
+              <li>Tap the <b>&#8942;</b> menu, then <b>Add to Home screen</b></li>
+              <li>Done — it opens like an app</li>
+            </ol>
+          </div>
+          <div class="ld-install-card">
+            <div class="cell-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2c1 2-1 4-1 6s2 2 2 5-3 5-6 5-4-3-2-6c2-1 2-3 1-5s3-4 6-5z"></path>
+              </svg></div>
+            <h3>iPhone &amp; iPad</h3>
+            <ol>
+              <li>Open Pocketsly in Safari</li>
+              <li>Tap the <b>Share</b> button, then <b>Add to Home Screen</b></li>
+              <li>Done — it works offline too</li>
+            </ol>
+          </div>
+          <div class="ld-install-card">
+            <div class="cell-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2"></rect>
+                <line x1="8" y1="21" x2="16" y2="21"></line>
+                <line x1="12" y1="17" x2="12" y2="21"></line>
+              </svg></div>
+            <h3>Computer</h3>
+            <ol>
+              <li>Open Pocketsly in Chrome or Edge</li>
+              <li>Click the <b>install icon</b> in the address bar</li>
+              <li>Done — launches like a real app</li>
+            </ol>
+          </div>
+        </div>
+        <div class="ld-install-cta">
+          <button class="ld-btn ld-btn-primary ld-btn-big" id="landing-install-cta-btn" onclick="App.requestInstall()"
+            type="button">Install Pocketsly now</button>
+          <p class="ld-install-note" id="install-ios-hint" hidden>On iPhone or iPad: use Safari &rarr; Share &rarr; Add
+            to Home Screen.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="ld-section" id="get-started">
+      <div class="container">
+        <div class="ld-cta">
+          <h2>Your best week starts today.</h2>
+          <p>Free to explore. Sign in whenever you're ready.</p>
+          <div class="ld-cta-actions">
+            <button class="ld-btn ld-btn-primary ld-btn-big" onclick="App.openProfileSettings()" type="button">Get
+              Started — it's free</button>
+            <button class="ld-btn ld-btn-ghost ld-btn-big" onclick="App.requestInstall()" type="button">Install
+              App</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="ld-footer">
+      <div class="container ld-footer-inner">
+        <span>© 2026 Pocketsly — Daily Routine &amp; Student Productivity Suite</span>
+        <span>Habits · Schedule · Journal · Curriculum · Budget</span>
+      </div>
+    </footer>
+  </div>

@@ -2443,317 +2443,30 @@ window.Notes = {
 
 /* ===== curriculum.js ===== */
 /**
- * CURRICULUM LAB CONTROLLER (curriculum.js)
- * ==========================================
- * LEARN: Complex Feature Modules & Real-Time UI Interactivity
- *
- * 1. sessionStorage       — Like localStorage but wiped when the browser tab
- *                           closes. Perfect for UI state (active tab) that
- *                           should not persist between sessions.
- * 2. Live SQL Sandbox     — We POST raw SQL to the server and render the JSON
- *                           response dynamically. No library needed.
- * 3. Sorting Visualiser   — setInterval() drives each animation step. We pause
- *                           between swaps to give the user time to see changes.
- * 4. Quiz State Machine   — quizIndex is the pointer. advanceQuiz() increments
- *                           it with modulo to wrap around the question bank.
+ * CURRICULUM CONTROLLER (curriculum.js)
+ * =====================================
+ * Manages the CS Curriculum Hub catalog, Academic & Faculty directory,
+ * Performance & Analytics dashboard, and GPA Target Simulator.
  */
 
 window.Curriculum = {
   activeTab: sessionStorage.getItem('curriculum_active_tab') || 'hub',
-  dbSchema: null,
-  algoArray: [],
-  sortingInProgress: false,
-  quizIndex: 0,
-  quizQuestions: [
-    {
-      question: "Which of the following is correct regarding relational databases?",
-      options: [
-        "Tables cannot have foreign key relationships with each other.",
-        "A Primary Key must be unique and cannot be NULL.",
-        "SQLite does not support any constraints like UNIQUE or NOT NULL.",
-        "SQL stands for Simple Query Language."
-      ],
-      answer: 1,
-      explanation: "A Primary Key uniquely identifies each record in a table, and SQL stands for Structured Query Language."
-    },
-    {
-      question: "In CSS Flexbox (freeCodeCamp / W3Schools track), which property aligns flex items along the main axis?",
-      options: [
-        "align-items",
-        "justify-content",
-        "flex-direction",
-        "align-content"
-      ],
-      answer: 1,
-      explanation: "'justify-content' aligns flex items along the main axis, while 'align-items' aligns them along the cross axis."
-    },
-    {
-      question: "What is the time complexity of a Bubble Sort algorithm in its worst case?",
-      options: [
-        "O(n log n)",
-        "O(1)",
-        "O(n²)",
-        "O(n)"
-      ],
-      answer: 2,
-      explanation: "Bubble Sort compares adjacent elements and swaps them, leading to nested loop behavior resulting in O(n²) time complexity."
-    },
-    {
-      question: "Which HTTP status code represents a successful resource creation in REST API design?",
-      options: [
-        "200 OK",
-        "201 Created",
-        "400 Bad Request",
-        "404 Not Found"
-      ],
-      answer: 1,
-      explanation: "The HTTP 201 Created status code indicates that the request has succeeded and led to the creation of a resource."
-    },
-    {
-      question: "In SQL (The Odin Project / W3Schools track), what does a LEFT JOIN return?",
-      options: [
-        "Only rows that match in both tables.",
-        "All rows from the left table, and matching rows from the right table.",
-        "All rows from both tables regardless of match.",
-        "Only records that have NULL primary keys."
-      ],
-      answer: 1,
-      explanation: "A LEFT JOIN returns all records from the left table (table1), and the matched records from the right table (table2). If no match is found, NULL is returned for right table columns."
-    },
-    {
-      question: "Which of the following describes a foreign key constraint?",
-      options: [
-        "It prevents passwords from being leaked.",
-        "It speeds up SELECT queries on indexes.",
-        "It links a column in one table to the primary key of another table to maintain referential integrity.",
-        "It automatically hashes passwords during INSERTs."
-      ],
-      answer: 2,
-      explanation: "A foreign key is a column or group of columns in a relational database table that provides a link between data in two tables, enforcing referential integrity."
-    },
-    {
-      question: "In Modern JavaScript (ES6+), what is the purpose of the async/await syntax?",
-      options: [
-        "To make JavaScript run synchronously on a single CPU core without an event loop.",
-        "To write asynchronous Promises in a clean, synchronous-looking format.",
-        "To automatically compile JavaScript into WebAssembly binary.",
-        "To force DOM elements to re-render instantly without CSS."
-      ],
-      answer: 1,
-      explanation: "async/await acts as syntactic sugar over Promises, making asynchronous code easier to read and maintain."
-    },
-    {
-      question: "In Python and SQLite, which technique is used to prevent SQL Injection vulnerability?",
-      options: [
-        "Executing queries with raw string concatenation like `f'SELECT * FROM users WHERE name={name}'`",
-        "Using '?' query placeholders or parameterized SQL inputs",
-        "Running base64 encryption on every incoming query text",
-        "Turning off SQLite foreign key constraints"
-      ],
-      answer: 1,
-      explanation: "Passing parameterized inputs with '?' prevents attackers from manipulating the structure of your queries (SQL Injection)."
-    },
-    {
-      question: "In Git Version Control (The Odin Project track), how do you create and switch to a new branch simultaneously?",
-      options: [
-        "git branch create <name>",
-        "git checkout -b <name>",
-        "git commit -m <name>",
-        "git push origin <name>"
-      ],
-      answer: 1,
-      explanation: "`git checkout -b <branch-name>` creates a new branch and immediately checks it out."
-    },
-    {
-      question: "What is the primary difference between HTTP GET and POST requests?",
-      options: [
-        "GET is used to create server database records, while POST is read-only.",
-        "GET requests parameters in the URL query string and should be idempotent, while POST sends data in the request body.",
-        "GET encrypts data automatically, while POST is plain text.",
-        "POST can only be sent over HTTP 1.0."
-      ],
-      answer: 1,
-      explanation: "GET is designed to retrieve data without side effects (idempotent), whereas POST submits data to be processed in the request body."
-    },
-    {
-      question: "What is the time complexity of Binary Search on a sorted array of size n?",
-      options: [
-        "O(n)",
-        "O(log n)",
-        "O(n log n)",
-        "O(1)"
-      ],
-      answer: 1,
-      explanation: "Binary search repeatedly divides the search interval in half, yielding O(log n) time complexity. The array must be sorted."
-    },
-    {
-      question: "In relational database design, what is the goal of Third Normal Form (3NF)?",
-      options: [
-        "To ensure all data is stored in a single flat table.",
-        "To eliminate transitive functional dependencies where non-key attributes depend on other non-key attributes.",
-        "To convert all numeric data types to string data types.",
-        "To remove all primary keys from child tables."
-      ],
-      answer: 1,
-      explanation: "3NF requires a table to be in 2NF and that all non-key columns depend only on the primary key, eliminating transitive dependencies."
-    },
-    {
-      question: "In the CSS Box Model, setting `box-sizing: border-box` causes an element's specified width to include:",
-      options: [
-        "Only the inner content area.",
-        "Content, padding, and border (excluding margin).",
-        "Content and margin (excluding border and padding).",
-        "Padding and margin (excluding border and content)."
-      ],
-      answer: 1,
-      explanation: "`box-sizing: border-box` includes padding and borders in the element's total calculated width and height, preventing layout breakage."
-    },
-    {
-      question: "In JavaScript's Event Loop, which tasks execute first when the current Call Stack becomes empty?",
-      options: [
-        "Macrotasks (e.g. setTimeout callbacks)",
-        "Microtasks (e.g. Promise.then and queueMicrotask callbacks)",
-        "setInterval timer executions",
-        "Browser window resizing events"
-      ],
-      answer: 1,
-      explanation: "The Microtask Queue is always drained completely before the event loop picks up the next task from the Macrotask (Callback) Queue."
-    },
-    {
-      question: "Which Data Structure operates on a Last-In, First-Out (LIFO) principle?",
-      options: [
-        "Queue",
-        "Stack",
-        "Binary Search Tree",
-        "Linked List"
-      ],
-      answer: 1,
-      explanation: "A Stack operates on LIFO (Last-In, First-Out), where elements are pushed and popped from the top (e.g. call stack, undo history)."
-    },
-    {
-      question: "What is the key difference between TCP and UDP at the Transport Layer?",
-      options: [
-        "TCP is connection-oriented and guarantees reliable, ordered packet delivery; UDP is connectionless and prioritized for low-latency streaming.",
-        "UDP guarantees zero packet loss, whereas TCP does not.",
-        "TCP only works over Wi-Fi, while UDP works over Ethernet.",
-        "UDP encrypts all traffic by default, while TCP sends plaintext."
-      ],
-      answer: 0,
-      explanation: "TCP uses three-way handshakes, acknowledgments, and retransmissions for reliable delivery. UDP is lightweight with no connection overhead."
-    },
-    {
-      question: "How does creating an Index on a database column improve performance?",
-      options: [
-        "It compresses the database file to 10% of its size.",
-        "It builds an auxiliary search structure (like a B-Tree) to speed up SELECT queries, with a trade-off in INSERT/UPDATE speed.",
-        "It automatically prevents duplicate entries across all tables.",
-        "It removes the need for Primary Keys."
-      ],
-      answer: 1,
-      explanation: "Database indexes allow the query engine to locate rows in O(log n) time using B-Trees rather than scanning the entire table (full table scan)."
-    },
-    {
-      question: "In Object-Oriented Programming (OOP), what is Polymorphism?",
-      options: [
-        "The ability to bundle data and methods into a single class entity.",
-        "The ability for different classes to be treated as instances of the same parent class through a common interface.",
-        "The process of copying class definitions into multiple files.",
-        "The restriction of private member variables from external access."
-      ],
-      answer: 1,
-      explanation: "Polymorphism allows objects of different subtypes to respond to the same method call with subclass-specific behavior."
-    },
-    {
-      question: "Which of the following is the most effective defense against Cross-Site Scripting (XSS) in web applications?",
-      options: [
-        "Relying solely on HTTPS certificates.",
-        "Context-aware HTML entity encoding and escaping user-supplied input before rendering to the DOM.",
-        "Storing passwords in plaintext inside cookies.",
-        "Disabling CSS animations across the client."
-      ],
-      answer: 1,
-      explanation: "Sanitizing and encoding untrusted inputs into safe HTML entities prevents injected `<script>` tags from executing in the victim's browser."
-    },
-    {
-      question: "What is the difference between HTTP 401 Unauthorized and HTTP 403 Forbidden status codes?",
-      options: [
-        "401 means the server crashed; 403 means the database is full.",
-        "401 indicates unauthenticated access (login required); 403 indicates authentication succeeded but access is denied (insufficient permissions).",
-        "401 is used for GET requests; 403 is used for POST requests.",
-        "401 and 403 are identical and interchangeable in REST APIs."
-      ],
-      answer: 1,
-      explanation: "401 Unauthorized means 'Who are you? Please provide valid credentials.' 403 Forbidden means 'I know who you are, but you do not have permission to view this resource.'"
-    },
-    {
-      question: "In a Hash Table, what is the 'Separate Chaining' collision resolution technique?",
-      options: [
-        "Re-hashing the entire table every time a collision occurs.",
-        "Storing all elements that hash to the same bucket in a linked list or dynamic array attached to that bucket.",
-        "Overwriting the previous value silently.",
-        "Dropping the key and throwing a runtime exception."
-      ],
-      answer: 1,
-      explanation: "Separate Chaining handles hash collisions by maintaining a linked list of key-value pairs at each bucket index."
-    },
-    {
-      question: "What does the 'A' in the database ACID transaction properties stand for?",
-      options: [
-        "Asynchronous",
-        "Atomicity",
-        "Availability",
-        "Aggregation"
-      ],
-      answer: 1,
-      explanation: "Atomicity ensures that all operations in a database transaction succeed or the entire transaction is rolled back (all-or-nothing)."
-    },
-    {
-      question: "In Tree Traversal algorithms, which traversal visits the Left subtree, Current node, and Right subtree in that order?",
-      options: [
-        "Pre-order Traversal",
-        "In-order Traversal",
-        "Post-order Traversal",
-        "Level-order Traversal"
-      ],
-      answer: 1,
-      explanation: "In-order traversal visits Left -> Root -> Right. In a Binary Search Tree, In-order traversal visits all values in ascending sorted order."
-    },
-    {
-      question: "In modern containerization (Docker), what is the difference between an Image and a Container?",
-      options: [
-        "An image is a running instance; a container is a read-only blueprint.",
-        "An image is a read-only template with instructions for building; a container is a runnable, isolated instance of an image.",
-        "Images can only run on Linux; containers can only run on Windows.",
-        "There is no technical difference between them."
-      ],
-      answer: 1,
-      explanation: "A Docker Image is an immutable snapshot of an application with its dependencies; a Docker Container is the live, isolated running process."
-    },
-    {
-      question: "What is the purpose of the HTTP `ETag` response header?",
-      options: [
-        "To measure server temperature.",
-        "To provide a unique content hash / fingerprint used by clients for conditional validation caching (`If-None-Match`).",
-        "To force the browser to clear localStorage on every page load.",
-        "To specify the email address of the server administrator."
-      ],
-      answer: 1,
-      explanation: "An ETag (Entity Tag) is an identifier assigned to a specific version of a resource to enable efficient conditional HTTP caching (304 Not Modified)."
-    }
-  ],
 
   init() {
     this.setupEventListeners();
-    this.generateAlgoArray();
+    if (this.initLabs) {
+      this.initLabs();
+    }
   },
 
   load() {
     this.switchTab(this.activeTab);
-    this.loadSchema();
-    this.loadQuizQuestion();
     this.loadAcademicData();
     this.loadPerformanceData();
     this.renderGPACalculator();
+    if (this.loadLabResources) {
+      this.loadLabResources();
+    }
   },
 
   setupEventListeners() {
@@ -2765,68 +2478,22 @@ window.Curriculum = {
       });
     });
 
-    // SQL Playground Buttons
-    const runSqlBtn = document.getElementById('run-sql-btn');
-    if (runSqlBtn) {
-      runSqlBtn.onclick = () => this.runSQL();
-    }
-
-    const resetSqlBtn = document.getElementById('reset-sql-btn');
-    if (resetSqlBtn) {
-      resetSqlBtn.onclick = () => {
-        const qInput = document.getElementById('sql-query-input');
-        if (qInput) {
-          qInput.value = '';
-          qInput.focus();
-        }
-        document.querySelectorAll('.template-btn').forEach(b => b.classList.remove('active'));
-        const results = document.getElementById('sql-results-container');
-        if (results) {
-          results.innerHTML = '<p class="text-muted" style="margin: 0; text-align: center; padding: 1.5rem 0;">Ready to execute. Pick a table above or write your SQL query.</p>';
-        }
-      };
-    }
-
-    // SQL Playground templates
-    document.querySelectorAll('.template-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        document.querySelectorAll('.template-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const sql = e.currentTarget.getAttribute('data-sql');
-        const qInput = document.getElementById('sql-query-input');
-        if (qInput) {
-          qInput.value = sql;
-          qInput.focus();
-          this.runSQL();
-        }
-      });
-    });
-
-    // Backend Explorer buttons
-    document.querySelectorAll('.backend-trigger-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const action = e.currentTarget.getAttribute('data-action');
-        this.runBackendInspector(action);
-      });
-    });
-
     // Add Course submit
     const courseForm = document.getElementById('add-course-form');
     if (courseForm) {
       courseForm.onsubmit = async (e) => {
         e.preventDefault();
-        const code    = document.getElementById('course-code').value.trim();
-        const name    = document.getElementById('course-name').value.trim();
+        const code = document.getElementById('course-code').value.trim();
+        const name = document.getElementById('course-name').value.trim();
         const credits = document.getElementById('course-credits').value;
 
         try {
-          // LEARN: Guard clause — return early on error instead of nesting in else
           const res = await API.post('/api/courses', { code, name, credits });
           if (res.error) { UI.toast(res.error, 'danger'); return; }
           UI.toast('Course saved successfully.', 'success');
           courseForm.reset();
           this.loadAcademicData();
-          this.loadSchema();
+          if (this.loadSchema) this.loadSchema();
         } catch (err) {
           UI.toast(err.message, 'danger');
         }
@@ -2838,8 +2505,8 @@ window.Curriculum = {
     if (lecturerForm) {
       lecturerForm.onsubmit = async (e) => {
         e.preventDefault();
-        const name   = document.getElementById('lecturer-name').value.trim();
-        const email  = document.getElementById('lecturer-email').value.trim();
+        const name = document.getElementById('lecturer-name').value.trim();
+        const email = document.getElementById('lecturer-email').value.trim();
         const office = document.getElementById('lecturer-office').value.trim();
 
         try {
@@ -2848,51 +2515,15 @@ window.Curriculum = {
           UI.toast('Lecturer profile added.', 'success');
           lecturerForm.reset();
           this.loadAcademicData();
-          this.loadSchema();
+          if (this.loadSchema) this.loadSchema();
         } catch (err) {
           UI.toast(err.message, 'danger');
         }
       };
     }
 
-    // Algo buttons
-    const shuffleBtn = document.getElementById('algo-generate-arr');
-    if (shuffleBtn) {
-      shuffleBtn.onclick = () => this.generateAlgoArray();
-    }
-
-    const bubbleBtn = document.getElementById('algo-sort-bubble');
-    if (bubbleBtn) {
-      bubbleBtn.onclick = () => this.bubbleSort();
-    }
-
-    const quickBtn = document.getElementById('algo-sort-quick');
-    if (quickBtn) {
-      quickBtn.onclick = () => this.startQuickSort();
-    }
-
-    // Algo Speed Slider
-    const speedInput = document.getElementById('algo-speed');
-    const speedVal = document.getElementById('algo-speed-val');
-    if (speedInput && speedVal) {
-      speedInput.oninput = (e) => {
-        speedVal.textContent = `${e.target.value}ms`;
-      };
-    }
-
-    // Quiz button
-    const nextQuizBtn = document.getElementById('quiz-next-btn');
-    if (nextQuizBtn) {
-      nextQuizBtn.onclick = () => this.nextQuiz();
-    }
-
-    // Quiz Back Button (Toggle flip on click to see question/explanation again)
-    const quizBackBtn = document.getElementById('quiz-back-btn');
-    if (quizBackBtn) {
-      quizBackBtn.onclick = () => {
-        const card3d = document.getElementById('quiz-card-3d');
-        if (card3d) card3d.classList.toggle('flipped');
-      };
+    if (this.setupLabEventListeners) {
+      this.setupLabEventListeners();
     }
   },
 
@@ -2902,7 +2533,6 @@ window.Curriculum = {
       sessionStorage.setItem('curriculum_active_tab', tabName);
     } catch (e) { }
 
-    // Map tab names to user-friendly titles and category groups
     const tabMeta = {
       'hub': { title: 'All Subject Catalog', category: 'all' },
       'general-sec': { title: 'General & Progress Directory', category: 'general' },
@@ -2914,13 +2544,15 @@ window.Curriculum = {
       'resources': { title: 'Library & Journals', category: 'general' },
       'algorithms': { title: 'Data Structures & Alg Visualizer', category: 'frontend' },
       'flashcards': { title: 'Flashcards & Quiz', category: 'frontend' },
+      'flexbox': { title: 'CSS Flexbox & Grid Sandbox', category: 'frontend' },
+      'jslab': { title: 'JS Array & Functional Lab', category: 'frontend' },
+      'regexlab': { title: 'Regex Pattern Validator', category: 'frontend' },
       'db': { title: 'Relational Database (SQL) Sandbox', category: 'backend' },
       'backend': { title: 'Backend API Flow Explorer', category: 'backend' }
     };
 
     const currentMeta = tabMeta[tabName] || { title: tabName, category: 'general' };
 
-    // Update active tab buttons in topbar
     document.querySelectorAll('.curr-tab-btn').forEach(btn => {
       const bTab = btn.getAttribute('data-tab');
       if (bTab === tabName || (tabName.endsWith('-sec') && bTab === tabName)) {
@@ -2932,13 +2564,11 @@ window.Curriculum = {
       }
     });
 
-    // Update breadcrumb indicator pill
     const activeNameEl = document.getElementById('curr-active-tab-name');
     if (activeNameEl) {
       activeNameEl.textContent = currentMeta.title;
     }
 
-    // If switching to one of the 3 section filters, show the Hub and filter the 3 section blocks
     if (tabName === 'hub' || tabName === 'general-sec' || tabName === 'frontend-sec' || tabName === 'backend-sec') {
       document.querySelectorAll('.curr-panel').forEach(panel => {
         if (panel.id === 'curr-hub') {
@@ -2948,388 +2578,49 @@ window.Curriculum = {
         }
       });
 
-      const secGen = document.getElementById('curr-sec-general');
-      const secFront = document.getElementById('curr-sec-frontend');
-      const secBack = document.getElementById('curr-sec-backend');
+      const secGeneral = document.getElementById('curr-sec-general');
+      const secFrontend = document.getElementById('curr-sec-frontend');
+      const secBackend = document.getElementById('curr-sec-backend');
 
-      if (tabName === 'hub') {
-        if (secGen) secGen.style.display = 'block';
-        if (secFront) secFront.style.display = 'block';
-        if (secBack) secBack.style.display = 'block';
-      } else if (tabName === 'general-sec') {
-        if (secGen) secGen.style.display = 'block';
-        if (secFront) secFront.style.display = 'none';
-        if (secBack) secBack.style.display = 'none';
-        if (secGen) secGen.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      } else if (tabName === 'frontend-sec') {
-        if (secGen) secGen.style.display = 'none';
-        if (secFront) secFront.style.display = 'block';
-        if (secBack) secBack.style.display = 'none';
-        if (secFront) secFront.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      } else if (tabName === 'backend-sec') {
-        if (secGen) secGen.style.display = 'none';
-        if (secFront) secFront.style.display = 'none';
-        if (secBack) secBack.style.display = 'block';
-        if (secBack) secBack.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
-      return;
-    }
-
-    // Show/hide specific view panels (e.g. curr-db, curr-performance, curr-algorithms)
-    document.querySelectorAll('.curr-panel').forEach(panel => {
-      if (panel.id === `curr-${tabName}`) {
-        panel.classList.remove('hidden');
-      } else {
-        panel.classList.add('hidden');
-      }
-    });
-
-    // Lazy load data on switch
-    if (tabName === 'performance') {
-      this.loadPerformanceData();
-    } else if (tabName === 'algorithms') {
-      if (!this.algoArray || this.algoArray.length === 0) {
-        this.generateAlgoArray();
-      } else {
-        this.renderAlgoBars();
-      }
-    } else if (tabName === 'db') {
-      this.loadSchema();
-    } else if (tabName === 'academic') {
-      this.loadAcademicData();
-    } else if (tabName === 'resources') {
-      window.App?.navigateTo('notes');
-      setTimeout(() => window.Notes?.switchTab('library'), 50);
-    } else if (tabName === 'flashcards') {
-      this.loadQuizQuestion();
-    } else if (tabName === 'gpa') {
-      this.renderGPACalculator();
-    } else if (tabName === 'flexbox') {
-      this.updateFlexStage();
-    } else if (tabName === 'jslab') {
-      this.runJSLab();
-    } else if (tabName === 'regexlab') {
-      this.testRegex();
-    }
-  },
-
-  // =========================================================================
-  // 1. DATABASE SCHEMA VIEWER & SQL PLAYGROUND
-  // =========================================================================
-
-  async loadSchema(selectedTable = 'all') {
-    const viewer = document.getElementById('db-schema-viewer');
-    if (!viewer) return;
-
-    try {
-      const res = await API.get('/api/curriculum/schema');
-      if (res.error) {
-        viewer.innerHTML = `<p class="text-danger">Failed to load schema: ${UI.esc(res.error)}</p>`;
-        return;
-      }
-
-      this.dbSchema = res;
-      const tableNames = Object.keys(res).sort();
-
-      let tabsHtml = `
-        <div class="schema-tabs-bar" style="display: flex; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 0.85rem; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border-color);">
-          <button type="button" class="day-pill-btn ${selectedTable === 'all' ? 'active' : ''}" onclick="Curriculum.loadSchema('all')" style="padding: 0.2rem 0.55rem; font-size: 0.72rem;">All (${tableNames.length})</button>
-          ${tableNames.map(t => `
-            <button type="button" class="day-pill-btn ${selectedTable === t ? 'active' : ''}" onclick="Curriculum.loadSchema('${t}')" style="padding: 0.2rem 0.55rem; font-size: 0.72rem;">${UI.esc(t)}</button>
-          `).join('')}
-        </div>
-      `;
-
-      let tablesToRender = selectedTable === 'all' ? tableNames : [selectedTable];
-      let tablesHtml = '';
-
-      for (const table of tablesToRender) {
-        const columns = res[table];
-        if (!columns) continue;
-        tablesHtml += `
-          <div class="schema-table-box" style="margin-bottom: 0.85rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-              <h5 class="schema-table-title" style="margin: 0; display: inline-flex; align-items: center; gap: 0.35rem;">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>
-                ${UI.esc(table)}
-              </h5>
-              <button type="button" class="btn btn-outline btn-sm" onclick="Curriculum.queryTable('${table}')" style="padding: 0.15rem 0.45rem; font-size: 0.7rem;">
-                Query Table
-              </button>
-            </div>
-            <table class="schema-table">
-              <thead>
-                <tr>
-                  <th>Field</th>
-                  <th>Type</th>
-                  <th>Key</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${columns.map(c => `
-                  <tr>
-                    <td class="${c.pk ? 'text-primary font-bold' : ''}">${UI.esc(c.name)} ${c.pk ? '<span class="priority-badge priority-high" style="font-size:0.6rem; padding:1px 4px; margin-left:4px;">PK</span>' : ''}</td>
-                    <td><code>${UI.esc(c.type)}</code></td>
-                    <td>${c.pk ? 'PK' : (c.notnull ? 'NN' : '')}</td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-          </div>
-        `;
-      }
-
-      viewer.innerHTML = tabsHtml + tablesHtml;
-    } catch (e) {
-      viewer.innerHTML = `<p class="text-danger">Failed to connect to backend: ${UI.esc(e.message)}</p>`;
-    }
-  },
-
-  toggleSchemaCollapse() {
-    const card = document.querySelector('.schema-card');
-    const btn = document.getElementById('schema-toggle-btn');
-    if (!card) return;
-    const isCollapsed = card.classList.toggle('collapsed');
-    if (btn) {
-      btn.textContent = isCollapsed ? 'Expand Schema' : 'Collapse';
-    }
-  },
-
-  /** Inserts SQL keywords / symbols at the current cursor position */
-  insertSQLSymbol(symbol) {
-    const input = document.getElementById('sql-query-input');
-    if (!input) return;
-    const start = input.selectionStart || 0;
-    const end = input.selectionEnd || 0;
-    const val = input.value;
-    input.value = val.substring(0, start) + symbol + val.substring(end);
-    const newPos = start + symbol.length;
-    input.focus();
-    input.setSelectionRange(newPos, newPos);
-  },
-
-  /** Populates SQL playground with query for selected table and runs it */
-  queryTable(tableName) {
-    const qInput = document.getElementById('sql-query-input');
-    if (qInput) {
-      qInput.value = `SELECT * FROM ${tableName} LIMIT 10;`;
-      qInput.focus();
-      this.runSQL();
-    }
-  },
-
-  async runSQL() {
-    const queryInput = document.getElementById('sql-query-input');
-    const resultsContainer = document.getElementById('sql-results-container');
-    if (!queryInput || !resultsContainer) return;
-
-    const sql = queryInput.value.trim();
-    if (!sql) {
-      UI.toast('Please write a SQL query first.', 'warning');
-      return;
-    }
-
-    resultsContainer.innerHTML = `
-      <div style="padding: 1.5rem; text-align: center; color: var(--text-muted);">
-        <div style="display: inline-block; width: 18px; height: 18px; border: 2px solid var(--primary); border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 0.5rem;"></div>
-        <p style="margin: 0; font-size: 0.85rem;">Executing query against SQLite...</p>
-      </div>
-    `;
-
-    const startTime = performance.now();
-
-    try {
-      const res = await API.post('/api/curriculum/playground', { query: sql });
-      const elapsedMs = Math.round(performance.now() - startTime);
-
-      if (res.error) {
-        resultsContainer.innerHTML = `
-          <div class="sql-error-box">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-              <span class="error-badge" style="color: var(--accent-danger); font-weight: 700; display: inline-flex; align-items: center; gap: 0.35rem;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                SQL Execution Error
-              </span>
-              <span style="font-size: 0.72rem; opacity: 0.75; font-family: var(--font-mono);">${elapsedMs}ms</span>
-            </div>
-            <pre style="margin: 0; white-space: pre-wrap; font-family: var(--font-mono); font-size: 0.82rem; line-height: 1.45;">${UI.esc(res.error)}</pre>
-          </div>
-        `;
-        UI.toast('Query execution failed.', 'danger');
-        return;
-      }
-
-      const rows = res.rows || (Array.isArray(res) ? res : []);
-      const columns = res.columns || (rows.length > 0 ? Object.keys(rows[0]) : []);
-
-      if (res.type === 'write') {
-        resultsContainer.innerHTML = `
-          <div class="sql-success-box" style="padding: 0.85rem 1rem; border-radius: var(--radius-md); background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25);">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span style="color: #10B981; font-weight: 700; display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.88rem;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
-                Query Executed Successfully
-              </span>
-              <span style="font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono);">${elapsedMs}ms</span>
-            </div>
-            <p style="margin: 0.35rem 0 0 0; font-size: 0.82rem; color: var(--text-secondary);"><strong>Affected rows:</strong> ${res.affected_rows || 0}</p>
-          </div>
-        `;
-        UI.toast('Database updated successfully.', 'success');
-        this.loadSchema(); // Reload tables in case keys or tables changed
-      } else {
-        if (!columns || columns.length === 0 || rows.length === 0) {
-          const colsHeader = (columns && columns.length > 0)
-            ? `<thead><tr>${columns.map(c => `<th>${UI.esc(c)}</th>`).join('')}</tr></thead>`
-            : '';
-          resultsContainer.innerHTML = `
-            <div class="sql-success-box">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                <span class="priority-badge priority-medium" style="font-size: 0.75rem;">0 rows returned</span>
-                <span style="font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono);">${elapsedMs}ms</span>
-              </div>
-              <div class="results-table-wrapper">
-                <table class="results-table">
-                  ${colsHeader}
-                  <tbody>
-                    <tr>
-                      <td colspan="${(columns && columns.length) || 1}" style="text-align: center; color: var(--text-muted); padding: 1.5rem 1rem;">
-                        Query executed successfully, but returned 0 rows.
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          `;
-          return;
+      if (secGeneral && secFrontend && secBackend) {
+        if (tabName === 'hub') {
+          secGeneral.classList.remove('hidden');
+          secFrontend.classList.remove('hidden');
+          secBackend.classList.remove('hidden');
+        } else if (tabName === 'general-sec') {
+          secGeneral.classList.remove('hidden');
+          secFrontend.classList.add('hidden');
+          secBackend.classList.add('hidden');
+        } else if (tabName === 'frontend-sec') {
+          secGeneral.classList.add('hidden');
+          secFrontend.classList.remove('hidden');
+          secBackend.classList.add('hidden');
+        } else if (tabName === 'backend-sec') {
+          secGeneral.classList.add('hidden');
+          secFrontend.classList.add('hidden');
+          secBackend.classList.remove('hidden');
         }
-
-        const headersHtml = columns.map(c => `<th>${UI.esc(c)}</th>`).join('');
-        const rowsHtml = rows.map(row => {
-          return `<tr>${columns.map(col => {
-            const val = row[col];
-            if (val === null || val === undefined) {
-              return `<td><span class="null-tag">NULL</span></td>`;
-            }
-            return `<td>${UI.esc(String(val))}</td>`;
-          }).join('')}</tr>`;
-        }).join('');
-
-        resultsContainer.innerHTML = `
-          <div class="sql-success-box">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
-              <span class="priority-badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981; font-weight: 700; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 4px;">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                ${rows.length} rows returned
-              </span>
-              <span style="font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono);">${elapsedMs}ms</span>
-            </div>
-            <div class="results-table-wrapper">
-              <table class="results-table">
-                <thead>
-                  <tr>${headersHtml}</tr>
-                </thead>
-                <tbody>
-                  ${rowsHtml}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        `;
-        UI.toast(`Query returned ${rows.length} rows.`, 'success');
       }
-    } catch (e) {
-      resultsContainer.innerHTML = `
-        <div class="sql-error-box">
-          <span class="error-badge" style="display: inline-flex; align-items: center; gap: 4px;">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            Network / Server Error
-          </span>
-          <pre style="margin: 0; white-space: pre-wrap; font-family: var(--font-mono); font-size: 0.82rem;">${UI.esc(e.message)}</pre>
-        </div>
-      `;
-    }
-  },
-
-  // =========================================================================
-  // 2. BACKEND API FLOW EXPLORER
-  // =========================================================================
-
-  async runBackendInspector(action) {
-    const outputEl = document.getElementById('backend-inspector-output');
-    if (!outputEl) return;
-
-    outputEl.innerHTML = '<pre><code>Waiting for API server response...</code></pre>';
-    let endpoint = '/api/session';
-    let method = 'GET';
-
-    switch (action) {
-      case 'get-session':
-        endpoint = '/api/session';
-        break;
-      case 'get-tasks':
-        endpoint = '/api/tasks';
-        break;
-      case 'get-schema':
-        endpoint = '/api/curriculum/schema';
-        break;
-      case 'get-habits':
-        endpoint = '/api/habits';
-        break;
-      case 'get-notes':
-        endpoint = '/api/notes';
-        break;
-      case 'get-courses':
-        endpoint = '/api/courses';
-        break;
-      case 'get-incomes':
-        endpoint = '/api/incomes';
-        break;
-      case 'get-expenses':
-        endpoint = '/api/expenses';
-        break;
-      case 'get-budget-summary':
-        endpoint = '/api/budget/summary';
-        break;
-      default:
-        endpoint = action.startsWith('/') ? action : `/api/${action}`;
+    } else {
+      document.querySelectorAll('.curr-panel').forEach(panel => {
+        if (panel.id === `curr-${tabName}`) {
+          panel.classList.remove('hidden');
+        } else {
+          panel.classList.add('hidden');
+        }
+      });
     }
 
-    try {
-      const res = await API.get(endpoint);
-      const inspectorHtml = `
-        <div class="inspector-meta">
-          <span class="badge method-badge">${method}</span>
-          <span class="endpoint-path">${UI.esc(endpoint)}</span>
-          <span class="status-badge success">200 OK</span>
-        </div>
-        <hr class="inspector-divider">
-        <div class="inspector-section">
-          <h5>Request Configuration</h5>
-          <pre><code class="language-js">fetch('${endpoint}', {
-  method: '${method}',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  credentials: 'same-origin' // Authenticated Session Cookie
-})</code></pre>
-        </div>
-        <div class="inspector-section">
-          <h5>JSON Response Body</h5>
-          <pre><code class="language-json">${UI.esc(JSON.stringify(res, null, 2))}</code></pre>
-        </div>
-      `;
-      outputEl.innerHTML = inspectorHtml;
-      UI.toast(`Inspected API call to ${endpoint}`, 'info');
-    } catch (e) {
-      outputEl.innerHTML = `<pre><code class="text-danger">Failed: ${UI.esc(e.message)}</code></pre>`;
-    }
+    if (tabName === 'performance') this.loadPerformanceData();
+    if (tabName === 'academic') this.loadAcademicData();
+    if (tabName === 'gpa') this.renderGPACalculator();
+    if (tabName === 'flexbox' && this.updateFlexStage) this.updateFlexStage();
+    if (tabName === 'jslab' && this.runJSLab) this.runJSLab();
+    if (tabName === 'regexlab' && this.testRegex) this.testRegex();
+    if (tabName === 'db' && this.loadSchema) this.loadSchema();
   },
 
-  // =========================================================================
-  // 3. ACADEMIC & FACULTY MANAGEMENT
-
+  // ── ACADEMIC & FACULTY MANAGEMENT ─────────────────────────────────────────
   async loadAcademicData() {
     const courseList = document.getElementById('active-courses-list');
     const lecturerList = document.getElementById('active-lecturers-list');
@@ -3344,12 +2635,12 @@ window.Curriculum = {
         courseList.innerHTML = '<p class="text-muted">No courses logged yet.</p>';
       } else {
         courseList.innerHTML = courses.map(c => `
-          <div class="task-item" style="padding: 0.75rem 1rem; margin-bottom: 0.5rem;">
+          <div class="task-item p-sm mb-xs">
             <div class="task-details">
               <span class="task-title">${UI.esc(c.code)} - ${UI.esc(c.name)}</span>
               <span class="task-meta">${UI.esc(c.credits)} SKS (Credits)</span>
             </div>
-            <button class="btn btn-danger" onclick="Curriculum.deleteCourse(${c.id})" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">Delete</button>
+            <button class="btn btn-danger btn-xs p-xs text-xs" onclick="Curriculum.deleteCourse(${c.id})" type="button">Delete</button>
           </div>
         `).join('');
       }
@@ -3361,12 +2652,12 @@ window.Curriculum = {
         lecturerList.innerHTML = '<p class="text-muted">No lecturers logged yet.</p>';
       } else {
         lecturerList.innerHTML = lecturers.map(l => `
-          <div class="task-item" style="padding: 0.75rem 1rem; margin-bottom: 0.5rem;">
+          <div class="task-item p-sm mb-xs">
             <div class="task-details">
               <span class="task-title">${UI.esc(l.name)}</span>
               <span class="task-meta">${UI.esc(l.email || 'No Email')} | Office: ${UI.esc(l.office || 'N/A')}</span>
             </div>
-            <button class="btn btn-danger" onclick="Curriculum.deleteLecturer(${l.id})" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">Delete</button>
+            <button class="btn btn-danger btn-xs p-xs text-xs" onclick="Curriculum.deleteLecturer(${l.id})" type="button">Delete</button>
           </div>
         `).join('');
       }
@@ -3383,7 +2674,7 @@ window.Curriculum = {
       else {
         UI.toast('Course removed.', 'success');
         this.loadAcademicData();
-        this.loadSchema();
+        if (this.loadSchema) this.loadSchema();
       }
     } catch (err) {
       UI.toast(err.message, 'danger');
@@ -3398,1018 +2689,413 @@ window.Curriculum = {
       else {
         UI.toast('Lecturer removed.', 'success');
         this.loadAcademicData();
-        this.loadSchema();
+        if (this.loadSchema) this.loadSchema();
       }
     } catch (err) {
       UI.toast(err.message, 'danger');
-    }
-  },
-
-  // =========================================================================
-  // =========================================================================
-  // 5. SORTING ALGORITHMS VISUALIZER
-  // =========================================================================
-
-  generateAlgoArray() {
-    if (this.sortingInProgress) return;
-    this.algoArray = [];
-    for (let i = 0; i < 20; i++) {
-      this.algoArray.push(Math.floor(Math.random() * 140) + 10);
-    }
-    this.renderAlgoBars();
-    const logEl = document.getElementById('algo-steps-log');
-    if (logEl) logEl.textContent = 'Array randomized! Click Bubble Sort or Quick Sort to visualize.';
-  },
-
-  renderAlgoBars(activeIndices = [], sortedIndices = []) {
-    const container = document.getElementById('algo-bars-container');
-    if (!container) return;
-
-    container.innerHTML = '';
-    this.algoArray.forEach((val, idx) => {
-      const bar = document.createElement('div');
-      bar.className = 'algo-bar';
-      bar.style.height = `${val}px`;
-
-      if (sortedIndices.includes(idx)) {
-        bar.classList.add('sorted');
-      } else if (activeIndices.includes(idx)) {
-        bar.classList.add('active');
-      }
-
-      const label = document.createElement('span');
-      label.className = 'algo-bar-label';
-      label.textContent = val;
-      bar.appendChild(label);
-
-      container.appendChild(bar);
-    });
-  },
-
-  sleep(ms) {
-    const speedInput = document.getElementById('algo-speed');
-    const delay = speedInput ? parseInt(speedInput.value) : ms;
-    return new Promise(resolve => setTimeout(resolve, delay));
-  },
-
-  async bubbleSort() {
-    if (this.sortingInProgress) return;
-    this.sortingInProgress = true;
-    const logEl = document.getElementById('algo-steps-log');
-    let arr = this.algoArray;
-    let len = arr.length;
-
-    logEl.innerHTML = `<strong>Bubble Sort algorithm started!</strong> Best time complexity: O(n), Worst/Avg: O(n²). Comparing adjacent index blocks...`;
-
-    let sorted = [];
-    for (let i = 0; i < len; i++) {
-      for (let j = 0; j < len - i - 1; j++) {
-        this.renderAlgoBars([j, j + 1], sorted);
-        await this.sleep(120);
-
-        if (arr[j] > arr[j + 1]) {
-          let temp = arr[j];
-          arr[j] = arr[j + 1];
-          arr[j + 1] = temp;
-          logEl.innerHTML = `Swapping index <strong>${j}</strong> (${arr[j + 1]}) and index <strong>${j + 1}</strong> (${arr[j]}) because ${arr[j + 1]} > ${arr[j]}.`;
-          this.renderAlgoBars([j, j + 1], sorted);
-          await this.sleep(120);
-        }
-      }
-      sorted.push(len - i - 1);
-    }
-
-    this.renderAlgoBars([], Array.from({ length: len }, (_, i) => i));
-    logEl.innerHTML = `<strong>Bubble Sort Completed!</strong> Entire array successfully ordered. Time: O(n²) worst-case execution completed.`;
-    this.sortingInProgress = false;
-    UI.toast('Bubble Sort completed!', 'success');
-  },
-
-  async startQuickSort() {
-    if (this.sortingInProgress) return;
-    this.sortingInProgress = true;
-    const logEl = document.getElementById('algo-steps-log');
-    logEl.innerHTML = `<strong>Quick Sort algorithm started!</strong> Average Time Complexity: O(n log n). Employs recursive Divide & Conquer approach via PIVOT choices.`;
-
-    await this.quickSort(0, this.algoArray.length - 1);
-
-    this.renderAlgoBars([], Array.from({ length: this.algoArray.length }, (_, i) => i));
-    logEl.innerHTML = `<strong>Quick Sort Completed!</strong> Balanced divide-and-conquer strategy achieved O(n log n) efficiency.`;
-    this.sortingInProgress = false;
-    UI.toast('Quick Sort completed!', 'success');
-  },
-
-  async quickSort(low, high) {
-    if (low < high) {
-      let pi = await this.partition(low, high);
-      await this.quickSort(low, pi - 1);
-      await this.quickSort(pi + 1, high);
-    }
-  },
-
-  async partition(low, high) {
-    const logEl = document.getElementById('algo-steps-log');
-    let arr = this.algoArray;
-    let pivot = arr[high];
-    logEl.innerHTML = `Choosing pivot element <strong>${pivot}</strong> at index ${high}. Partitioning subarray bounds...`;
-
-    let i = (low - 1);
-
-    for (let j = low; j < high; j++) {
-      this.renderAlgoBars([j, high]);
-      await this.sleep(150);
-
-      if (arr[j] < pivot) {
-        i++;
-        let temp = arr[i];
-        arr[i] = arr[j];
-        arr[j] = temp;
-        logEl.innerHTML = `Element ${arr[i]} is smaller than pivot ${pivot}. Swapping to index ${i}.`;
-        this.renderAlgoBars([i, j, high]);
-        await this.sleep(150);
-      }
-    }
-
-    let temp = arr[i + 1];
-    arr[i + 1] = arr[high];
-    arr[high] = temp;
-    logEl.innerHTML = `Placing pivot ${pivot} at its final sorted boundary index ${i + 1}.`;
-    this.renderAlgoBars([i + 1, high]);
-    await this.sleep(150);
-
-    return i + 1;
-  },
-
-  // =========================================================================
-  // 6. ROADMAP ACADEMIC QUIZZES / FLASHCARDS
-  // =========================================================================
-
-  loadQuizQuestion() {
-    const qText = document.getElementById('quiz-question-text');
-    const optionsBox = document.getElementById('quiz-options-box');
-    const progressText = document.getElementById('quiz-progress-text');
-    const card3d = document.getElementById('quiz-card-3d');
-
-    if (!qText || !optionsBox || !progressText) return;
-
-    // Ensure card is not flipped
-    if (card3d) card3d.classList.remove('flipped');
-
-    const currentQuiz = this.quizQuestions[this.quizIndex];
-    qText.textContent = currentQuiz.question;
-    progressText.textContent = `Question ${this.quizIndex + 1} of ${this.quizQuestions.length}`;
-
-    optionsBox.innerHTML = '';
-    currentQuiz.options.forEach((opt, idx) => {
-      const btn = document.createElement('button');
-      btn.className = 'quiz-opt-btn';
-      btn.innerHTML = `<span class="opt-letter">${String.fromCharCode(65 + idx)}</span> <span class="opt-text">${UI.esc(opt)}</span>`;
-      btn.onclick = () => this.checkQuizAnswer(idx);
-      optionsBox.appendChild(btn);
-    });
-  },
-
-  checkQuizAnswer(selectedIdx) {
-    const currentQuiz = this.quizQuestions[this.quizIndex];
-    const feedbackBox = document.getElementById('quiz-feedback-box');
-    const resultBadge = document.getElementById('quiz-result-badge');
-    const card3d = document.getElementById('quiz-card-3d');
-
-    if (!feedbackBox || !resultBadge || !card3d) return;
-
-    const isCorrect = selectedIdx === currentQuiz.answer;
-
-    if (isCorrect) {
-      resultBadge.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> Correct!`;
-      resultBadge.className = 'quiz-badge badge-success d-inline-flex items-center justify-center gap-xs';
-      feedbackBox.innerHTML = `<p class="explanation-text">${UI.esc(currentQuiz.explanation)}</p>`;
-      UI.toast('Well done! Correct answer.', 'success');
-    } else {
-      resultBadge.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg> Incorrect`;
-      resultBadge.className = 'quiz-badge badge-danger d-inline-flex items-center justify-center gap-xs';
-      feedbackBox.innerHTML = `
-        <p class="wrong-alert">You selected option <strong>${String.fromCharCode(65 + selectedIdx)}</strong></p>
-        <p class="explanation-text"><strong>Correct Answer:</strong> ${UI.esc(currentQuiz.options[currentQuiz.answer])}</p>
-        <p class="explanation-text" style="margin-top: 0.5rem;">${UI.esc(currentQuiz.explanation)}</p>
-      `;
-      UI.toast('Incorrect choice, review the explanation.', 'warning');
-    }
-
-    // Trigger flip transition
-    card3d.classList.add('flipped');
-  },
-
-  nextQuiz() {
-    this.quizIndex = (this.quizIndex + 1) % this.quizQuestions.length;
-    this.loadQuizQuestion();
-  },
-
-  async loadPerformanceData() {
-    try {
-      const [coursesRes, tasksRes, habitsRes, studyLogsRes] = await Promise.all([
-        API.get('/api/courses'),
-        API.get('/api/tasks'),
-        API.get('/api/habits'),
-        API.get('/api/study-logs')
-      ]);
-
-      const courses = Array.isArray(coursesRes) ? coursesRes : [];
-      const tasks = Array.isArray(tasksRes) ? tasksRes : [];
-      const habits = Array.isArray(habitsRes) ? habitsRes : [];
-      const studyLogs = Array.isArray(studyLogsRes) ? studyLogsRes : [];
-
-      // 1. Course Complete Progress & List
-      const progressList = document.getElementById('perf-course-progress-list');
-      const percentageEl = document.getElementById('perf-course-percentage');
-      if (progressList) {
-        if (courses.length === 0) {
-          if (percentageEl) percentageEl.textContent = '0%';
-          progressList.innerHTML = `
-            <div style="text-align: center; padding: 1rem; border: 1px dashed var(--border-color); border-radius: var(--radius-md);">
-              <p class="text-muted" style="font-size: 0.8rem; margin: 0 0 0.5rem 0;">No courses added yet.</p>
-              <button class="btn btn-outline btn-xs" onclick="Curriculum.openAddCourseModal()">+ Add Your First Course</button>
-            </div>
-          `;
-        } else {
-          const totalProg = courses.reduce((sum, c) => sum + (Number(c.progress) || 0), 0);
-          const avgProg = Math.round(totalProg / courses.length);
-          if (percentageEl) {
-            percentageEl.textContent = `${avgProg}%`;
-          }
-
-          progressList.innerHTML = courses.map(c => {
-            const prog = Number(c.progress) || 0;
-            return `
-              <div class="perf-course-row" style="background: var(--bg-surface-alt); padding: 0.65rem 0.85rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.35rem;">
-                  <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 180px;" title="${UI.esc(c.code)} - ${UI.esc(c.name)}">
-                    ${UI.esc(c.code)}: ${UI.esc(c.name)}
-                  </span>
-                  <div style="display: flex; align-items: center; gap: 0.5rem;">
-                    <span style="color: var(--primary);">${prog}%</span>
-                    <button class="btn-icon" style="padding: 2px;" onclick="Curriculum.openEditProgressModal(${c.id}, ${prog}, '${UI.esc(c.name).replace(/'/g, "\\'")}')" title="Edit Progress">
-                      <svg class="icon-svg" viewBox="0 0 24 24" style="width: 0.9em; height: 0.9em;"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                    </button>
-                    <button class="btn-icon text-muted" style="padding: 2px;" onclick="Curriculum.deleteCourseFromPerf(${c.id})" title="Remove Course">
-                      <svg class="icon-svg" viewBox="0 0 24 24" style="width: 0.9em; height: 0.9em;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                    </button>
-                  </div>
-                </div>
-                <div class="course-progress-bar-container" style="height: 6px; background: var(--bg-hover); border-radius: var(--radius-full); overflow: hidden;">
-                  <div class="course-progress-bar-fill" style="width: ${prog}%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--primary-400)); border-radius: var(--radius-full); transition: width 0.3s ease;"></div>
-                </div>
-              </div>
-            `;
-          }).join('');
-        }
-      }
-
-      // 2. Overall Productivity & Activity Heatmap
-      const prodEl = document.getElementById('perf-productivity-hours');
-      const breakdownEl = document.getElementById('perf-theory-practice-breakdown');
-      const heatmapContainer = document.getElementById('perf-heatmap-grid');
-
-      // Calculate hours from study logs in past 7 days (or total if recent)
-      const now = new Date();
-      const past7Days = new Date();
-      past7Days.setDate(past7Days.getDate() - 7);
-
-      let weeklyTheory = 0;
-      let weeklyPractice = 0;
-      let totalLoggedHours = 0;
-
-      const dateHoursMap = {};
-
-      studyLogs.forEach(log => {
-        const hrs = Number(log.hours) || 0;
-        totalLoggedHours += hrs;
-        const logDate = new Date(log.log_date);
-        dateHoursMap[log.log_date] = (dateHoursMap[log.log_date] || 0) + hrs;
-
-        if (logDate >= past7Days) {
-          if (log.activity_type === 'theory' || log.activity_type === 'lecture') {
-            weeklyTheory += hrs;
-          } else {
-            weeklyPractice += hrs;
-          }
-        }
-      });
-
-      // If no study logs, estimate from completed tasks/habits
-      let weeklyTotal = weeklyTheory + weeklyPractice;
-      if (studyLogs.length === 0) {
-        const completedTasksCount = tasks.filter(t => t.done === 1).length;
-        let habitCount = 0;
-        habits.forEach(h => { if (h.today_done) habitCount++; });
-        weeklyTotal = Math.max(0, (completedTasksCount * 2) + habitCount);
-        weeklyTheory = Math.round(weeklyTotal * 0.35);
-        weeklyPractice = weeklyTotal - weeklyTheory;
-      }
-
-      if (prodEl) {
-        prodEl.innerHTML = `${weeklyTotal} <span style="font-size: 1rem; font-weight: 500; color: var(--text-muted);">hours/week</span>`;
-      }
-      if (breakdownEl) {
-        breakdownEl.innerHTML = `${weeklyTheory} h theory &bull; ${weeklyPractice} h practice`;
-      }
-
-      // Render 28-cell heatmap for past 4 weeks (28 days)
-      if (heatmapContainer) {
-        let heatmapHtml = '';
-        for (let i = 27; i >= 0; i--) {
-          const d = new Date();
-          d.setDate(d.getDate() - i);
-          const iso = d.toISOString().split('T')[0];
-          const hrs = dateHoursMap[iso] || 0;
-          let valClass = 'val-0';
-          if (hrs > 4) valClass = 'val-4';
-          else if (hrs >= 3) valClass = 'val-3';
-          else if (hrs >= 1.5) valClass = 'val-2';
-          else if (hrs > 0) valClass = 'val-1';
-
-          heatmapHtml += `<div class="heatmap-cell ${valClass}" title="${iso}: ${hrs} hours logged"></div>`;
-        }
-        heatmapContainer.innerHTML = heatmapHtml;
-      }
-
-      // 3. Tasks & Quiz Mastery
-      const hwEl = document.getElementById('perf-homeworks-percentage');
-      const pendingEl = document.getElementById('perf-pending-tasks');
-      const doneEl = document.getElementById('perf-done-tasks');
-
-      const doneTasks = tasks.filter(t => t.done === 1).length;
-      const pendingTasks = tasks.length - doneTasks;
-
-      if (pendingEl) pendingEl.textContent = `${pendingTasks} pending`;
-      if (doneEl) doneEl.textContent = `${doneTasks} completed`;
-
-      if (hwEl) {
-        if (tasks.length === 0) {
-          hwEl.textContent = '100%';
-        } else {
-          const pct = Math.round((doneTasks / tasks.length) * 100);
-          hwEl.textContent = `${pct}%`;
-        }
-      }
-
-      // 4. Study Logs List & Total Monthly Hours
-      const totalHoursEl = document.getElementById('perf-monthly-hours-total');
-      if (totalHoursEl) {
-        totalHoursEl.innerHTML = `${totalLoggedHours.toFixed(1)} <span style="font-size: 0.9rem; font-weight: 500; color: var(--text-muted);">hours logged total</span>`;
-      }
-
-      const studyLogsContainer = document.getElementById('perf-study-logs-container');
-      if (studyLogsContainer) {
-        if (studyLogs.length === 0) {
-          studyLogsContainer.innerHTML = `
-            <div style="text-align: center; padding: 1.5rem; color: var(--text-muted); font-size: 0.85rem;">
-              No study sessions logged yet. Click "Add Study Session" above to track your practice & theory hours.
-            </div>
-          `;
-        } else {
-          studyLogsContainer.innerHTML = `
-            <table class="schema-table" style="width: 100%; font-size: 0.82rem;">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Subject / Course</th>
-                  <th>Category</th>
-                  <th>Hours</th>
-                  <th>Notes</th>
-                  <th style="text-align: right;">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${studyLogs.map(l => `
-                  <tr>
-                    <td style="white-space: nowrap; font-weight: 600;">${UI.esc(l.log_date)}</td>
-                    <td style="font-weight: 700; color: var(--text-primary);">${UI.esc(l.course_name)}</td>
-                    <td>
-                      <span class="priority-badge ${l.activity_type === 'theory' ? 'priority-medium' : (l.activity_type === 'exam' ? 'priority-high' : 'priority-low')}" style="text-transform: capitalize; font-size: 0.7rem;">
-                        ${UI.esc(l.activity_type || 'practice')}
-                      </span>
-                    </td>
-                    <td style="font-weight: 700; color: #10B981;">${UI.esc(String(l.hours))} hrs</td>
-                    <td class="text-muted">${UI.esc(l.notes || '-')}</td>
-                    <td style="text-align: right;">
-                      <button class="btn-icon text-muted" onclick="Curriculum.deleteStudyLog(${l.id})" title="Delete entry" style="padding: 2px;">
-                        <svg class="icon-svg" viewBox="0 0 24 24" style="width: 0.9em; height: 0.9em;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                      </button>
-                    </td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-          `;
-        }
-      }
-
-    } catch (e) {
-      console.error("Error loading performance dashboard metrics:", e);
     }
   },
 
   openAddCourseModal() {
-    const formHtml = `
-      <form id="perf-add-course-form">
+    UI.openModal('Add New Course / Study', `
+      <form id="modal-add-course-form" class="auth-form d-flex flex-col gap-md">
         <div class="form-group">
-          <label for="perf-course-code">Course Code</label>
-          <input type="text" id="perf-course-code" required placeholder="e.g. CS101, WEB-DEV">
+          <label>Course Code</label>
+          <input type="text" id="modal-course-code" placeholder="e.g. IF-101" required>
         </div>
         <div class="form-group">
-          <label for="perf-course-name">Course / Subject Name</label>
-          <input type="text" id="perf-course-name" required placeholder="e.g. Frontend Web Architecture & UI">
+          <label>Course Name</label>
+          <input type="text" id="modal-course-name" placeholder="e.g. Pemrograman Dasar" required>
         </div>
-        <div style="display: flex; gap: 1rem;">
-          <div class="form-group" style="flex: 1;">
-            <label for="perf-course-credits">Credits (SKS)</label>
-            <input type="number" id="perf-course-credits" min="1" max="10" value="3" required>
-          </div>
-          <div class="form-group" style="flex: 1;">
-            <label for="perf-course-progress">Completion Progress (%)</label>
-            <input type="number" id="perf-course-progress" min="0" max="100" value="50" required>
-          </div>
+        <div class="form-group">
+          <label>Credits (SKS)</label>
+          <input type="number" id="modal-course-credits" value="3" min="1" required>
         </div>
-        <button type="submit" class="btn btn-primary btn-block">Save Course</button>
+        <button type="submit" class="btn btn-primary">Save Course</button>
       </form>
-    `;
+    `);
 
-    UI.openModal('Add Course / Subject', formHtml);
+    const mForm = document.getElementById('modal-add-course-form');
+    if (mForm) {
+      mForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const code = document.getElementById('modal-course-code').value.trim();
+        const name = document.getElementById('modal-course-name').value.trim();
+        const credits = document.getElementById('modal-course-credits').value;
 
-    document.getElementById('perf-add-course-form').onsubmit = async (e) => {
-      e.preventDefault();
-      const code = document.getElementById('perf-course-code').value.trim();
-      const name = document.getElementById('perf-course-name').value.trim();
-      const credits = parseInt(document.getElementById('perf-course-credits').value, 10);
-      const progress = parseInt(document.getElementById('perf-course-progress').value, 10);
-
-      try {
-        const res = await API.post('/api/courses', { code, name, credits, progress });
-        if (res.error) {
-          UI.toast(res.error, 'danger');
-        } else {
+        try {
+          const res = await API.post('/api/courses', { code, name, credits });
+          if (res.error) { UI.toast(res.error, 'danger'); return; }
+          UI.toast('Course saved successfully.', 'success');
           UI.closeModal();
-          UI.toast('Course added successfully!', 'success');
-          this.loadPerformanceData();
           this.loadAcademicData();
+          if (this.loadSchema) this.loadSchema();
+        } catch (err) {
+          UI.toast(err.message, 'danger');
         }
-      } catch (err) {
-        UI.toast(err.message, 'danger');
-      }
-    };
-  },
-
-  openEditProgressModal(courseId, currentProgress, courseName) {
-    const formHtml = `
-      <form id="perf-edit-progress-form">
-        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
-          Update completion progress for: <strong style="color: var(--text-primary);">${UI.esc(courseName)}</strong>
-        </p>
-        <div class="form-group">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-            <label for="perf-edit-slider" style="margin: 0;">Progress Percentage</label>
-            <span id="perf-slider-val" style="font-weight: 800; font-size: 1.1rem; color: var(--primary);">${currentProgress}%</span>
-          </div>
-          <input type="range" id="perf-edit-slider" min="0" max="100" step="1" value="${currentProgress}" style="width: 100%;" oninput="document.getElementById('perf-slider-val').textContent = this.value + '%'">
-        </div>
-        <button type="submit" class="btn btn-primary btn-block">Update Progress</button>
-      </form>
-    `;
-
-    UI.openModal('Update Course Progress', formHtml);
-
-    document.getElementById('perf-edit-progress-form').onsubmit = async (e) => {
-      e.preventDefault();
-      const progress = parseInt(document.getElementById('perf-edit-slider').value, 10);
-
-      try {
-        const res = await API.patch(`/api/courses/${courseId}`, { progress });
-        if (res.error) {
-          UI.toast(res.error, 'danger');
-        } else {
-          UI.closeModal();
-          UI.toast('Course progress updated!', 'success');
-          this.loadPerformanceData();
-          this.loadAcademicData();
-        }
-      } catch (err) {
-        UI.toast(err.message, 'danger');
-      }
-    };
-  },
-
-  async deleteCourseFromPerf(courseId) {
-    if (!confirm('Remove this course from your curriculum?')) return;
-    try {
-      await API.delete(`/api/courses/${courseId}`);
-      UI.toast('Course removed.', 'info');
-      this.loadPerformanceData();
-      this.loadAcademicData();
-    } catch (err) {
-      UI.toast(err.message, 'danger');
+      };
     }
   },
 
-  /** Opens the study-log form. prefill may carry { hours, notes } so other
-      modules (e.g. the Focus Timer) can log completed sessions in one tap. */
-  openLogStudyModal(prefill = {}) {
-    const todayISO = UI.getTodayStr();
-    const preHours = prefill.hours != null ? prefill.hours : 2.0;
-    const preNotes = prefill.notes ? UI.esc(prefill.notes) : '';
-    const formHtml = `
-      <form id="perf-log-study-form">
-        <div class="form-group">
-          <label for="perf-log-course">Course / Subject Name</label>
-          <input type="text" id="perf-log-course" required placeholder="e.g. Relational Database SQL, Data Structures Practice">
-        </div>
-        <div style="display: flex; gap: 1rem;">
-          <div class="form-group" style="flex: 1;">
-            <label for="perf-log-hours">Study Duration (Hours)</label>
-            <input type="number" id="perf-log-hours" step="any" min="0.1" max="24" value="${preHours}" required>
+  // ── PERFORMANCE & ANALYTICS ───────────────────────────────────────────────
+  async loadPerformanceData() {
+    try {
+      const [courses, tasks, studyLogs] = await Promise.all([
+        API.get('/api/courses'),
+        API.get('/api/tasks'),
+        API.get('/api/study_logs')
+      ]);
+
+      const courseListEl = document.getElementById('perf-course-progress-list');
+      const coursePctEl = document.getElementById('perf-course-percentage');
+      if (courseListEl && Array.isArray(courses)) {
+        if (courses.length === 0) {
+          courseListEl.innerHTML = '<p class="text-muted text-xs">No active courses registered. Add courses to monitor progress.</p>';
+          if (coursePctEl) coursePctEl.textContent = '0%';
+        } else {
+          let totalCompletion = 0;
+          courseListEl.innerHTML = courses.map((c, i) => {
+            const seedPct = Math.min(100, Math.max(15, ((c.id * 37 + 13) % 85) + 15));
+            totalCompletion += seedPct;
+            return `
+              <div>
+                <div class="d-flex justify-between text-xs font-semibold text-secondary">
+                  <span>${UI.esc(c.code)}: ${UI.esc(c.name)}</span>
+                  <span class="text-brand font-bold">${seedPct}%</span>
+                </div>
+                <div class="course-progress-bar-container">
+                  <div class="course-progress-bar-fill" style="width: ${seedPct}%;"></div>
+                </div>
+              </div>
+            `;
+          }).join('');
+          if (coursePctEl) coursePctEl.textContent = `${Math.round(totalCompletion / courses.length)}%`;
+        }
+      }
+
+      if (Array.isArray(tasks)) {
+        const pending = tasks.filter(t => !t.done).length;
+        const done = tasks.filter(t => t.done).length;
+        const total = tasks.length;
+        const pct = total > 0 ? Math.round((done / total) * 100) : 100;
+
+        const hwPctEl = document.getElementById('perf-homeworks-percentage');
+        const pendingEl = document.getElementById('perf-pending-tasks');
+        const doneEl = document.getElementById('perf-done-tasks');
+
+        if (hwPctEl) hwPctEl.textContent = `${pct}%`;
+        if (pendingEl) pendingEl.textContent = `${pending} pending`;
+        if (doneEl) doneEl.textContent = `${done} completed`;
+      }
+
+      this.renderStudyAnalytics(studyLogs);
+    } catch (e) {
+      console.error('Failed to load performance metrics', e);
+    }
+  },
+
+  renderStudyAnalytics(studyLogs) {
+    const logs = Array.isArray(studyLogs) ? studyLogs : [];
+    let totalTheory = 0;
+    let totalPractice = 0;
+
+    const heatmapMap = {};
+    for (let i = 0; i < 28; i++) {
+      const d = new Date();
+      d.setDate(d.getDate() - (27 - i));
+      const key = d.toISOString().split('T')[0];
+      heatmapMap[key] = 0;
+    }
+
+    logs.forEach(log => {
+      const hrs = Number(log.hours) || 0;
+      if (log.type === 'theory') totalTheory += hrs;
+      else totalPractice += hrs;
+
+      if (log.study_date && heatmapMap[log.study_date] !== undefined) {
+        heatmapMap[log.study_date] += hrs;
+      }
+    });
+
+    const totalHours = totalTheory + totalPractice;
+    const weeklyHours = (totalHours / 4).toFixed(1);
+
+    const prodHoursEl = document.getElementById('perf-productivity-hours');
+    const breakdownEl = document.getElementById('perf-theory-practice-breakdown');
+    const totalMonthEl = document.getElementById('perf-monthly-hours-total');
+
+    if (prodHoursEl) prodHoursEl.innerHTML = `${weeklyHours} <span class="text-muted text-base">hours/week</span>`;
+    if (breakdownEl) breakdownEl.textContent = `${totalTheory.toFixed(1)} h theory • ${totalPractice.toFixed(1)} h practice`;
+    if (totalMonthEl) totalMonthEl.innerHTML = `${totalHours.toFixed(1)} <span class="text-muted font-normal text-base">hours logged total</span>`;
+
+    const heatmapContainer = document.getElementById('perf-heatmap-grid');
+    if (heatmapContainer) {
+      const keys = Object.keys(heatmapMap);
+      heatmapContainer.innerHTML = keys.map(k => {
+        const val = heatmapMap[k];
+        let level = 0;
+        if (val > 4) level = 4;
+        else if (val > 2) level = 3;
+        else if (val > 1) level = 2;
+        else if (val > 0) level = 1;
+        return `<div class="heatmap-cell val-${level}" title="${k}: ${val.toFixed(1)} hours"></div>`;
+      }).join('');
+    }
+
+    const logsContainer = document.getElementById('perf-study-logs-container');
+    if (logsContainer) {
+      if (logs.length === 0) {
+        logsContainer.innerHTML = '<p class="text-muted text-center p-xl">No study sessions logged yet. Click "Add Study Session" to track your hours.</p>';
+      } else {
+        logsContainer.innerHTML = `
+          <div class="list-container d-flex flex-col gap-xs">
+            ${logs.slice(0, 10).map(l => `
+              <div class="task-item p-sm d-flex justify-between items-center">
+                <div class="d-flex items-center gap-sm">
+                  <span class="priority-badge ${l.type === 'practice' ? 'priority-high' : 'priority-medium'} text-xs">${l.type.toUpperCase()}</span>
+                  <div>
+                    <div class="font-bold text-sm text-primary">${UI.esc(l.subject || 'Independent Study')}</div>
+                    <div class="text-muted text-xs">${UI.esc(l.study_date)} • ${UI.esc(l.notes || 'No description')}</div>
+                  </div>
+                </div>
+                <div class="d-flex items-center gap-md">
+                  <span class="font-mono font-bold text-success text-sm">+${Number(l.hours).toFixed(1)} hrs</span>
+                  <button class="btn-icon text-muted cursor-pointer" onclick="Curriculum.deleteStudyLog(${l.id})" title="Delete entry" type="button">×</button>
+                </div>
+              </div>
+            `).join('')}
           </div>
-          <div class="form-group" style="flex: 1;">
-            <label for="perf-log-type">Activity Category</label>
-            <select id="perf-log-type">
-              <option value="practice" selected>Practice / Coding</option>
-              <option value="theory">Theory / Reading</option>
-              <option value="exam">Exam Preparation</option>
-              <option value="lecture">Lecture / Class</option>
+        `;
+      }
+    }
+  },
+
+  openLogStudyModal() {
+    const today = new Date().toISOString().split('T')[0];
+    UI.openModal('Log Study Hours', `
+      <form id="modal-study-log-form" class="auth-form d-flex flex-col gap-md">
+        <div class="form-group">
+          <label>Subject / Topic</label>
+          <input type="text" id="modal-study-subject" placeholder="e.g. Data Structures / Web Dev" required>
+        </div>
+        <div class="grid-2col gap-sm">
+          <div class="form-group">
+            <label>Hours Spent</label>
+            <input type="number" id="modal-study-hours" step="0.25" min="0.25" max="24" value="2.0" required>
+          </div>
+          <div class="form-group">
+            <label>Study Mode</label>
+            <select id="modal-study-type">
+              <option value="theory">Theory & Reading</option>
+              <option value="practice" selected>Practice & Coding</option>
             </select>
           </div>
         </div>
         <div class="form-group">
-          <label for="perf-log-date">Date</label>
-          <input type="date" id="perf-log-date" value="${todayISO}" required>
+          <label>Date</label>
+          <input type="date" id="modal-study-date" value="${today}" required>
         </div>
         <div class="form-group">
-          <label for="perf-log-notes">Session Notes (Optional)</label>
-          <input type="text" id="perf-log-notes" value="${preNotes}" placeholder="e.g. Built normalization schema, completed 3 DSA challenges">
+          <label>Notes / Insights (Optional)</label>
+          <input type="text" id="modal-study-notes" placeholder="Solved dynamic programming challenges">
         </div>
-        <button type="submit" class="btn btn-primary btn-block">Add Study Session</button>
+        <button type="submit" class="btn btn-primary font-bold">Log Study Session</button>
       </form>
-    `;
+    `);
 
-    UI.openModal('Study Hours & Productivity', formHtml);
+    const sForm = document.getElementById('modal-study-log-form');
+    if (sForm) {
+      sForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const subject = document.getElementById('modal-study-subject').value.trim();
+        const hours = parseFloat(document.getElementById('modal-study-hours').value);
+        const type = document.getElementById('modal-study-type').value;
+        const study_date = document.getElementById('modal-study-date').value;
+        const notes = document.getElementById('modal-study-notes').value.trim();
 
-    document.getElementById('perf-log-study-form').onsubmit = async (e) => {
-      e.preventDefault();
-      const course_name = document.getElementById('perf-log-course').value.trim();
-      const hours = parseFloat(document.getElementById('perf-log-hours').value);
-      const activity_type = document.getElementById('perf-log-type').value;
-      const log_date = document.getElementById('perf-log-date').value;
-      const notes = document.getElementById('perf-log-notes').value.trim();
-
-      try {
-        const res = await API.post('/api/study-logs', { course_name, hours, activity_type, log_date, notes });
-        if (res.error) {
-          UI.toast(res.error, 'danger');
-        } else {
+        try {
+          const res = await API.post('/api/study_logs', { subject, hours, type, study_date, notes });
+          if (res.error) { UI.toast(res.error, 'danger'); return; }
+          UI.toast('Study session recorded!', 'success');
           UI.closeModal();
-          UI.toast('Study session added!', 'success');
           this.loadPerformanceData();
+        } catch (err) {
+          UI.toast(err.message, 'danger');
         }
-      } catch (err) {
-        UI.toast(err.message, 'danger');
-      }
-    };
+      };
+    }
   },
 
-  async deleteStudyLog(logId) {
-    if (!confirm('Delete this study session?')) return;
+  async deleteStudyLog(id) {
     try {
-      await API.delete(`/api/study-logs/${logId}`);
-      UI.toast('Study session deleted.', 'info');
-      this.loadPerformanceData();
+      const res = await API.delete(`/api/study_logs/${id}`);
+      if (res.error) UI.toast(res.error, 'danger');
+      else {
+        UI.toast('Study log removed.', 'info');
+        this.loadPerformanceData();
+      }
     } catch (err) {
       UI.toast(err.message, 'danger');
     }
   },
 
-  // =========================================================================
-  // 7. GPA / GRADE CALCULATOR & TARGET SIMULATOR
-  // =========================================================================
-  gpaCourses: [
-    { name: 'Pemrograman Dasar', credits: 3, grade: 'A' },
-    { name: 'Basis Data Relasional', credits: 3, grade: 'A-' },
-    { name: 'Struktur Data & Algoritma', credits: 4, grade: 'B+' },
-    { name: 'Matematika Diskrit', credits: 3, grade: 'B' },
-  ],
+  // ── GPA & TARGET GRADE SIMULATOR ──────────────────────────────────────────
+  renderGPACalculator() {
+    const tbody = document.getElementById('gpa-courses-tbody');
+    if (!tbody) return;
 
-  GRADE_SCALE: {
-    'A': 4.0, 'A-': 3.7, 'B+': 3.3, 'B': 3.0, 'B-': 2.7,
-    'C+': 2.3, 'C': 2.0, 'D': 1.0, 'E': 0.0, 'F': 0.0
-  },
-
-  calculateGPA() {
-    let totalPoints = 0;
-    let totalCredits = 0;
-
-    this.gpaCourses.forEach(c => {
-      const credits = Number(c.credits) || 0;
-      const point = this.GRADE_SCALE[c.grade] ?? 0;
-      totalPoints += credits * point;
-      totalCredits += credits;
-    });
-
-    const gpa = totalCredits > 0 ? (totalPoints / totalCredits) : 0.0;
-    return { gpa: gpa.toFixed(2), totalCredits, totalPoints: totalPoints.toFixed(1) };
+    if (tbody.children.length === 0) {
+      this.loadCoursesIntoGPA();
+    } else {
+      this.calculateGPA();
+      this.calculateTargetGPA();
+    }
   },
 
   async loadCoursesIntoGPA() {
+    const tbody = document.getElementById('gpa-courses-tbody');
+    if (!tbody) return;
+
+    tbody.innerHTML = '';
     try {
       const courses = await API.get('/api/courses');
-      if (courses && courses.length > 0) {
-        this.gpaCourses = courses.map(c => ({
-          name: c.name || c.code,
-          credits: c.credits || 3,
-          grade: 'A'
-        }));
-        this.renderGPACalculator();
-        UI.toast('Imported enrolled academic courses into GPA calculator.', 'success');
+      if (Array.isArray(courses) && courses.length > 0) {
+        courses.forEach(c => {
+          this.addGPACourseRow(c.name || c.code, c.credits || 3, 'A');
+        });
       } else {
-        UI.toast('No courses found in database. You can add courses directly below.', 'info');
+        const defaults = [
+          { name: 'Pemrograman Dasar', sks: 4, grade: 'A' },
+          { name: 'Algoritma & Struktur Data', sks: 3, grade: 'A-' },
+          { name: 'Sistem Basis Data', sks: 3, grade: 'B+' },
+          { name: 'Matematika Diskrit', sks: 3, grade: 'A' }
+        ];
+        defaults.forEach(d => this.addGPACourseRow(d.name, d.sks, d.grade));
       }
     } catch (e) {
-      UI.toast('Failed to load courses for GPA calculator.', 'danger');
+      this.addGPACourseRow('Course 1', 3, 'A');
     }
+    this.calculateGPA();
+    this.calculateTargetGPA();
   },
 
-  addGPACourseRow(name = '', credits = 3, grade = 'A') {
-    this.gpaCourses.push({ name, credits, grade });
-    this.renderGPACalculator();
+  addGPACourseRow(name = 'New Course', credits = 3, grade = 'A') {
+    const tbody = document.getElementById('gpa-courses-tbody');
+    if (!tbody) return;
+
+    const tr = document.createElement('tr');
+    tr.className = 'gpa-course-row';
+    tr.innerHTML = `
+      <td class="p-xs">
+        <input type="text" class="gpa-course-name w-full p-xs font-semibold" value="${UI.esc(name)}" oninput="Curriculum.calculateGPA()">
+      </td>
+      <td class="p-xs text-center">
+        <input type="number" class="gpa-course-credits text-center p-xs" value="${credits}" min="1" max="6" style="width: 55px;" oninput="Curriculum.calculateGPA()">
+      </td>
+      <td class="p-xs">
+        <select class="gpa-course-grade p-xs font-bold text-brand" onchange="Curriculum.calculateGPA()">
+          <option value="4.0" ${grade === 'A' ? 'selected' : ''}>A (4.00)</option>
+          <option value="3.7" ${grade === 'A-' ? 'selected' : ''}>A- (3.70)</option>
+          <option value="3.3" ${grade === 'B+' ? 'selected' : ''}>B+ (3.30)</option>
+          <option value="3.0" ${grade === 'B' ? 'selected' : ''}>B (3.00)</option>
+          <option value="2.7" ${grade === 'B-' ? 'selected' : ''}>B- (2.70)</option>
+          <option value="2.3" ${grade === 'C+' ? 'selected' : ''}>C+ (2.30)</option>
+          <option value="2.0" ${grade === 'C' ? 'selected' : ''}>C (2.00)</option>
+          <option value="1.0" ${grade === 'D' ? 'selected' : ''}>D (1.00)</option>
+          <option value="0.0" ${grade === 'E' || grade === 'F' ? 'selected' : ''}>E/F (0.00)</option>
+        </select>
+      </td>
+      <td class="p-xs text-center">
+        <button type="button" class="btn-icon text-danger cursor-pointer" onclick="this.closest('tr').remove(); Curriculum.calculateGPA();" title="Remove course">×</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+    this.calculateGPA();
   },
 
-  removeGPACourseRow(index) {
-    if (this.gpaCourses.length <= 1) {
-      UI.toast('At least one course is required in calculator.', 'warning');
-      return;
-    }
-    this.gpaCourses.splice(index, 1);
-    this.renderGPACalculator();
-  },
+  calculateGPA() {
+    const rows = document.querySelectorAll('.gpa-course-row');
+    let totalCredits = 0;
+    let totalPoints = 0;
 
-  updateGPACourse(index, field, value) {
-    if (this.gpaCourses[index]) {
-      this.gpaCourses[index][field] = value;
-      this.renderGPASummary();
+    rows.forEach(r => {
+      const credInput = r.querySelector('.gpa-course-credits');
+      const gradeSelect = r.querySelector('.gpa-course-grade');
+      const sks = parseFloat(credInput?.value) || 0;
+      const point = parseFloat(gradeSelect?.value) || 0;
+
+      totalCredits += sks;
+      totalPoints += sks * point;
+    });
+
+    const gpa = totalCredits > 0 ? (totalPoints / totalCredits).toFixed(2) : '0.00';
+    const gpaDisplay = document.getElementById('gpa-score-display');
+    const creditsDisplay = document.getElementById('gpa-total-credits-display');
+    const pointsDisplay = document.getElementById('gpa-total-points-display');
+    const badgeDisplay = document.getElementById('gpa-standing-badge');
+
+    if (gpaDisplay) gpaDisplay.textContent = gpa;
+    if (creditsDisplay) creditsDisplay.textContent = `${totalCredits} SKS`;
+    if (pointsDisplay) pointsDisplay.textContent = `${totalPoints.toFixed(1)} Pts`;
+
+    if (badgeDisplay) {
+      const val = parseFloat(gpa);
+      if (val >= 3.8) {
+        badgeDisplay.textContent = 'Summa Cum Laude';
+        badgeDisplay.className = 'font-bold text-success mb-md text-xs';
+      } else if (val >= 3.5) {
+        badgeDisplay.textContent = 'Magna Cum Laude';
+        badgeDisplay.className = 'font-bold text-brand mb-md text-xs';
+      } else if (val >= 3.0) {
+        badgeDisplay.textContent = 'Good Standing';
+        badgeDisplay.className = 'font-bold text-warning mb-md text-xs';
+      } else {
+        badgeDisplay.textContent = 'Academic Warning Zone';
+        badgeDisplay.className = 'font-bold text-danger mb-md text-xs';
+      }
     }
   },
 
   calculateTargetGPA() {
-    const currentGPA = parseFloat(document.getElementById('target-curr-gpa')?.value) || 0;
-    const currentCredits = parseFloat(document.getElementById('target-curr-credits')?.value) || 0;
-    const targetGPA = parseFloat(document.getElementById('target-goal-gpa')?.value) || 0;
+    const currGPA = parseFloat(document.getElementById('target-curr-gpa')?.value) || 0;
+    const currCredits = parseFloat(document.getElementById('target-curr-credits')?.value) || 0;
+    const goalGPA = parseFloat(document.getElementById('target-goal-gpa')?.value) || 0;
     const futureCredits = parseFloat(document.getElementById('target-future-credits')?.value) || 0;
-    const resultEl = document.getElementById('target-gpa-result');
+    const resultBox = document.getElementById('target-gpa-result');
 
-    if (!resultEl) return;
+    if (!resultBox) return;
 
-    if (futureCredits <= 0 || targetGPA <= 0) {
-      resultEl.innerHTML = '<p class="text-muted" style="margin: 0.5rem 0;">Please enter your target GPA and remaining future credits.</p>';
+    if (futureCredits <= 0) {
+      resultBox.innerHTML = '<p class="text-warning text-xs">Enter remaining SKS to calculate.</p>';
       return;
     }
 
-    const currentPoints = currentGPA * currentCredits;
-    const totalCredits = currentCredits + futureCredits;
-    const requiredTotalPoints = targetGPA * totalCredits;
-    const neededPoints = requiredTotalPoints - currentPoints;
-    const requiredFutureGPA = neededPoints / futureCredits;
+    const totalCredits = currCredits + futureCredits;
+    const targetPoints = totalCredits * goalGPA;
+    const currentPoints = currCredits * currGPA;
+    const neededPoints = targetPoints - currentPoints;
+    const neededGPA = (neededPoints / futureCredits).toFixed(2);
 
-    if (requiredFutureGPA > 4.0) {
-      resultEl.innerHTML = `
-        <div style="padding: 0.85rem 1rem; border-radius: var(--radius-md); background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.25); color: var(--accent-danger); font-size: 0.88rem;">
-          <strong>Target Out of Range:</strong> Requires a <strong>${requiredFutureGPA.toFixed(2)}</strong> GPA on remaining ${futureCredits} credits (maximum possible is 4.00). Try taking more credit hours or adjusting your goal.
+    if (neededGPA > 4.0) {
+      resultBox.innerHTML = `
+        <div class="p-sm badge-danger-subtle rounded text-xs">
+          <strong>Mathematically Impossible (${neededGPA})</strong><br>
+          Target exceeds 4.0 maximum GPA. Try increasing future credits or adjusting goal.
         </div>
       `;
-    } else if (requiredFutureGPA <= 0) {
-      resultEl.innerHTML = `
-        <div style="padding: 0.85rem 1rem; border-radius: var(--radius-md); background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25); color: #10B981; font-size: 0.88rem;">
-          <strong>Target Already Secured!</strong> Maintaining any passing grade will keep you above your goal.
+    } else if (neededGPA < 0) {
+      resultBox.innerHTML = `
+        <div class="p-sm badge-success-subtle rounded text-xs">
+          <strong>Target Already Exceeded!</strong><br>
+          You will maintain your target honor standing.
         </div>
       `;
     } else {
-      resultEl.innerHTML = `
-        <div style="padding: 0.85rem 1rem; border-radius: var(--radius-md); background: rgba(124, 58, 237, 0.1); border: 1px solid rgba(124, 58, 237, 0.25); color: var(--primary); font-size: 0.88rem;">
-          <strong>Target Plan:</strong> You need an average GPA of <strong>${requiredFutureGPA.toFixed(2)}</strong> across your next <strong>${futureCredits} SKS credits</strong> to graduate with a <strong>${targetGPA.toFixed(2)}</strong> cumulative GPA!
+      resultBox.innerHTML = `
+        <div class="p-sm bg-surface-alt rounded text-xs border">
+          You need an average of <strong class="text-brand font-bold text-sm">${neededGPA}</strong> across your remaining ${futureCredits} SKS.
         </div>
       `;
-    }
-  },
-
-  renderGPACalculator() {
-    const tableBody = document.getElementById('gpa-courses-tbody');
-    if (!tableBody) return;
-
-    const grades = ['A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'D', 'E', 'F'];
-
-    tableBody.innerHTML = this.gpaCourses.map((c, i) => `
-      <tr style="border-bottom: 1px solid var(--border-color);">
-        <td style="padding: 0.5rem 0.5rem 0.5rem 0;">
-          <input type="text" value="${UI.esc(c.name)}" placeholder="e.g. Algoritma"
-                 oninput="Curriculum.updateGPACourse(${i}, 'name', this.value)"
-                 style="width: 100%; padding: 0.4rem 0.6rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-surface);">
-        </td>
-        <td style="width: 80px; padding: 0.5rem;">
-          <input type="number" value="${c.credits}" min="1" max="10"
-                 oninput="Curriculum.updateGPACourse(${i}, 'credits', parseInt(this.value) || 0)"
-                 style="width: 100%; padding: 0.4rem 0.6rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-surface); text-align: center;">
-        </td>
-        <td style="width: 120px; padding: 0.5rem;">
-          <select onchange="Curriculum.updateGPACourse(${i}, 'grade', this.value)"
-                  style="width: 100%; padding: 0.4rem 0.6rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-surface); font-weight: 600;">
-            ${grades.map(g => `<option value="${g}" ${g === c.grade ? 'selected' : ''}>${g} (${this.GRADE_SCALE[g].toFixed(1)})</option>`).join('')}
-          </select>
-        </td>
-        <td style="width: 40px; text-align: center; padding: 0.5rem 0 0.5rem 0.5rem;">
-          <button class="btn-icon text-muted" onclick="Curriculum.removeGPACourseRow(${i})" title="Remove course"
-                  style="font-size: 1.1rem; line-height: 1;">&times;</button>
-        </td>
-      </tr>
-    `).join('');
-
-    this.renderGPASummary();
-  },
-
-  renderGPASummary() {
-    const { gpa, totalCredits, totalPoints } = this.calculateGPA();
-    const gpaValEl = document.getElementById('gpa-score-display');
-    const gpaCreditsEl = document.getElementById('gpa-total-credits-display');
-    const gpaPointsEl = document.getElementById('gpa-total-points-display');
-    const gpaBadgeEl = document.getElementById('gpa-standing-badge');
-
-    if (gpaValEl) gpaValEl.textContent = gpa;
-    if (gpaCreditsEl) gpaCreditsEl.textContent = `${totalCredits} SKS`;
-    if (gpaPointsEl) gpaPointsEl.textContent = `${totalPoints} Pts`;
-
-    if (gpaBadgeEl) {
-      const numGpa = parseFloat(gpa);
-      if (numGpa >= 3.75) {
-        gpaBadgeEl.textContent = 'Summa Cum Laude (High Distinction)';
-        gpaBadgeEl.style.color = '#10B981';
-      } else if (numGpa >= 3.5) {
-        gpaBadgeEl.textContent = 'Magna Cum Laude (Distinction)';
-        gpaBadgeEl.style.color = 'var(--primary)';
-      } else if (numGpa >= 3.0) {
-        gpaBadgeEl.textContent = 'Good Academic Standing';
-        gpaBadgeEl.style.color = '#F59E0B';
-      } else {
-        gpaBadgeEl.textContent = 'Academic Advisory Zone';
-        gpaBadgeEl.style.color = 'var(--accent-danger)';
-      }
-    }
-  },
-
-  // ── 8. CSS FLEXBOX & GRID VISUALIZER ─────────────────────────────────────
-  _flexBoxCount: 4,
-
-  updateFlexStage() {
-    const stage = document.getElementById('flex-interactive-stage');
-    const dir = document.getElementById('flex-dir-select')?.value || 'row';
-    const justify = document.getElementById('flex-justify-select')?.value || 'flex-start';
-    const align = document.getElementById('flex-align-select')?.value || 'stretch';
-    const wrap = document.getElementById('flex-wrap-select')?.value || 'nowrap';
-    const gap = document.getElementById('flex-gap-slider')?.value || '12';
-    const gapVal = document.getElementById('flex-gap-val');
-    const snippet = document.getElementById('flex-css-snippet');
-
-    if (gapVal) gapVal.textContent = `${gap}px`;
-
-    if (stage) {
-      stage.style.flexDirection = dir;
-      stage.style.justifyContent = justify;
-      stage.style.alignItems = align;
-      stage.style.flexWrap = wrap;
-      stage.style.gap = `${gap}px`;
-    }
-
-    if (snippet) {
-      snippet.textContent = `.container {\n  display: flex;\n  flex-direction: ${dir};\n  justify-content: ${justify};\n  align-items: ${align};\n  flex-wrap: ${wrap};\n  gap: ${gap}px;\n}`;
-    }
-  },
-
-  addFlexItem() {
-    if (this._flexBoxCount >= 8) {
-      UI.toast('Maximum 8 boxes reached.', 'info');
-      return;
-    }
-    this._flexBoxCount++;
-    const stage = document.getElementById('flex-interactive-stage');
-    const badge = document.getElementById('flex-item-count-badge');
-    if (stage) {
-      const box = document.createElement('div');
-      box.className = `flex-stage-box box-${((this._flexBoxCount - 1) % 6) + 1}`;
-      box.innerHTML = `<span>Box ${this._flexBoxCount}</span>`;
-      stage.appendChild(box);
-    }
-    if (badge) badge.textContent = `${this._flexBoxCount} Items`;
-    this.updateFlexStage();
-  },
-
-  removeFlexItem() {
-    if (this._flexBoxCount <= 1) {
-      UI.toast('Minimum 1 box required.', 'info');
-      return;
-    }
-    const stage = document.getElementById('flex-interactive-stage');
-    const badge = document.getElementById('flex-item-count-badge');
-    if (stage && stage.lastElementChild) {
-      stage.removeChild(stage.lastElementChild);
-      this._flexBoxCount--;
-    }
-    if (badge) badge.textContent = `${this._flexBoxCount} Items`;
-    this.updateFlexStage();
-  },
-
-  copyFlexCSS() {
-    const snippet = document.getElementById('flex-css-snippet')?.textContent || '';
-    navigator.clipboard?.writeText(snippet).then(() => {
-      UI.toast('CSS rules copied to clipboard!', 'success');
-    }).catch(() => {
-      UI.toast('Failed to copy.', 'warning');
-    });
-  },
-
-  // ── 9. JS FUNCTIONAL & ARRAY METHODS LAB ──────────────────────────────────
-  _currentJSMethod: 'map',
-
-  selectJSMethod(method) {
-    this._currentJSMethod = method;
-    const pills = document.querySelectorAll('#js-method-pills .day-pill-btn');
-    pills.forEach(p => {
-      if (p.textContent.includes(method)) p.classList.add('active');
-      else p.classList.remove('active');
-    });
-
-    const exprInput = document.getElementById('js-callback-expr');
-    const presets = {
-      map: 'x => x * 2',
-      filter: 'x => x > 40',
-      reduce: '(acc, curr) => acc + curr',
-      find: 'x => x % 5 === 0',
-      sort: '(a, b) => a - b'
-    };
-    if (exprInput && presets[method]) {
-      exprInput.value = presets[method];
-    }
-    this.runJSLab();
-  },
-
-  runJSLab() {
-    const rawArr = document.getElementById('js-input-array')?.value || '[]';
-    const rawExpr = document.getElementById('js-callback-expr')?.value || 'x => x';
-    const resultView = document.getElementById('js-lab-result-view');
-    if (!resultView) return;
-
-    try {
-      const arr = JSON.parse(rawArr);
-      if (!Array.isArray(arr)) throw new Error('Input must be a valid JSON array.');
-
-      // Safely evaluate functional expression
-      const fn = new Function(`return (${rawExpr})`)();
-      let result;
-      let explanation = '';
-
-      if (this._currentJSMethod === 'map') {
-        result = arr.map(fn);
-        explanation = `Transformed each of the ${arr.length} elements using ${rawExpr}.`;
-      } else if (this._currentJSMethod === 'filter') {
-        result = arr.filter(fn);
-        explanation = `Filtered ${arr.length} elements down to ${result.length} matching elements.`;
-      } else if (this._currentJSMethod === 'reduce') {
-        result = arr.reduce(fn);
-        explanation = `Aggregated ${arr.length} elements into a single accumulated scalar value.`;
-      } else if (this._currentJSMethod === 'find') {
-        result = arr.find(fn);
-        explanation = `Found first matching element: ${result !== undefined ? result : 'undefined'}`;
-      } else if (this._currentJSMethod === 'sort') {
-        result = [...arr].sort(fn);
-        explanation = `Sorted ${arr.length} elements using custom comparator.`;
-      }
-
-      resultView.innerHTML = `
-        <div class="d-flex flex-col gap-md">
-          <div class="d-flex justify-between items-center flex-wrap gap-xs">
-            <span class="font-bold text-success text-sm d-flex items-center gap-xs">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              Operation Successful
-            </span>
-            <span class="priority-badge priority-low font-mono text-xs">.${this._currentJSMethod}()</span>
-          </div>
-          <p class="text-muted text-xs m-0">${UI.esc(explanation)}</p>
-          <div class="p-md rounded" style="background: var(--bg-surface-alt); border: 1px solid var(--border-color); border-radius: var(--radius-md);">
-            <div class="text-xs font-bold text-muted mb-xs">OUTPUT RESULT:</div>
-            <pre class="font-mono text-sm font-bold text-brand m-0">${UI.esc(JSON.stringify(result, null, 2))}</pre>
-          </div>
-        </div>
-      `;
-    } catch (err) {
-      resultView.innerHTML = `
-        <div class="p-md rounded" style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: var(--radius-md);">
-          <span class="font-bold text-danger text-sm">Execution Error</span>
-          <p class="font-mono text-xs text-secondary mt-xs m-0">${UI.esc(err.message)}</p>
-        </div>
-      `;
-    }
-  },
-
-  // ── 10. REGEX PATTERN VALIDATOR LAB ───────────────────────────────────────
-  setRegexPreset(preset) {
-    const patternInput = document.getElementById('regex-pattern-input');
-    const flagsInput = document.getElementById('regex-flags-input');
-    const textInput = document.getElementById('regex-test-text');
-
-    const presets = {
-      email: {
-        pattern: '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}',
-        flags: 'gi',
-        text: 'Contact support@pocketsly.edu or rizzqi.maulana@campus.ac.id for assistance.'
-      },
-      date: {
-        pattern: '\\b\\d{4}-\\d{2}-\\d{2}\\b',
-        flags: 'g',
-        text: 'Upcoming semester deadlines: Midterm Exam on 2026-10-15 and Final Project submission on 2026-12-20.'
-      },
-      phone: {
-        pattern: '(?:\\+62|08)[0-9]{8,12}',
-        flags: 'g',
-        text: 'Academic advisor mobile: +6281234567890 or student hotline 081987654321.'
-      },
-      hex: {
-        pattern: '#(?:[0-9a-fA-F]{3}){1,2}\\b',
-        flags: 'gi',
-        text: 'Design tokens: primary #7C3AED, success #10B981, danger #EF4444, and white #FFF.'
-      },
-      nim: {
-        pattern: '\\b(?:20|21|22|23|24|25|26)\\d{6,8}\\b',
-        flags: 'g',
-        text: 'Registered students: NIM 241011526, NIM 241011589, and NIM 231011902.'
-      }
-    };
-
-    if (presets[preset]) {
-      if (patternInput) patternInput.value = presets[preset].pattern;
-      if (flagsInput) flagsInput.value = presets[preset].flags;
-      if (textInput) textInput.value = presets[preset].text;
-    }
-    this.testRegex();
-  },
-
-  testRegex() {
-    const pattern = document.getElementById('regex-pattern-input')?.value || '';
-    const flags = document.getElementById('regex-flags-input')?.value || 'g';
-    const text = document.getElementById('regex-test-text')?.value || '';
-    const highlightOutput = document.getElementById('regex-highlight-output');
-    const matchesList = document.getElementById('regex-matches-list');
-    const badge = document.getElementById('regex-match-badge');
-
-    if (!pattern) {
-      if (highlightOutput) highlightOutput.textContent = text;
-      if (badge) badge.textContent = '0 Matches';
-      if (matchesList) matchesList.innerHTML = '';
-      return;
-    }
-
-    try {
-      const regex = new RegExp(pattern, flags.includes('g') ? flags : flags + 'g');
-      const matches = [...text.matchAll(regex)];
-
-      if (badge) {
-        badge.textContent = `${matches.length} Match${matches.length === 1 ? '' : 'es'}`;
-      }
-
-      if (matches.length === 0) {
-        if (highlightOutput) highlightOutput.textContent = text;
-        if (matchesList) matchesList.innerHTML = '<p class="text-muted text-xs m-0">No matches found in test string.</p>';
-        return;
-      }
-
-      // Highlight in text
-      let highlighted = '';
-      let lastIndex = 0;
-      for (const m of matches) {
-        const matchStart = m.index;
-        const matchEnd = matchStart + m[0].length;
-        highlighted += UI.esc(text.substring(lastIndex, matchStart));
-        highlighted += `<mark class="regex-match-pill">${UI.esc(m[0])}</mark>`;
-        lastIndex = matchEnd;
-      }
-      highlighted += UI.esc(text.substring(lastIndex));
-      if (highlightOutput) highlightOutput.innerHTML = highlighted;
-
-      // Render matched details
-      if (matchesList) {
-        matchesList.innerHTML = `
-          <div class="d-flex flex-col gap-xs">
-            <span class="text-xs font-bold text-muted">CAPTURED MATCHES:</span>
-            <div class="d-flex gap-xs flex-wrap">
-              ${matches.map((m, idx) => `<span class="priority-badge" style="background: var(--bg-surface-alt); border: 1px solid var(--border-color); font-family: var(--font-mono); font-size: 0.75rem;">#${idx + 1}: ${UI.esc(m[0])}</span>`).join('')}
-            </div>
-          </div>
-        `;
-      }
-    } catch (err) {
-      if (highlightOutput) highlightOutput.innerHTML = `<span class="text-danger font-mono text-xs">Invalid Regex: ${UI.esc(err.message)}</span>`;
-      if (badge) badge.textContent = 'Error';
     }
   }
 };
@@ -4421,22 +3107,794 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
+/* ===== curriculum_labs.js ===== */
+/**
+ * CURRICULUM INTERACTIVE LABS (curriculum_labs.js)
+ * ===============================================
+ * Extends window.Curriculum with live execution sandboxes:
+ * SQL Console, API Inspector, Sorting Visualizer, Quizzer, Flexbox Lab, JS Lab, and Regex Tester.
+ */
+
+(function () {
+  if (!window.Curriculum) window.Curriculum = {};
+
+  const labsMethods = {
+    dbSchema: null,
+    algoArray: [],
+    sortingInProgress: false,
+    quizIndex: 0,
+    _flexBoxCount: 4,
+    _currentJSMethod: 'map',
+
+    quizQuestions: [
+      {
+        question: "Which of the following is correct regarding relational databases?",
+        options: [
+          "Tables cannot have foreign key relationships with each other.",
+          "A Primary Key must be unique and cannot be NULL.",
+          "SQLite does not support any constraints like UNIQUE or NOT NULL.",
+          "SQL stands for Simple Query Language."
+        ],
+        answer: 1,
+        explanation: "A Primary Key uniquely identifies each record in a table, and SQL stands for Structured Query Language."
+      },
+      {
+        question: "In CSS Flexbox, which property aligns flex items along the main axis?",
+        options: [
+          "align-items",
+          "justify-content",
+          "flex-direction",
+          "align-content"
+        ],
+        answer: 1,
+        explanation: "'justify-content' aligns flex items along the main axis, while 'align-items' aligns them along the cross axis."
+      },
+      {
+        question: "What is the time complexity of a Bubble Sort algorithm in its worst case?",
+        options: [
+          "O(n log n)",
+          "O(1)",
+          "O(n²)",
+          "O(n)"
+        ],
+        answer: 2,
+        explanation: "Bubble Sort compares adjacent elements and swaps them, leading to nested loop behavior resulting in O(n²) time complexity."
+      },
+      {
+        question: "Which HTTP status code represents a successful resource creation in REST API design?",
+        options: [
+          "200 OK",
+          "201 Created",
+          "400 Bad Request",
+          "404 Not Found"
+        ],
+        answer: 1,
+        explanation: "The HTTP 201 Created status code indicates that the request has succeeded and led to the creation of a resource."
+      },
+      {
+        question: "In SQL, what does a LEFT JOIN return?",
+        options: [
+          "Only rows that match in both tables.",
+          "All rows from the left table, and matching rows from the right table.",
+          "All rows from both tables regardless of match.",
+          "Only records that have NULL primary keys."
+        ],
+        answer: 1,
+        explanation: "A LEFT JOIN returns all records from the left table, and matching records from the right table. Non-matching right columns are NULL."
+      },
+      {
+        question: "Which of the following describes a foreign key constraint?",
+        options: [
+          "It prevents passwords from being leaked.",
+          "It speeds up SELECT queries on indexes.",
+          "It links a column in one table to the primary key of another table to maintain referential integrity.",
+          "It automatically hashes passwords during INSERTs."
+        ],
+        answer: 2,
+        explanation: "A foreign key enforces referential integrity between two related tables in a relational database."
+      },
+      {
+        question: "In Modern JavaScript (ES6+), what is the purpose of async/await?",
+        options: [
+          "To make JavaScript run synchronously on a single CPU core.",
+          "To write asynchronous Promises in a clean, synchronous-looking format.",
+          "To compile JavaScript into WebAssembly.",
+          "To force DOM elements to re-render without CSS."
+        ],
+        answer: 1,
+        explanation: "async/await acts as syntactic sugar over Promises, making asynchronous code easier to read and maintain."
+      },
+      {
+        question: "In Python and SQLite, which technique is used to prevent SQL Injection vulnerability?",
+        options: [
+          "Executing queries with raw string concatenation.",
+          "Using '?' query placeholders or parameterized SQL inputs.",
+          "Running base64 encryption on every incoming query text.",
+          "Turning off SQLite foreign key constraints."
+        ],
+        answer: 1,
+        explanation: "Passing parameterized inputs with '?' prevents attackers from manipulating the structure of your queries."
+      },
+      {
+        question: "What is the time complexity of Binary Search on a sorted array of size n?",
+        options: [
+          "O(n)",
+          "O(log n)",
+          "O(n log n)",
+          "O(1)"
+        ],
+        answer: 1,
+        explanation: "Binary search repeatedly divides the sorted search interval in half, yielding O(log n) time complexity."
+      }
+    ],
+
+    initLabs() {
+      this.generateAlgoArray();
+    },
+
+    loadLabResources() {
+      this.loadSchema();
+      this.loadQuizQuestion();
+    },
+
+    setupLabEventListeners() {
+      // SQL Playground Run
+      const runSqlBtn = document.getElementById('run-sql-btn');
+      if (runSqlBtn) {
+        runSqlBtn.onclick = () => this.runSQL();
+      }
+
+      const resetSqlBtn = document.getElementById('reset-sql-btn');
+      if (resetSqlBtn) {
+        resetSqlBtn.onclick = () => {
+          const qInput = document.getElementById('sql-query-input');
+          if (qInput) {
+            qInput.value = '';
+            qInput.focus();
+          }
+          document.querySelectorAll('.template-btn').forEach(b => b.classList.remove('active'));
+          const results = document.getElementById('sql-results-container');
+          if (results) {
+            results.innerHTML = '<p class="text-muted m-0 text-center p-2xl">Ready to execute. Pick a table above or write your SQL query.</p>';
+          }
+        };
+      }
+
+      // SQL Templates
+      document.querySelectorAll('.template-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          document.querySelectorAll('.template-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const sql = e.currentTarget.getAttribute('data-sql');
+          const qInput = document.getElementById('sql-query-input');
+          if (qInput) {
+            qInput.value = sql;
+            qInput.focus();
+            this.runSQL();
+          }
+        });
+      });
+
+      // Backend Explorer triggers
+      document.querySelectorAll('.backend-trigger-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const action = e.currentTarget.getAttribute('data-action');
+          this.runBackendInspector(action);
+        });
+      });
+
+      // Algo Visualizer
+      const shuffleBtn = document.getElementById('algo-generate-arr');
+      if (shuffleBtn) shuffleBtn.onclick = () => this.generateAlgoArray();
+
+      const bubbleBtn = document.getElementById('algo-sort-bubble');
+      if (bubbleBtn) bubbleBtn.onclick = () => this.bubbleSort();
+
+      const quickBtn = document.getElementById('algo-sort-quick');
+      if (quickBtn) quickBtn.onclick = () => this.startQuickSort();
+
+      const speedInput = document.getElementById('algo-speed');
+      const speedVal = document.getElementById('algo-speed-val');
+      if (speedInput && speedVal) {
+        speedInput.oninput = (e) => {
+          speedVal.textContent = `${e.target.value}ms`;
+        };
+      }
+
+      // Quiz Buttons
+      const nextQuizBtn = document.getElementById('quiz-next-btn');
+      if (nextQuizBtn) nextQuizBtn.onclick = () => this.nextQuiz();
+
+      const quizBackBtn = document.getElementById('quiz-back-btn');
+      if (quizBackBtn) {
+        quizBackBtn.onclick = () => {
+          const card3d = document.getElementById('quiz-card-3d');
+          if (card3d) card3d.classList.toggle('flipped');
+        };
+      }
+    },
+
+    // ── 1. RELATIONAL DATABASE & SQL LAB ─────────────────────────────────────
+    async loadSchema() {
+      const viewer = document.getElementById('db-schema-viewer');
+      if (!viewer) return;
+
+      try {
+        const schema = await API.get('/api/curriculum/schema');
+        if (schema.error) {
+          viewer.innerHTML = `<p class="text-danger">${UI.esc(schema.error)}</p>`;
+          return;
+        }
+        this.dbSchema = schema;
+        this.renderSchema(schema);
+      } catch (err) {
+        viewer.innerHTML = `<p class="text-danger">Failed to fetch database schema: ${UI.esc(err.message)}</p>`;
+      }
+    },
+
+    renderSchema(schema) {
+      const viewer = document.getElementById('db-schema-viewer');
+      if (!viewer) return;
+
+      const tables = Object.keys(schema);
+      if (tables.length === 0) {
+        viewer.innerHTML = '<p class="text-muted">No tables available in SQLite instance.</p>';
+        return;
+      }
+
+      viewer.innerHTML = tables.map(tbl => `
+        <div class="schema-table-item mb-sm p-sm rounded border bg-surface-alt">
+          <div class="font-bold text-xs text-primary d-flex items-center gap-xs mb-xs">
+            <span class="text-success font-mono">■</span> ${UI.esc(tbl)}
+          </div>
+          <div class="d-flex flex-col gap-xs">
+            ${schema[tbl].map(col => `
+              <div class="d-flex justify-between text-xs text-secondary font-mono">
+                <span>${UI.esc(col.name)}</span>
+                <span class="text-muted">${UI.esc(col.type || 'TEXT')}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+    },
+
+    toggleSchemaCollapse() {
+      const viewer = document.getElementById('db-schema-viewer');
+      const btn = document.getElementById('schema-toggle-btn');
+      if (!viewer || !btn) return;
+
+      if (viewer.classList.contains('hidden')) {
+        viewer.classList.remove('hidden');
+        btn.textContent = 'Collapse';
+      } else {
+        viewer.classList.add('hidden');
+        btn.textContent = 'Expand';
+      }
+    },
+
+    insertSQLSymbol(symbol) {
+      const qInput = document.getElementById('sql-query-input');
+      if (!qInput) return;
+      const start = qInput.selectionStart || 0;
+      const end = qInput.selectionEnd || 0;
+      const val = qInput.value;
+      qInput.value = val.substring(0, start) + symbol + val.substring(end);
+      qInput.focus();
+      qInput.selectionStart = qInput.selectionEnd = start + symbol.length;
+    },
+
+    async runSQL() {
+      const qInput = document.getElementById('sql-query-input');
+      const resultsContainer = document.getElementById('sql-results-container');
+      if (!qInput || !resultsContainer) return;
+
+      const query = qInput.value.trim();
+      if (!query) {
+        UI.toast('Please enter a SQL query.', 'warning');
+        return;
+      }
+
+      resultsContainer.innerHTML = '<p class="text-muted text-center p-lg font-mono text-xs">Executing SQLite query on server...</p>';
+
+      try {
+        const res = await API.post('/api/curriculum/query', { query });
+        if (res.error) {
+          resultsContainer.innerHTML = `
+            <div class="p-md text-danger font-mono text-xs">
+              <strong>Query Execution Error:</strong><br>${UI.esc(res.error)}
+            </div>
+          `;
+          return;
+        }
+
+        if (res.rows && res.rows.length > 0) {
+          const cols = Object.keys(res.rows[0]);
+          resultsContainer.innerHTML = `
+            <table class="w-full text-xs font-mono">
+              <thead>
+                <tr class="bg-surface-alt border-b">
+                  ${cols.map(c => `<th class="p-xs text-left">${UI.esc(c)}</th>`).join('')}
+                </tr>
+              </thead>
+              <tbody>
+                ${res.rows.map(r => `
+                  <tr class="border-b hover-row">
+                    ${cols.map(c => `<td class="p-xs">${UI.esc(String(r[c] !== null ? r[c] : 'NULL'))}</td>`).join('')}
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          `;
+        } else {
+          resultsContainer.innerHTML = '<p class="text-success text-center p-md font-mono text-xs">Query completed. 0 rows returned.</p>';
+        }
+      } catch (e) {
+        resultsContainer.innerHTML = `<div class="p-md text-danger font-mono text-xs">Network error: ${UI.esc(e.message)}</div>`;
+      }
+    },
+
+    // ── 2. BACKEND API FLOW EXPLORER ─────────────────────────────────────────
+    async runBackendInspector(action) {
+      const outputEl = document.getElementById('backend-inspector-output');
+      if (!outputEl) return;
+
+      outputEl.innerHTML = '<pre><code>Waiting for API server response...</code></pre>';
+      let endpoint = '/api/session';
+
+      switch (action) {
+        case 'get-session': endpoint = '/api/session'; break;
+        case 'get-tasks': endpoint = '/api/tasks'; break;
+        case 'get-schema': endpoint = '/api/curriculum/schema'; break;
+        case 'get-habits': endpoint = '/api/habits'; break;
+        case 'get-notes': endpoint = '/api/notes'; break;
+        case 'get-courses': endpoint = '/api/courses'; break;
+        case 'get-incomes': endpoint = '/api/incomes'; break;
+        case 'get-expenses': endpoint = '/api/expenses'; break;
+        case 'get-budget-summary': endpoint = '/api/budget/summary'; break;
+        default: endpoint = action.startsWith('/') ? action : `/api/${action}`;
+      }
+
+      try {
+        const res = await API.get(endpoint);
+        outputEl.innerHTML = `
+          <div class="d-flex justify-between items-center mb-sm">
+            <span class="priority-badge priority-low">GET ${UI.esc(endpoint)}</span>
+            <span class="text-success font-bold font-mono text-xs">200 OK</span>
+          </div>
+          <pre class="m-0 font-mono text-xs"><code class="language-json">${UI.esc(JSON.stringify(res, null, 2))}</code></pre>
+        `;
+        UI.toast(`Inspected ${endpoint}`, 'info');
+      } catch (e) {
+        outputEl.innerHTML = `<pre class="text-danger">Failed: ${UI.esc(e.message)}</pre>`;
+      }
+    },
+
+    // ── 3. ALGORITHM SORTING VISUALIZER ──────────────────────────────────────
+    generateAlgoArray(size = 12) {
+      this.algoArray = [];
+      for (let i = 0; i < size; i++) {
+        this.algoArray.push(Math.floor(Math.random() * 180) + 30);
+      }
+      this.renderAlgoBars();
+      const logEl = document.getElementById('algo-steps-log');
+      if (logEl) logEl.textContent = 'Array initialized. Click a sorting algorithm to start visual trace.';
+    },
+
+    renderAlgoBars(activeIndices = [], sortedIndices = []) {
+      const container = document.getElementById('algo-bars-container');
+      if (!container) return;
+
+      container.innerHTML = '';
+      this.algoArray.forEach((val, idx) => {
+        const bar = document.createElement('div');
+        bar.className = 'algo-bar';
+        bar.style.height = `${val}px`;
+
+        if (sortedIndices.includes(idx)) bar.classList.add('sorted');
+        else if (activeIndices.includes(idx)) bar.classList.add('active');
+
+        const label = document.createElement('span');
+        label.className = 'algo-bar-label';
+        label.textContent = val;
+        bar.appendChild(label);
+        container.appendChild(bar);
+      });
+    },
+
+    sleep(ms) {
+      const speedInput = document.getElementById('algo-speed');
+      const delay = speedInput ? parseInt(speedInput.value) : ms;
+      return new Promise(resolve => setTimeout(resolve, delay));
+    },
+
+    async bubbleSort() {
+      if (this.sortingInProgress) return;
+      this.sortingInProgress = true;
+      const logEl = document.getElementById('algo-steps-log');
+      let arr = this.algoArray;
+      let len = arr.length;
+
+      if (logEl) logEl.innerHTML = `<strong>Bubble Sort started:</strong> Comparing adjacent index elements...`;
+
+      let sorted = [];
+      for (let i = 0; i < len; i++) {
+        for (let j = 0; j < len - i - 1; j++) {
+          this.renderAlgoBars([j, j + 1], sorted);
+          await this.sleep(120);
+
+          if (arr[j] > arr[j + 1]) {
+            let temp = arr[j];
+            arr[j] = arr[j + 1];
+            arr[j + 1] = temp;
+            if (logEl) logEl.innerHTML = `Swapping index <strong>${j}</strong> (${arr[j + 1]}) and index <strong>${j + 1}</strong> (${arr[j]}).`;
+            this.renderAlgoBars([j, j + 1], sorted);
+            await this.sleep(120);
+          }
+        }
+        sorted.push(len - i - 1);
+      }
+
+      this.renderAlgoBars([], Array.from({ length: len }, (_, i) => i));
+      if (logEl) logEl.innerHTML = `<strong>Bubble Sort Completed!</strong> Entire array ordered in O(n²) time.`;
+      this.sortingInProgress = false;
+      UI.toast('Bubble Sort completed!', 'success');
+    },
+
+    async startQuickSort() {
+      if (this.sortingInProgress) return;
+      this.sortingInProgress = true;
+      const logEl = document.getElementById('algo-steps-log');
+      if (logEl) logEl.innerHTML = `<strong>Quick Sort started!</strong> Average Time Complexity: O(n log n).`;
+
+      await this.quickSort(0, this.algoArray.length - 1);
+      this.renderAlgoBars([], Array.from({ length: this.algoArray.length }, (_, i) => i));
+      if (logEl) logEl.innerHTML = `<strong>Quick Sort Completed!</strong> Array partitioned and ordered.`;
+      this.sortingInProgress = false;
+      UI.toast('Quick Sort completed!', 'success');
+    },
+
+    async quickSort(low, high) {
+      if (low < high) {
+        const pi = await this.partition(low, high);
+        await this.quickSort(low, pi - 1);
+        await this.quickSort(pi + 1, high);
+      }
+    },
+
+    async partition(low, high) {
+      const arr = this.algoArray;
+      const pivot = arr[high];
+      let i = low - 1;
+      const logEl = document.getElementById('algo-steps-log');
+
+      for (let j = low; j < high; j++) {
+        this.renderAlgoBars([j, high]);
+        await this.sleep(100);
+
+        if (arr[j] < pivot) {
+          i++;
+          const temp = arr[i];
+          arr[i] = arr[j];
+          arr[j] = temp;
+          if (logEl) logEl.innerHTML = `Partitioning with pivot <strong>${pivot}</strong>: Swapping index ${i} and ${j}.`;
+          this.renderAlgoBars([i, j]);
+          await this.sleep(100);
+        }
+      }
+
+      const temp = arr[i + 1];
+      arr[i + 1] = arr[high];
+      arr[high] = temp;
+      this.renderAlgoBars([i + 1, high]);
+      await this.sleep(100);
+      return i + 1;
+    },
+
+    // ── 4. FLASHCARDS & QUIZ CONTROLLER ──────────────────────────────────────
+    loadQuizQuestion() {
+      const q = this.quizQuestions[this.quizIndex];
+      const qText = document.getElementById('quiz-question-text');
+      const optBox = document.getElementById('quiz-options-box');
+      const progressText = document.getElementById('quiz-progress-text');
+      const card3d = document.getElementById('quiz-card-3d');
+
+      if (card3d) card3d.classList.remove('flipped');
+      if (progressText) progressText.textContent = `Question ${this.quizIndex + 1}/${this.quizQuestions.length}`;
+      if (qText) qText.textContent = q.question;
+
+      if (optBox) {
+        optBox.innerHTML = q.options.map((opt, idx) => `
+          <button class="quiz-opt-btn" onclick="Curriculum.answerQuiz(${idx})" type="button">
+            <span class="opt-letter">${String.fromCharCode(65 + idx)}</span>
+            <span>${UI.esc(opt)}</span>
+          </button>
+        `).join('');
+      }
+    },
+
+    answerQuiz(selectedIndex) {
+      const q = this.quizQuestions[this.quizIndex];
+      const isCorrect = selectedIndex === q.answer;
+      const badge = document.getElementById('quiz-result-badge');
+      const feedbackBox = document.getElementById('quiz-feedback-box');
+      const card3d = document.getElementById('quiz-card-3d');
+
+      if (badge) {
+        badge.textContent = isCorrect ? 'Correct! ✓' : 'Incorrect ✗';
+        badge.className = `quiz-badge ${isCorrect ? 'badge-success' : 'badge-danger'}`;
+      }
+
+      if (feedbackBox) {
+        feedbackBox.innerHTML = `
+          <p class="explanation-text m-0">${UI.esc(q.explanation)}</p>
+          ${!isCorrect ? `<div class="wrong-alert">Correct Answer: <strong>${UI.esc(q.options[q.answer])}</strong></div>` : ''}
+        `;
+      }
+
+      if (card3d) card3d.classList.add('flipped');
+    },
+
+    nextQuiz() {
+      this.quizIndex = (this.quizIndex + 1) % this.quizQuestions.length;
+      this.loadQuizQuestion();
+    },
+
+    // ── 5. CSS FLEXBOX & GRID VISUALIZER ────────────────────────────────────
+    updateFlexStage() {
+      const stage = document.getElementById('flex-interactive-stage');
+      const dir = document.getElementById('flex-dir-select')?.value || 'row';
+      const justify = document.getElementById('flex-justify-select')?.value || 'flex-start';
+      const align = document.getElementById('flex-align-select')?.value || 'stretch';
+      const wrap = document.getElementById('flex-wrap-select')?.value || 'nowrap';
+      const gap = document.getElementById('flex-gap-slider')?.value || '12';
+      const gapVal = document.getElementById('flex-gap-val');
+      const snippet = document.getElementById('flex-css-snippet');
+
+      if (gapVal) gapVal.textContent = `${gap}px`;
+
+      if (stage) {
+        stage.style.flexDirection = dir;
+        stage.style.justifyContent = justify;
+        stage.style.alignItems = align;
+        stage.style.flexWrap = wrap;
+        stage.style.gap = `${gap}px`;
+      }
+
+      if (snippet) {
+        snippet.textContent = `.container {\n  display: flex;\n  flex-direction: ${dir};\n  justify-content: ${justify};\n  align-items: ${align};\n  flex-wrap: ${wrap};\n  gap: ${gap}px;\n}`;
+      }
+    },
+
+    addFlexItem() {
+      if (this._flexBoxCount >= 8) {
+        UI.toast('Maximum 8 boxes reached.', 'info');
+        return;
+      }
+      this._flexBoxCount++;
+      const stage = document.getElementById('flex-interactive-stage');
+      const badge = document.getElementById('flex-item-count-badge');
+      if (stage) {
+        const box = document.createElement('div');
+        box.className = `flex-stage-box box-${((this._flexBoxCount - 1) % 6) + 1}`;
+        box.innerHTML = `<span>Box ${this._flexBoxCount}</span>`;
+        stage.appendChild(box);
+      }
+      if (badge) badge.textContent = `${this._flexBoxCount} Items`;
+      this.updateFlexStage();
+    },
+
+    removeFlexItem() {
+      if (this._flexBoxCount <= 1) {
+        UI.toast('Minimum 1 box required.', 'info');
+        return;
+      }
+      const stage = document.getElementById('flex-interactive-stage');
+      const badge = document.getElementById('flex-item-count-badge');
+      if (stage && stage.lastElementChild) {
+        stage.removeChild(stage.lastElementChild);
+        this._flexBoxCount--;
+      }
+      if (badge) badge.textContent = `${this._flexBoxCount} Items`;
+      this.updateFlexStage();
+    },
+
+    copyFlexCSS() {
+      const snippet = document.getElementById('flex-css-snippet')?.textContent || '';
+      navigator.clipboard?.writeText(snippet).then(() => {
+        UI.toast('CSS rules copied to clipboard!', 'success');
+      }).catch(() => {
+        UI.toast('Failed to copy.', 'warning');
+      });
+    },
+
+    // ── 6. JS ARRAY & FUNCTIONAL LAB ────────────────────────────────────────
+    selectJSMethod(method) {
+      this._currentJSMethod = method;
+      const pills = document.querySelectorAll('#js-method-pills .day-pill-btn');
+      pills.forEach(p => {
+        if (p.textContent.includes(method)) p.classList.add('active');
+        else p.classList.remove('active');
+      });
+
+      const exprInput = document.getElementById('js-callback-expr');
+      const presets = {
+        map: 'x => x * 2',
+        filter: 'x => x > 40',
+        reduce: '(acc, curr) => acc + curr',
+        find: 'x => x % 5 === 0',
+        sort: '(a, b) => a - b'
+      };
+      if (exprInput && presets[method]) {
+        exprInput.value = presets[method];
+      }
+      this.runJSLab();
+    },
+
+    runJSLab() {
+      const rawArr = document.getElementById('js-input-array')?.value || '[]';
+      const rawExpr = document.getElementById('js-callback-expr')?.value || 'x => x';
+      const resultView = document.getElementById('js-lab-result-view');
+      if (!resultView) return;
+
+      try {
+        const arr = JSON.parse(rawArr);
+        if (!Array.isArray(arr)) throw new Error('Input must be a valid JSON array.');
+
+        const fn = new Function(`return (${rawExpr})`)();
+        let result;
+        let explanation = '';
+
+        if (this._currentJSMethod === 'map') {
+          result = arr.map(fn);
+          explanation = `Transformed each of the ${arr.length} elements using ${rawExpr}.`;
+        } else if (this._currentJSMethod === 'filter') {
+          result = arr.filter(fn);
+          explanation = `Filtered ${arr.length} elements down to ${result.length} matching elements.`;
+        } else if (this._currentJSMethod === 'reduce') {
+          result = arr.reduce(fn);
+          explanation = `Aggregated ${arr.length} elements into a single accumulated scalar value.`;
+        } else if (this._currentJSMethod === 'find') {
+          result = arr.find(fn);
+          explanation = `Found first matching element: ${result !== undefined ? result : 'undefined'}`;
+        } else if (this._currentJSMethod === 'sort') {
+          result = [...arr].sort(fn);
+          explanation = `Sorted ${arr.length} elements using custom comparator.`;
+        }
+
+        resultView.innerHTML = `
+          <div class="d-flex flex-col gap-md">
+            <div class="d-flex justify-between items-center flex-wrap gap-xs">
+              <span class="font-bold text-success text-sm">Operation Successful</span>
+              <span class="priority-badge priority-low font-mono text-xs">.${this._currentJSMethod}()</span>
+            </div>
+            <p class="text-muted text-xs m-0">${UI.esc(explanation)}</p>
+            <div class="p-md rounded border bg-surface-alt">
+              <div class="text-xs font-bold text-muted mb-xs">OUTPUT RESULT:</div>
+              <pre class="font-mono text-sm font-bold text-brand m-0">${UI.esc(JSON.stringify(result, null, 2))}</pre>
+            </div>
+          </div>
+        `;
+      } catch (err) {
+        resultView.innerHTML = `
+          <div class="p-md rounded border text-danger bg-surface-alt">
+            <span class="font-bold text-sm">Execution Error</span>
+            <p class="font-mono text-xs text-secondary mt-xs m-0">${UI.esc(err.message)}</p>
+          </div>
+        `;
+      }
+    },
+
+    // ── 7. REGEX PATTERN VALIDATOR LAB ──────────────────────────────────────
+    setRegexPreset(preset) {
+      const patternInput = document.getElementById('regex-pattern-input');
+      const flagsInput = document.getElementById('regex-flags-input');
+      const textInput = document.getElementById('regex-test-text');
+
+      const presets = {
+        email: {
+          pattern: '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}',
+          flags: 'gi',
+          text: 'Contact support@pocketsly.edu or rizzqi.maulana@campus.ac.id for assistance.'
+        },
+        date: {
+          pattern: '\\b\\d{4}-\\d{2}-\\d{2}\\b',
+          flags: 'g',
+          text: 'Upcoming semester deadlines: Midterm Exam on 2026-10-15 and Final Project submission on 2026-12-20.'
+        },
+        phone: {
+          pattern: '(?:\\+62|08)[0-9]{8,12}',
+          flags: 'g',
+          text: 'Academic advisor mobile: +6281234567890 or student hotline 081987654321.'
+        },
+        hex: {
+          pattern: '#(?:[0-9a-fA-F]{3}){1,2}\\b',
+          flags: 'gi',
+          text: 'Design tokens: primary #7C3AED, success #10B981, danger #EF4444, and white #FFF.'
+        },
+        nim: {
+          pattern: '\\b(?:20|21|22|23|24|25|26)\\d{6,8}\\b',
+          flags: 'g',
+          text: 'Registered students: NIM 241011526, NIM 241011589, and NIM 231011902.'
+        }
+      };
+
+      if (presets[preset]) {
+        if (patternInput) patternInput.value = presets[preset].pattern;
+        if (flagsInput) flagsInput.value = presets[preset].flags;
+        if (textInput) textInput.value = presets[preset].text;
+      }
+      this.testRegex();
+    },
+
+    testRegex() {
+      const pattern = document.getElementById('regex-pattern-input')?.value || '';
+      const flags = document.getElementById('regex-flags-input')?.value || 'g';
+      const text = document.getElementById('regex-test-text')?.value || '';
+      const highlightOutput = document.getElementById('regex-highlight-output');
+      const matchesList = document.getElementById('regex-matches-list');
+      const badge = document.getElementById('regex-match-badge');
+
+      if (!pattern) {
+        if (highlightOutput) highlightOutput.textContent = text;
+        if (badge) badge.textContent = '0 Matches';
+        if (matchesList) matchesList.innerHTML = '';
+        return;
+      }
+
+      try {
+        const regex = new RegExp(pattern, flags.includes('g') ? flags : flags + 'g');
+        const matches = [...text.matchAll(regex)];
+
+        if (badge) {
+          badge.textContent = `${matches.length} Match${matches.length === 1 ? '' : 'es'}`;
+        }
+
+        if (matches.length === 0) {
+          if (highlightOutput) highlightOutput.textContent = text;
+          if (matchesList) matchesList.innerHTML = '<p class="text-muted text-xs m-0">No matches found in test string.</p>';
+          return;
+        }
+
+        let highlighted = '';
+        let lastIndex = 0;
+        for (const m of matches) {
+          const matchStart = m.index;
+          const matchEnd = matchStart + m[0].length;
+          highlighted += UI.esc(text.substring(lastIndex, matchStart));
+          highlighted += `<mark class="regex-match-pill">${UI.esc(m[0])}</mark>`;
+          lastIndex = matchEnd;
+        }
+        highlighted += UI.esc(text.substring(lastIndex));
+        if (highlightOutput) highlightOutput.innerHTML = highlighted;
+
+        if (matchesList) {
+          matchesList.innerHTML = `
+            <div class="d-flex flex-col gap-xs">
+              <span class="text-xs font-bold text-muted">CAPTURED MATCHES:</span>
+              <div class="d-flex gap-xs flex-wrap">
+                ${matches.map((m, idx) => `<span class="priority-badge text-xs font-mono">#${idx + 1}: ${UI.esc(m[0])}</span>`).join('')}
+              </div>
+            </div>
+          `;
+        }
+      } catch (err) {
+        if (highlightOutput) highlightOutput.innerHTML = `<span class="text-danger font-mono text-xs">Invalid Regex: ${UI.esc(err.message)}</span>`;
+        if (badge) badge.textContent = 'Error';
+      }
+    }
+  };
+
+  Object.assign(window.Curriculum, labsMethods);
+})();
+
+
 /* ===== budget.js ===== */
 /**
  * MONTHLY BUDGET & CASH FLOW CONTROLLER (budget.js)
  * ===================================================
- * LEARN: Financial Data Modelling & SVG Data Visualisation
- *
- * 1. Array.reduce()      — The canonical way to sum a list of numbers. We
- *                          extract _sumAmounts() so the formula is written
- *                          once instead of duplicated in every render method.
- * 2. SVG stroke-dasharray — Setting `stroke-dasharray: "75 100"` on a circle
- *                          draws 75% of its circumference. We use this to make
- *                          the donut chart without any charting library.
- * 3. Guard Clauses        — `if (res.error) { ...; return; }` is cleaner than
- *                          nesting logic inside `else` blocks.
- * 4. Parallel Fetch       — Promise.all() loads incomes, expenses, and budgets
- *                          simultaneously rather than waiting for each in turn.
+ * Manages financial accounting, cash flow KPIs, income/expense ledgers,
+ * monthly category targets, CSV export, and print statements.
  */
 
 // ── Module-level SVG icons ─────────────────────────────────────────────────
@@ -4469,16 +3927,6 @@ window.Budget = {
   activeFormTab: 'income', // 'income', 'expense', 'budget'
   _handlePasteBound: null,
 
-  /**
-   * Sums the `amount` field of an array of transaction objects.
-   *
-   * LEARN: Array.reduce(callback, initialValue) is the functional way to
-   * accumulate a value across a list. We start from 0 and add each amount.
-   * This is equivalent to a for-loop sum but more declarative.
-   *
-   * @param {object[]} list  array with numeric `amount` field
-   * @returns {number}       total sum
-   */
   _sumAmounts(list) {
     return list.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
   },
@@ -4497,7 +3945,6 @@ window.Budget = {
   },
 
   async setCurrency(code) {
-    // No-op for backwards compatibility
     this.renderKPIs();
     this.renderDonut();
     this.renderMicroCharts();
@@ -4510,8 +3957,9 @@ window.Budget = {
     this.setupEventListeners();
     this.initCurrencyFormatters();
     this.setDefaultDates();
-    this._handlePasteBound = (e) => this.handleReceiptPaste(e);
-    this._bindScanModeToggle();
+    if (this._initOCR) {
+      this._initOCR();
+    }
   },
 
   _parseAmount(inputVal) {
@@ -4524,57 +3972,425 @@ window.Budget = {
   initCurrencyFormatters() {
     document.querySelectorAll('.currency-formatted-input').forEach(input => {
       input.addEventListener('input', (e) => {
-        let raw = e.target.value.replace(/[^\d.]/g, '');
+        const raw = e.target.value.replace(/,/g, '').replace(/[^\d]/g, '');
         if (!raw) {
           e.target.value = '';
           return;
         }
-        const parts = raw.split('.');
-        if (parts.length > 2) raw = parts[0] + '.' + parts.slice(1).join('');
-        const intPart = parts[0] ? Number(parts[0]).toLocaleString('en-US') : '0';
-        e.target.value = parts.length > 1 ? `${intPart}.${parts[1]}` : intPart;
+        const num = parseInt(raw, 10);
+        e.target.value = isNaN(num) ? '' : num.toLocaleString('en-US');
       });
-    });
-  },
-
-  selectIncomePreset(preset) {
-    const clean = preset.replace(/^[^\w\s]+/, '').trim();
-    const input = document.getElementById('income-source');
-    if (input) {
-      input.value = clean;
-      input.focus();
-    }
-    document.querySelectorAll('.income-preset-chips .preset-chip').forEach(btn => {
-      btn.classList.toggle('active', btn.textContent.includes(clean));
-    });
-  },
-
-  selectExpensePreset(preset) {
-    const clean = preset.replace(/^[^\w\s&]+/, '').trim();
-    const input = document.getElementById('expense-category');
-    if (input) {
-      input.value = clean;
-      input.focus();
-    }
-    document.querySelectorAll('.expense-preset-chips .preset-chip').forEach(btn => {
-      btn.classList.toggle('active', btn.textContent.includes(clean));
     });
   },
 
   setDefaultDates() {
     const today = new Date().toISOString().substring(0, 10);
-    const incDate = document.getElementById('income-date');
     const expDate = document.getElementById('expense-date');
-    if (incDate && !incDate.value) incDate.value = today;
+    const incDate = document.getElementById('income-date');
     if (expDate && !expDate.value) expDate.value = today;
+    if (incDate && !incDate.value) incDate.value = today;
   },
 
+  async load() {
+    const periodText = document.getElementById('budget-period-text');
+    if (periodText) {
+      const d = new Date();
+      periodText.textContent = d.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+    }
+
+    try {
+      const [incRes, expRes, budRes] = await Promise.all([
+        API.get('/api/incomes'),
+        API.get('/api/expenses'),
+        API.get('/api/budgets')
+      ]);
+
+      this.incomesList  = Array.isArray(incRes) ? incRes : [];
+      this.expensesList = Array.isArray(expRes) ? expRes : [];
+      this.budgetsList  = Array.isArray(budRes) ? budRes : [];
+
+      this.renderKPIs();
+      this.renderDonut();
+      this.renderMicroCharts();
+      this.renderTransactionsList();
+      this.renderCategoryCards();
+    } catch (e) {
+      console.error('Failed to load budget data:', e);
+      UI.toast('Failed to load budget ledger data.', 'danger');
+    }
+  },
+
+  setupEventListeners() {
+    // Expense form submit
+    const expForm = document.getElementById('add-expense-form');
+    if (expForm) {
+      expForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const amtInput = document.getElementById('expense-amount');
+        const amount = this._parseAmount(amtInput?.value);
+        const category = document.getElementById('expense-category')?.value.trim() || 'General';
+        const expense_date = document.getElementById('expense-date')?.value;
+        const wallet = document.getElementById('expense-wallet')?.value || 'Cash';
+        const description = document.getElementById('expense-desc')?.value.trim() || '';
+
+        if (!amount || amount <= 0) {
+          UI.toast('Please enter a valid expense amount.', 'warning');
+          return;
+        }
+
+        try {
+          const res = await API.post('/api/expenses', {
+            amount,
+            category,
+            expense_date,
+            description: `${wallet ? '[' + wallet + '] ' : ''}${description}`.trim()
+          });
+
+          if (res.error) { UI.toast(res.error, 'danger'); return; }
+          UI.toast(`Expense of ${this.formatCurrency(amount)} recorded!`, 'success');
+          if (amtInput) amtInput.value = '';
+          const descEl = document.getElementById('expense-desc');
+          if (descEl) descEl.value = '';
+          this.closeEntryModal();
+          await this.load();
+        } catch (err) {
+          UI.toast(err.message, 'danger');
+        }
+      };
+    }
+
+    // Income form submit
+    const incForm = document.getElementById('add-income-form');
+    if (incForm) {
+      incForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const amtInput = document.getElementById('income-amount');
+        const amount = this._parseAmount(amtInput?.value);
+        const source = document.getElementById('income-source')?.value.trim() || 'Allowance';
+        const income_date = document.getElementById('income-date')?.value;
+        const wallet = document.getElementById('income-wallet')?.value || 'Cash';
+        const recurring = document.getElementById('income-recurring')?.value || 'none';
+        const description = document.getElementById('income-desc')?.value.trim() || '';
+
+        if (!amount || amount <= 0) {
+          UI.toast('Please enter a valid income amount.', 'warning');
+          return;
+        }
+
+        try {
+          const res = await API.post('/api/incomes', {
+            amount,
+            source,
+            income_date,
+            recurring,
+            description: `${wallet ? '[' + wallet + '] ' : ''}${description}`.trim()
+          });
+
+          if (res.error) { UI.toast(res.error, 'danger'); return; }
+          UI.toast(`Income of +${this.formatCurrency(amount)} added!`, 'success');
+          if (amtInput) amtInput.value = '';
+          const descEl = document.getElementById('income-desc');
+          if (descEl) descEl.value = '';
+          this.closeEntryModal();
+          await this.load();
+        } catch (err) {
+          UI.toast(err.message, 'danger');
+        }
+      };
+    }
+
+    // Budget Target Limit submit
+    const budForm = document.getElementById('add-budget-form');
+    if (budForm) {
+      budForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const category = document.getElementById('budget-category')?.value.trim();
+        const amount = this._parseAmount(document.getElementById('budget-amount')?.value);
+        const month = this.currentMonth;
+
+        if (!category || !amount || amount <= 0) {
+          UI.toast('Please specify a category and positive target limit.', 'warning');
+          return;
+        }
+
+        try {
+          const res = await API.post('/api/budgets', { category, amount, month });
+          if (res.error) { UI.toast(res.error, 'danger'); return; }
+          UI.toast(`Target for "${category}" set to ${this.formatCurrency(amount)}`, 'success');
+          budForm.reset();
+          this.closeEntryModal();
+          await this.load();
+        } catch (err) {
+          UI.toast(err.message, 'danger');
+        }
+      };
+    }
+  },
+
+  // ── RENDER KPIs & SUMMARY METRICS ─────────────────────────────────────────
+  renderKPIs() {
+    const totalInc = this._sumAmounts(this.incomesList);
+    const totalExp = this._sumAmounts(this.expensesList);
+    const netBal   = totalInc - totalExp;
+
+    const balEl    = document.getElementById('kpi-total-balance');
+    const incEl    = document.getElementById('kpi-total-income');
+    const expEl    = document.getElementById('kpi-total-spent');
+    const statusEl = document.getElementById('kpi-balance-status');
+
+    if (balEl) {
+      balEl.textContent = (netBal >= 0 ? '+' : '-') + this.formatCurrency(Math.abs(netBal));
+      balEl.style.color = netBal >= 0 ? 'var(--text-primary)' : 'var(--accent-danger)';
+    }
+
+    if (incEl) incEl.textContent = '+' + this.formatCurrency(totalInc);
+    if (expEl) expEl.textContent = '-' + this.formatCurrency(totalExp);
+
+    if (statusEl) {
+      if (netBal > 0) {
+        statusEl.textContent = 'Healthy Surplus';
+        statusEl.className = 'priority-badge priority-low font-bold text-xs';
+      } else if (netBal === 0 && totalInc === 0) {
+        statusEl.textContent = 'No Transactions Yet';
+        statusEl.className = 'priority-badge priority-medium font-bold text-xs';
+      } else if (netBal === 0) {
+        statusEl.textContent = 'Break-even';
+        statusEl.className = 'priority-badge priority-medium font-bold text-xs';
+      } else {
+        statusEl.textContent = 'Deficit Spending';
+        statusEl.className = 'priority-badge priority-high font-bold text-xs';
+      }
+    }
+  },
+
+  renderDonut() {
+    const totalInc = this._sumAmounts(this.incomesList);
+    const totalExp = this._sumAmounts(this.expensesList);
+
+    const segment = document.getElementById('donut-usage-segment');
+    const pctText = document.getElementById('donut-percent-text');
+    const feedback = document.getElementById('donut-feedback-text');
+
+    let pct = 0;
+    if (totalInc > 0) {
+      pct = Math.round((totalExp / totalInc) * 100);
+    } else if (totalExp > 0) {
+      pct = 100;
+    }
+
+    const cappedPct = Math.min(pct, 100);
+    if (segment) {
+      segment.setAttribute('stroke-dasharray', `${cappedPct} ${100 - cappedPct}`);
+      segment.style.stroke = pct > 90 ? '#EF4444' : pct > 75 ? '#F59E0B' : 'var(--primary)';
+    }
+
+    if (pctText) {
+      pctText.textContent = `${pct}% of income spent`;
+    }
+
+    if (feedback) {
+      if (totalInc === 0 && totalExp === 0) {
+        feedback.textContent = 'Ready to track: Log daily expenses or income.';
+      } else if (pct <= 50) {
+        feedback.textContent = `Great savings rate! Only ${pct}% of cashflow utilized this month.`;
+      } else if (pct <= 80) {
+        feedback.textContent = `Balanced budget: ${pct}% of earnings spent so far.`;
+      } else if (pct <= 100) {
+        feedback.textContent = `Warning: ${pct}% spent. Approaching your total income ceiling.`;
+      } else {
+        feedback.textContent = `Alert: Spending exceeds income by ${pct - 100}%. Review outgoing expenses.`;
+      }
+    }
+  },
+
+  renderMicroCharts() {
+    // Micro sparkline visualizer
+  },
+
+  // ── TRANSACTIONS LEDGER & FILTERING ───────────────────────────────────────
+  filterTransactions(filter) {
+    this.activeTxFilter = filter;
+    ['all', 'incomes', 'expenses'].forEach(f => {
+      const btn = document.getElementById(`tx-filter-${f}`);
+      if (btn) {
+        if (f === filter) btn.classList.add('active');
+        else btn.classList.remove('active');
+      }
+    });
+    this.renderTransactionsList();
+  },
+
+  renderTransactionsList() {
+    const listEl = document.getElementById('recent-transactions-list');
+    if (!listEl) return;
+
+    let items = [];
+    if (this.activeTxFilter === 'all' || this.activeTxFilter === 'incomes') {
+      this.incomesList.forEach(inc => {
+        items.push({
+          id: inc.id,
+          type: 'income',
+          title: inc.source || 'Income',
+          date: inc.income_date,
+          amount: Number(inc.amount),
+          notes: inc.description || '',
+          recurring: inc.recurring || 'none'
+        });
+      });
+    }
+
+    if (this.activeTxFilter === 'all' || this.activeTxFilter === 'expenses') {
+      this.expensesList.forEach(exp => {
+        items.push({
+          id: exp.id,
+          type: 'expense',
+          title: exp.category || 'Expense',
+          date: exp.expense_date,
+          amount: Number(exp.amount),
+          notes: exp.description || '',
+          recurring: 'none'
+        });
+      });
+    }
+
+    items.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
+    if (items.length === 0) {
+      listEl.innerHTML = `
+        <div class="empty-state p-xl text-center">
+          <p class="text-muted m-0 text-sm">No transactions logged for this filter.</p>
+        </div>
+      `;
+      return;
+    }
+
+    listEl.innerHTML = items.map(it => {
+      const isInc = it.type === 'income';
+      const sign = isInc ? '+' : '-';
+      const colorClass = isInc ? 'text-success' : 'text-danger';
+      const badgeIcon = isInc ? BUDGET_SVG.income : BUDGET_SVG.expense;
+
+      return `
+        <div class="task-item transaction-row p-sm mb-xs d-flex justify-between items-center">
+          <div class="d-flex items-center gap-sm">
+            <span class="tx-badge ${isInc ? 'badge-inc' : 'badge-exp'}">${badgeIcon}</span>
+            <div>
+              <div class="font-bold text-sm text-primary">${UI.esc(it.title)}</div>
+              <div class="text-muted text-xs">${UI.esc(it.date || 'Today')} ${it.notes ? '• ' + UI.esc(it.notes) : ''}</div>
+            </div>
+          </div>
+          <div class="d-flex items-center gap-md">
+            <span class="font-mono font-extrabold ${colorClass} text-sm">${sign}${this.formatCurrency(it.amount)}</span>
+            <button class="btn-icon text-muted cursor-pointer" onclick="Budget.deleteTransaction('${it.type}', ${it.id})" title="Delete entry" type="button">
+              ${BUDGET_SVG.trash}
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  },
+
+  async deleteTransaction(type, id) {
+    if (!confirm(`Are you sure you want to remove this ${type} entry?`)) return;
+    try {
+      const endpoint = type === 'income' ? `/api/incomes/${id}` : `/api/expenses/${id}`;
+      const res = await API.delete(endpoint);
+      if (res.error) UI.toast(res.error, 'danger');
+      else {
+        UI.toast('Entry removed.', 'info');
+        await this.load();
+      }
+    } catch (e) {
+      UI.toast(e.message, 'danger');
+    }
+  },
+
+  // ── CATEGORY TARGETS & LIMITS ─────────────────────────────────────────────
+  renderCategoryCards() {
+    const grid = document.getElementById('budget-category-cards');
+    const summary = document.getElementById('category-targets-summary');
+    if (!grid) return;
+
+    if (this.budgetsList.length === 0) {
+      if (summary) summary.textContent = '0 targets set';
+      grid.innerHTML = `
+        <div class="col-span-full text-center p-xl border rounded bg-surface-alt">
+          <p class="text-muted text-sm m-0">No monthly category limits configured yet. Click "🎯 Set Target" above to allocate spending caps.</p>
+        </div>
+      `;
+      return;
+    }
+
+    if (summary) summary.textContent = `${this.budgetsList.length} categories active`;
+
+    grid.innerHTML = this.budgetsList.map(bud => {
+      const catExpenses = this.expensesList.filter(e => (e.category || '').toLowerCase() === (bud.category || '').toLowerCase());
+      const spent = this._sumAmounts(catExpenses);
+      const limit = Number(bud.amount) || 1;
+      const pct = Math.round((spent / limit) * 100);
+      const remaining = limit - spent;
+
+      let statusColor = 'var(--primary)';
+      let statusBadge = 'On Track';
+      let badgeClass = 'priority-low';
+
+      if (pct >= 100) {
+        statusColor = 'var(--accent-danger)';
+        statusBadge = 'Exceeded';
+        badgeClass = 'priority-high';
+      } else if (pct >= 80) {
+        statusColor = '#F59E0B';
+        statusBadge = 'Warning (80%+)';
+        badgeClass = 'priority-medium';
+      }
+
+      return `
+        <div class="card p-md border rounded bg-surface-alt">
+          <div class="d-flex justify-between items-start mb-sm">
+            <div>
+              <div class="font-bold text-sm text-primary">${UI.esc(bud.category)}</div>
+              <span class="text-muted text-xs font-mono">${this.formatCurrency(spent)} of ${this.formatCurrency(limit)}</span>
+            </div>
+            <div class="d-flex items-center gap-xs">
+              <span class="priority-badge ${badgeClass} text-xs">${statusBadge}</span>
+              <button class="btn-icon text-muted cursor-pointer" onclick="Budget.deleteBudgetLimit(${bud.id})" title="Delete Target" type="button">×</button>
+            </div>
+          </div>
+          <div class="course-progress-bar-container mb-xs">
+            <div class="course-progress-bar-fill" style="width: ${Math.min(pct, 100)}%; background: ${statusColor};"></div>
+          </div>
+          <div class="d-flex justify-between text-xs text-muted mt-xs font-mono">
+            <span>${pct}% used</span>
+            <span class="${remaining >= 0 ? 'text-success' : 'text-danger'} font-bold">
+              ${remaining >= 0 ? this.formatCurrency(remaining) + ' left' : this.formatCurrency(Math.abs(remaining)) + ' over'}
+            </span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  },
+
+  async deleteBudgetLimit(id) {
+    if (!confirm('Remove this category limit?')) return;
+    try {
+      const res = await API.delete(`/api/budgets/${id}`);
+      if (res.error) UI.toast(res.error, 'danger');
+      else {
+        UI.toast('Category limit deleted.', 'info');
+        await this.load();
+      }
+    } catch (e) {
+      UI.toast(e.message, 'danger');
+    }
+  },
+
+  // ── MODAL WINDOW CONTROLS ────────────────────────────────────────────────
   openEntryModal(tab = 'expense') {
     const modal = document.getElementById('budget-entry-modal');
     if (!modal) return;
     modal.classList.remove('hidden');
-    document.body.classList.add('modal-open');
     this.switchModalTab(tab);
+    document.body.classList.add('modal-open');
   },
 
   closeEntryModal() {
@@ -4585,695 +4401,128 @@ window.Budget = {
 
   switchModalTab(tab) {
     this.activeFormTab = tab;
-    const titleEl = document.getElementById('budget-modal-title');
-    const tabIncomeBtn = document.getElementById('modal-tab-income');
-    const tabExpenseBtn = document.getElementById('modal-tab-expense');
-    const tabBudgetBtn = document.getElementById('modal-tab-budget');
-
-    const formIncome = document.getElementById('add-income-form');
-    const formExpense = document.getElementById('add-expense-form');
-    const formBudget = document.getElementById('add-budget-form');
-
-    // Reset button states
-    [tabIncomeBtn, tabExpenseBtn, tabBudgetBtn].forEach(btn => {
-      btn?.classList.remove('active-expense', 'active-income', 'active-budget');
+    ['expense', 'income', 'budget'].forEach(t => {
+      const tabBtn = document.getElementById(`modal-tab-${t}`);
+      const form = document.getElementById(`add-${t}-form`);
+      if (tabBtn) {
+        if (t === tab) tabBtn.classList.add(`active-${t}`);
+        else tabBtn.classList.remove(`active-${t}`);
+      }
+      if (form) {
+        if (t === tab) form.classList.remove('hidden');
+        else form.classList.add('hidden');
+      }
     });
 
-    // Hide all forms
-    formIncome?.classList.add('hidden');
-    formExpense?.classList.add('hidden');
-    formBudget?.classList.add('hidden');
-
-    if (tab === 'income') {
-      tabIncomeBtn?.classList.add('active-income');
-      formIncome?.classList.remove('hidden');
-      if (titleEl) titleEl.innerHTML = '<span style="color:#10B981; font-weight:900;">+</span> Log Income';
-      setTimeout(() => document.getElementById('income-amount')?.focus(), 80);
-    } else if (tab === 'expense') {
-      tabExpenseBtn?.classList.add('active-expense');
-      formExpense?.classList.remove('hidden');
-      if (titleEl) titleEl.innerHTML = '<span style="color:#EF4444; font-weight:900;">-</span> Log Expense';
-      setTimeout(() => document.getElementById('expense-amount')?.focus(), 80);
-    } else if (tab === 'budget') {
-      tabBudgetBtn?.classList.add('active-budget');
-      formBudget?.classList.remove('hidden');
-      if (titleEl) titleEl.innerHTML = '<span>🎯</span> Set Budget Target';
-      setTimeout(() => document.getElementById('budget-amount')?.focus(), 80);
+    const titleEl = document.getElementById('budget-modal-title');
+    if (titleEl) {
+      if (tab === 'expense') titleEl.textContent = 'Log Outgoing Expense';
+      else if (tab === 'income') titleEl.textContent = 'Log Incoming Cashflow';
+      else titleEl.textContent = 'Set Monthly Category Limit';
     }
   },
 
-  switchFormTab(tab) {
-    this.openEntryModal(tab);
-  },
-
-  filterTransactions(filter) {
-    this.activeTxFilter = filter;
-    const filterAll = document.getElementById('tx-filter-all');
-    const filterIncomes = document.getElementById('tx-filter-incomes');
-    const filterExpenses = document.getElementById('tx-filter-expenses');
-
-    [filterAll, filterIncomes, filterExpenses].forEach(btn => btn?.classList.remove('active'));
-
-    if (filter === 'incomes') filterIncomes?.classList.add('active');
-    else if (filter === 'expenses') filterExpenses?.classList.add('active');
-    else filterAll?.classList.add('active');
-
-    this.renderTransactionsList();
-  },
-
-  async load() {
-    const periodText = document.getElementById('budget-period-text');
-    if (periodText) {
-      periodText.textContent = `Month: ${this.currentMonth}`;
-    }
-    this.setDefaultDates();
-    this.initCurrencyFormatters();
-
-    try {
-      const [incomes, expenses, budgets] = await Promise.all([
-        API.get('/api/incomes'),
-        API.get('/api/expenses'),
-        API.get(`/api/budgets?month=${this.currentMonth}`)
-      ]);
-
-      this.incomesList = Array.isArray(incomes) ? incomes : [];
-      this.expensesList = Array.isArray(expenses) ? expenses : [];
-      this.budgetsList = Array.isArray(budgets) ? budgets : [];
-
-      this.renderKPIs();
-      this.renderDonut();
-      this.renderMicroCharts();
-      this.renderTransactionsList();
-      this.renderCategoryCards();
-    } catch (err) {
-      console.error('Failed to load financial data:', err);
-      UI.toast('Failed to sync financial dashboard.', 'danger');
-    }
-  },
-
-  renderKPIs() {
-    const incomeEl       = document.getElementById('kpi-total-income');
-    const incomeCountEl  = document.getElementById('kpi-incomes-count');
-    const balanceEl      = document.getElementById('kpi-total-balance');
-    const balanceStatusEl = document.getElementById('kpi-balance-status');
-    const spentEl        = document.getElementById('kpi-total-spent');
-    const expensesCountEl = document.getElementById('kpi-expenses-count');
-
-    // LEARN: _sumAmounts() replaces two identical reduce() calls written inline.
-    const totalIncome = this._sumAmounts(this.incomesList);
-    const totalSpent  = this._sumAmounts(this.expensesList);
-    const netBalance  = totalIncome - totalSpent;
-
-    if (incomeEl)      incomeEl.textContent = this.formatCurrency(totalIncome);
-    if (incomeCountEl) incomeCountEl.textContent = `${this.incomesList.length} log${this.incomesList.length === 1 ? '' : 's'}`;
-
-    if (balanceEl) {
-      const sign = netBalance < 0 ? '-' : '';
-      balanceEl.textContent = `${sign}${this.formatCurrency(Math.abs(netBalance))}`;
-      if (netBalance < 0)      balanceEl.style.color = 'var(--accent-danger)';
-      else if (netBalance > 0) balanceEl.style.color = 'var(--accent-success-strong)';
-      else                     balanceEl.style.color = 'var(--text-primary)';
-    }
-
-    if (balanceStatusEl) {
-      if (netBalance > 0) {
-        balanceStatusEl.className  = 'priority-badge priority-low';
-        balanceStatusEl.textContent = 'Surplus (Savings)';
-        balanceStatusEl.style.background = 'rgba(16, 185, 129, 0.15)';
-        balanceStatusEl.style.color      = 'var(--accent-success-strong)';
-      } else if (netBalance === 0) {
-        balanceStatusEl.className  = 'priority-badge priority-medium';
-        balanceStatusEl.textContent = 'Break-even';
-        balanceStatusEl.style.background = 'rgba(245, 158, 11, 0.15)';
-        balanceStatusEl.style.color      = 'var(--accent-warning-strong)';
-      } else {
-        balanceStatusEl.className  = 'priority-badge priority-high';
-        balanceStatusEl.textContent = 'Deficit / In Debt';
-        balanceStatusEl.style.background = 'rgba(239, 68, 68, 0.15)';
-        balanceStatusEl.style.color      = 'var(--accent-danger-strong)';
-      }
-    }
-
-    if (spentEl)        spentEl.textContent = this.formatCurrency(totalSpent);
-    if (expensesCountEl) expensesCountEl.textContent = `${this.expensesList.length} log${this.expensesList.length === 1 ? '' : 's'}`;
-  },
-
-  renderDonut() {
-    const donutSegment = document.getElementById('donut-usage-segment');
-    const percentText  = document.getElementById('donut-percent-text');
-    const feedbackText = document.getElementById('donut-feedback-text');
-    const inflowEl     = document.getElementById('donut-kpi-inflow');
-    const outflowEl    = document.getElementById('donut-kpi-outflow');
-    const savingsEl    = document.getElementById('donut-kpi-savings');
-    if (!donutSegment || !percentText) return;
-
-    // LEARN: _sumAmounts() reuses the same logic as renderKPIs().
-    const totalIncome = this._sumAmounts(this.incomesList);
-    const totalSpent  = this._sumAmounts(this.expensesList);
-
-    let percentSpent = 0;
-    if (totalIncome > 0)       percentSpent = (totalSpent / totalIncome) * 100;
-    else if (totalSpent > 0)   percentSpent = 100;
-
-    const displayPercent = Math.min(Math.round(percentSpent), 100);
-    percentText.textContent = `${Math.round(percentSpent)}%`;
-    // LEARN: stroke-dasharray="X 100" on a viewBox circle with r=15.9 (circumference≈100)
-    // draws X% of the circle as a filled arc — a pure CSS donut chart technique.
-    donutSegment.setAttribute('stroke-dasharray', `${displayPercent} 100`);
-
-    // Zero-State Ratio Guard & Colors
-    if (totalIncome === 0 && totalSpent === 0) {
-      donutSegment.setAttribute('stroke', 'var(--border-color)');
-      percentText.textContent = '--%';
-      if (feedbackText) feedbackText.textContent = 'Ready to Track: Log incoming allowance or expenses to see ratio.';
-    } else if (totalSpent === 0) {
-      // Only income, no expenses yet
-      donutSegment.setAttribute('stroke', 'url(#donut-gradient)');
-      percentText.textContent = '0%';
-      if (feedbackText) feedbackText.textContent = 'No expenses recorded yet';
-    } else if (percentSpent > 100) {
-      donutSegment.setAttribute('stroke', 'var(--accent-danger)');
-      if (feedbackText) feedbackText.textContent = 'Alert: Expenses exceed your total incoming cash flow!';
-    } else if (percentSpent > 80) {
-      donutSegment.setAttribute('stroke', 'var(--accent-warning)');
-      if (feedbackText) feedbackText.textContent = 'Caution: You have spent over 80% of your total earnings.';
-    } else {
-      donutSegment.setAttribute('stroke', 'url(#donut-gradient)');
-      if (feedbackText) feedbackText.textContent = 'Healthy ratio! You are saving a significant portion of your income.';
-    }
-
-    // Populate adjacent KPI metric stack cards
-    if (inflowEl) inflowEl.textContent = this.formatCurrency(totalIncome);
-    if (outflowEl) outflowEl.textContent = this.formatCurrency(totalSpent);
-    if (savingsEl) {
-      const savings = totalIncome - totalSpent;
-      const rate = totalIncome > 0 ? Math.max(0, Math.round((savings / totalIncome) * 100)) : 0;
-      savingsEl.textContent = `${rate}%`;
-    }
-  },
-
-  renderMicroCharts() {
-    // Incomes Micro Chart
-    const incomeChartEl = document.getElementById('income-micro-chart');
-    if (incomeChartEl) {
-      if (this.incomesList.length === 0) {
-        incomeChartEl.innerHTML = '<span class="text-muted" style="font-size: 0.75rem;">No income logs</span>';
-      } else {
-        const recent = this.incomesList.slice(0, 8).reverse();
-        const maxVal = Math.max(...recent.map(e => Number(e.amount)), 1);
-        incomeChartEl.innerHTML = recent.map(e => {
-          const heightPercent = Math.max((Number(e.amount) / maxVal) * 100, 15);
-          return `<div class="micro-bar" style="height: ${heightPercent}%; width: 6px; cursor: pointer; background: #10B981; border-radius: 2px;" title="${UI.esc(e.source)}: +${this.formatCurrency(Number(e.amount))}"></div>`;
-        }).join('');
-      }
-    }
-
-    // Expenses Micro Chart
-    const spentChartEl = document.getElementById('spent-micro-chart');
-    if (spentChartEl) {
-      if (this.expensesList.length === 0) {
-        spentChartEl.innerHTML = '<span class="text-muted" style="font-size: 0.75rem;">No expense logs</span>';
-      } else {
-        const recent = this.expensesList.slice(0, 8).reverse();
-        const maxVal = Math.max(...recent.map(e => Number(e.amount)), 1);
-        spentChartEl.innerHTML = recent.map(e => {
-          const heightPercent = Math.max((Number(e.amount) / maxVal) * 100, 15);
-          return `<div class="micro-bar high" style="height: ${heightPercent}%; width: 6px; cursor: pointer; border-radius: 2px;" title="${UI.esc(e.category)}: -${this.formatCurrency(Number(e.amount))}"></div>`;
-        }).join('');
-      }
-    }
-  },
-
-  renderTransactionsList() {
-    const container = document.getElementById('recent-transactions-list');
-    if (!container) return;
-
-    // Combine both types into unified transaction list
-    let combined = [];
-
-    if (this.activeTxFilter === 'all' || this.activeTxFilter === 'incomes') {
-      this.incomesList.forEach(inc => {
-        combined.push({
-          type: 'income',
-          id: inc.id,
-          title: inc.source,
-          amount: Number(inc.amount),
-          date: inc.income_date,
-          wallet: inc.wallet || 'Cash',
-          recurring: inc.recurring || 'none',
-          desc: inc.description
-        });
-      });
-    }
-
-    if (this.activeTxFilter === 'all' || this.activeTxFilter === 'expenses') {
-      this.expensesList.forEach(exp => {
-        combined.push({
-          type: 'expense',
-          id: exp.id,
-          title: exp.category,
-          amount: Number(exp.amount),
-          date: exp.expense_date,
-          wallet: exp.wallet || 'Cash',
-          recurring: 'none',
-          desc: exp.description
-        });
-      });
-    }
-
-    // Sort by date descending
-    combined.sort((a, b) => (b.date || '').localeCompare(a.date || '') || (b.id - a.id));
-
-    if (combined.length === 0) {
-      container.innerHTML = '<p class="text-muted" style="text-align: center; padding: 1.5rem 0;">No transactions found for this filter.</p>';
-      return;
-    }
-
-    const incomeSvg  = BUDGET_SVG.income;
-    const expenseSvg = BUDGET_SVG.expense;
-
-    container.innerHTML = combined.slice(0, 8).map(item => {
-      const isIncome = item.type === 'income';
-      const borderLeftColor = isIncome ? '#10B981' : 'var(--accent-danger)';
-      const iconBg = isIncome ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)';
-      const iconColor = isIncome ? '#10B981' : 'var(--accent-danger)';
-      const amountColor = isIncome ? '#10B981' : 'var(--accent-danger)';
-      const sign = isIncome ? '+' : '-';
-      const deleteFn = isIncome ? `Budget.deleteIncome(${item.id})` : `Budget.deleteExpense(${item.id})`;
-
-      const walletBadge = item.wallet ? `<span class="preset-chip" style="font-size:0.68rem; padding: 2px 7px; display:inline-flex; align-items:center; gap:3px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> ${UI.esc(item.wallet)}</span>` : '';
-      const recurringBadge = (item.recurring && item.recurring !== 'none') ? `<span class="preset-chip" style="font-size:0.68rem; padding: 2px 7px; color: #10B981; display:inline-flex; align-items:center; gap:3px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg> ${item.recurring}</span>` : '';
-      const catBadge = `<span class="tx-category-badge ${isIncome ? 'tx-badge-income' : 'tx-badge-expense'}">${UI.esc(item.title || (isIncome ? 'Income' : 'Expense'))}</span>`;
-
-      return `
-        <div class="transaction-row task-item" style="padding: 0.85rem 1rem; margin-bottom: 0.5rem; border-left: 3px solid ${borderLeftColor}; background: var(--bg-surface-alt); border-radius: var(--radius-md);">
-          <div style="display: flex; align-items: center; gap: 0.85rem; width: 100%;">
-            <div style="width: 32px; height: 32px; border-radius: var(--radius-full); background: ${iconBg}; color: ${iconColor}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-              ${isIncome ? incomeSvg : expenseSvg}
-            </div>
-            <div class="task-details" style="flex: 1; min-width: 0;">
-              <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
-                ${catBadge}
-                ${walletBadge}
-                ${recurringBadge}
-              </div>
-              <span class="task-meta" style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 0.35rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${UI.esc(item.desc || 'No notes')} &bull; ${UI.esc(item.date)}</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0;">
-              <div style="font-family: var(--font-mono); font-weight: 700; color: ${amountColor}; font-size: 0.95rem; text-align: right;">
-                ${sign}${this.formatCurrency(item.amount)}
-              </div>
-              <button onclick="${deleteFn}" class="btn-icon" style="background: transparent; border: none; padding: 4px; cursor: pointer; color: var(--text-muted); opacity: 0.6; transition: opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6" title="Delete transaction">
-                ${BUDGET_SVG.trash}
-              </button>
-            </div>
-          </div>
-        </div>
-      `;
-    }).join('');
-  },
-
-  renderCategoryCards() {
-    const container = document.getElementById('budget-category-cards');
-    const summaryEl = document.getElementById('category-targets-summary');
-    if (!container) return;
-
-    if (summaryEl) {
-      summaryEl.textContent = `${this.budgetsList.length} categories tracked`;
-    }
-
-    if (!this.budgetsList || this.budgetsList.length === 0) {
-      container.innerHTML = `
-        <div class="target-empty-card">
-          <div class="target-empty-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="8" x2="12" y2="16"></line>
-              <line x1="8" y1="12" x2="16" y2="12"></line>
-            </svg>
-          </div>
-          <h4 style="margin: 0 0 0.35rem 0; font-size: 1.05rem; font-weight: 800; color: var(--text-primary);">No Targets Set</h4>
-          <p class="text-muted" style="font-size: 0.82rem; max-width: 280px; margin: 0 0 1.25rem 0; line-height: 1.4;">Configure monthly category limit targets to monitor and control your spending habits.</p>
-          <button type="button" class="btn btn-primary btn-sm d-inline-flex items-center gap-xs" onclick="Budget.switchFormTab('budget'); const el = document.getElementById('budget-category'); if (el) { el.focus(); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            Set Target Limit
-          </button>
-        </div>
-      `;
-      return;
-    }
-
-    container.innerHTML = this.budgetsList.map(b => {
-      const spent = b.spent || 0;
-      const percentage = Math.min((spent / b.amount) * 100, 100);
-      const isOver = spent > b.amount;
-
-      let cardClass = 'color-teal';
-      let badgeStyle = 'background: rgba(16, 185, 129, 0.15); color: #10B981;';
-      if (isOver) {
-        cardClass = 'color-coral';
-        badgeStyle = 'background: rgba(239, 68, 68, 0.15); color: #EF4444;';
-      } else if (percentage > 70) {
-        cardClass = 'color-purple';
-        badgeStyle = 'background: rgba(124, 58, 237, 0.15); color: var(--primary-400);';
-      }
-
-      const remaining = b.amount - spent;
-
-      return `
-        <div class="category-card ${cardClass}">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%; gap: 0.5rem;">
-            <span style="font-weight: 700; font-size: 0.95rem; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${UI.esc(b.category)}</span>
-            <div style="display: flex; align-items: center; gap: 0.35rem; flex-shrink: 0;">
-              <span class="priority-badge" style="${badgeStyle} font-weight: 800; font-size: 0.75rem; padding: 0.15rem 0.4rem;">${Math.round(percentage)}%</span>
-              <button onclick="Budget.deleteBudget(${b.id})" class="btn-icon" style="background: transparent; border: none; padding: 2px; cursor: pointer; color: var(--text-muted); opacity: 0.6; transition: opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6" title="Delete Budget Target">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-              </button>
-            </div>
-          </div>
-          <div style="margin-top: 1.25rem;">
-            <div style="font-size: 0.7rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Remaining</div>
-            <div style="font-size: 1.15rem; font-weight: 800; color: ${isOver ? 'var(--accent-danger)' : 'var(--text-primary)'}; margin-top: 0.15rem; font-family: var(--font-mono);">
-              ${isOver ? '-' : ''}${this.formatCurrency(Math.abs(remaining))}
-            </div>
-            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; font-weight: 500;">Limit: ${this.formatCurrency(b.amount)}</div>
-          </div>
-        </div>
-      `;
-    }).join('');
-  },
-
-  setupEventListeners() {
-    // 1. Submit Income
-    const incomeForm = document.getElementById('add-income-form');
-    if (incomeForm) {
-      incomeForm.onsubmit = async (e) => {
-        e.preventDefault();
-        const source      = document.getElementById('income-source').value.trim();
-        const amount      = this._parseAmount(document.getElementById('income-amount').value);
-        const income_date = document.getElementById('income-date').value || new Date().toISOString().substring(0, 10);
-        const wallet      = document.getElementById('income-wallet')?.value || 'Cash';
-        const recurring   = document.getElementById('income-recurring')?.value || 'none';
-        const description = document.getElementById('income-desc').value.trim();
-
-        if (!source || isNaN(amount) || amount <= 0) {
-          UI.toast('Please input a valid category and positive income amount.', 'warning');
-          return;
-        }
-
-        try {
-          const res = await API.post('/api/incomes', { source, amount, income_date, wallet, recurring, description });
-          if (res.error) { UI.toast(res.error, 'danger'); return; }
-          UI.toast('Income logged successfully! (+)', 'success');
-          incomeForm.reset();
-          document.getElementById('income-source').value = 'Allowance';
-          this.setDefaultDates();
-          this.closeEntryModal();
-          this.load();
-          document.activeElement?.blur();
-        } catch (err) {
-          UI.toast(err.message, 'danger');
-        }
-      };
-    }
-
-    // 2. Submit Expense
-    const expenseForm = document.getElementById('add-expense-form');
-    if (expenseForm) {
-      expenseForm.onsubmit = async (e) => {
-        e.preventDefault();
-        const category     = document.getElementById('expense-category').value.trim();
-        const amount       = this._parseAmount(document.getElementById('expense-amount').value);
-        const expense_date = document.getElementById('expense-date').value || new Date().toISOString().substring(0, 10);
-        const wallet       = document.getElementById('expense-wallet')?.value || 'Cash';
-        const description  = document.getElementById('expense-desc').value.trim();
-
-        if (!category || isNaN(amount) || amount <= 0) {
-          UI.toast('Please input a valid category and positive amount.', 'warning');
-          return;
-        }
-
-        try {
-          const res = await API.post('/api/expenses', { category, amount, expense_date, wallet, description });
-          if (res.error) { UI.toast(res.error, 'danger'); return; }
-          UI.toast('Expense logged successfully. (-)', 'success');
-          expenseForm.reset();
-          document.getElementById('expense-category').value = 'Food & Dining';
-          this.setDefaultDates();
-          this.closeEntryModal();
-          this.load();
-          document.activeElement?.blur();
-        } catch (err) {
-          UI.toast(err.message, 'danger');
-        }
-      };
-    }
-
-    // 3. Submit Budget Target
-    const budgetForm = document.getElementById('add-budget-form');
-    if (budgetForm) {
-      budgetForm.onsubmit = async (e) => {
-        e.preventDefault();
-        const category = document.getElementById('budget-category').value.trim();
-        const amount   = this._parseAmount(document.getElementById('budget-amount').value);
-
-        if (!category || isNaN(amount) || amount <= 0) {
-          UI.toast('Please input a valid category and positive limit.', 'warning');
-          return;
-        }
-
-        try {
-          const res = await API.post('/api/budgets', { category, amount, month_year: this.currentMonth });
-          if (res.error) { UI.toast(res.error, 'danger'); return; }
-          UI.toast('Budget target allocated.', 'success');
-          budgetForm.reset();
-          this.closeEntryModal();
-          this.load();
-          document.activeElement?.blur();
-        } catch (err) {
-          UI.toast(err.message, 'danger');
-        }
-      };
-    }
-  },
-
-  async deleteIncome(id) {
-    if (!confirm('Are you sure you want to delete this income entry?')) return;
-    try {
-      const res = await API.delete(`/api/incomes/${id}`);
-      if (res.error) {
-        UI.toast(res.error, 'danger');
-      } else {
-        UI.toast('Income entry deleted.', 'success');
-        this.load();
-      }
-    } catch (err) {
-      UI.toast(err.message, 'danger');
-    }
-  },
-
-  async deleteExpense(id) {
-    if (!confirm('Are you sure you want to delete this expense transaction log?')) return;
-    try {
-      const res = await API.delete(`/api/expenses/${id}`);
-      if (res.error) {
-        UI.toast(res.error, 'danger');
-      } else {
-        UI.toast('Expense transaction log deleted.', 'success');
-        this.load();
-      }
-    } catch (err) {
-      UI.toast(err.message, 'danger');
-    }
-  },
-
-  async deleteBudget(id) {
-    if (!confirm('Are you sure you want to delete this budget category target?')) return;
-    try {
-      const res = await API.delete(`/api/budgets/${id}`);
-      if (res.error) {
-        UI.toast(res.error, 'danger');
-      } else {
-        UI.toast('Budget allocation deleted.', 'success');
-        this.load();
-      }
-    } catch (err) {
-      UI.toast(err.message, 'danger');
-    }
-  },
-
-  /**
-   * Generates and triggers browser download of an RFC 4180-compliant CSV report.
-   *
-   * LEARN: Client-side CSV generation using Blob + URL.createObjectURL() allows
-   * instant spreadsheet export without generating temporary files on the server.
-   */
+  // ── EXPORT & PRINT STATEMENTS ─────────────────────────────────────────────
   exportCSV() {
-    if (this.incomesList.length === 0 && this.expensesList.length === 0) {
-      UI.toast('No financial transactions logged to export.', 'info');
-      return;
-    }
-
-    const cur = this.getCurrency();
     const rows = [
-      ['Transaction Type', 'Title / Source', 'Category', `Amount (${cur})`, 'Date (YYYY-MM-DD)', 'Description']
+      ['Date', 'Type', 'Category / Source', 'Description / Account', 'Amount']
     ];
 
     this.incomesList.forEach(inc => {
       rows.push([
-        'INCOME',
-        `"${(inc.source || '').replace(/"/g, '""')}"`,
-        'Incoming Cashflow',
-        inc.amount || 0,
         inc.income_date || '',
-        `"${(inc.description || '').replace(/"/g, '""')}"`
+        'INCOME',
+        inc.source || '',
+        inc.description || '',
+        inc.amount || 0
       ]);
     });
 
     this.expensesList.forEach(exp => {
       rows.push([
-        'EXPENSE',
-        `"${(exp.category || '').replace(/"/g, '""')}"`,
-        exp.category || 'General',
-        -(exp.amount || 0),
         exp.expense_date || '',
-        `"${(exp.description || '').replace(/"/g, '""')}"`
+        'EXPENSE',
+        exp.category || '',
+        exp.description || '',
+        exp.amount || 0
       ]);
     });
 
-    const csvContent = rows.map(r => r.join(',')).join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
+    const csvContent = 'data:text/csv;charset=utf-8,' + rows.map(e => e.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', `pocketsly_financial_report_${this.currentMonth || 'all'}_${cur}.csv`);
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `Pocketsly_Cashflow_${this.currentMonth}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    UI.toast(`Financial CSV report (${cur}) downloaded!`, 'success');
+    UI.toast('Exported cashflow ledger as CSV!', 'success');
   },
 
-  /**
-   * Generates a clean 1-page financial cashflow statement and triggers print.
-   * Prints ONLY the cashflow table and notes, excluding forms and other page elements.
-   */
   printReport() {
     const printContainer = document.getElementById('financial-print-statement');
-    if (!printContainer) {
-      window.print();
-      return;
-    }
+    if (!printContainer) return;
 
-    const username = window.Auth?.currentUser?.username || 'User';
-    const month = this.currentMonth || new Date().toISOString().substring(0, 7);
-    const dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-    const curCode = this.getCurrency();
-
-    let totalInc = 0;
-    let totalExp = 0;
+    let totalInc = this._sumAmounts(this.incomesList);
+    let totalExp = this._sumAmounts(this.expensesList);
+    const netBal = totalInc - totalExp;
 
     const allTx = [];
     this.incomesList.forEach(inc => {
-      const amt = Number(inc.amount) || 0;
-      totalInc += amt;
       allTx.push({
         type: 'INCOME',
         date: inc.income_date,
         source: inc.source,
-        category: 'Incoming Cashflow',
         notes: inc.description || '-',
-        amount: amt,
+        amount: Number(inc.amount) || 0,
         isIncome: true
       });
     });
 
     this.expensesList.forEach(exp => {
-      const amt = Number(exp.amount) || 0;
-      totalExp += amt;
       allTx.push({
         type: 'EXPENSE',
         date: exp.expense_date,
         source: exp.category,
-        category: exp.category || 'General',
         notes: exp.description || '-',
-        amount: amt,
+        amount: Number(exp.amount) || 0,
         isIncome: false
       });
     });
 
-    // Sort transactions chronologically descending
     allTx.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
 
-    const netBal = totalInc - totalExp;
-
     printContainer.innerHTML = `
-      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #111; padding: 24px; max-width: 800px; margin: 0 auto;">
-        <!-- Header -->
-        <div style="border-bottom: 2px solid #222; padding-bottom: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end;">
-          <div>
-            <h1 style="margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.02em;">POCKETSLY &bull; CASH FLOW STATEMENT</h1>
-            <p style="margin: 4px 0 0; font-size: 13px; color: #555;">Statement Period: <strong>${UI.esc(month)}</strong> &bull; Currency: <strong>${curCode}</strong> &bull; Generated: ${UI.esc(dateStr)}</p>
-          </div>
-          <div style="text-align: right;">
-            <div style="font-size: 13px; font-weight: 600;">Account: ${UI.esc(username)}</div>
-            <div style="font-size: 12px; color: #666;">Monthly Financial Record</div>
-          </div>
+      <div class="print-statement-box p-xl">
+        <h2 class="m-0 text-xl font-bold">Pocketsly Financial Statement</h2>
+        <p class="text-muted text-xs mb-lg">Statement Period: ${this.currentMonth}</p>
+        <div class="d-flex gap-lg mb-lg">
+          <div>Total Income: <strong class="text-success">+${this.formatCurrency(totalInc)}</strong></div>
+          <div>Total Expense: <strong class="text-danger">-${this.formatCurrency(totalExp)}</strong></div>
+          <div>Net Balance: <strong class="${netBal >= 0 ? 'text-success' : 'text-danger'}">${this.formatCurrency(netBal)}</strong></div>
         </div>
-
-        <!-- Summary KPIs -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 24px;">
-          <div style="border: 1px solid #ddd; padding: 10px 14px; border-radius: 6px; background: #f9fafb;">
-            <div style="font-size: 11px; text-transform: uppercase; color: #666; font-weight: 700;">Total Income</div>
-            <div style="font-size: 18px; font-weight: 800; color: #059669; margin-top: 2px;">${this.formatCurrency(totalInc)}</div>
-          </div>
-          <div style="border: 1px solid #ddd; padding: 10px 14px; border-radius: 6px; background: #f9fafb;">
-            <div style="font-size: 11px; text-transform: uppercase; color: #666; font-weight: 700;">Total Expenses</div>
-            <div style="font-size: 18px; font-weight: 800; color: #dc2626; margin-top: 2px;">${this.formatCurrency(totalExp)}</div>
-          </div>
-          <div style="border: 1px solid #ddd; padding: 10px 14px; border-radius: 6px; background: #f9fafb;">
-            <div style="font-size: 11px; text-transform: uppercase; color: #666; font-weight: 700;">Net Cashflow</div>
-            <div style="font-size: 18px; font-weight: 800; color: ${netBal >= 0 ? '#059669' : '#dc2626'}; margin-top: 2px;">
-              ${netBal >= 0 ? '+' : '-'}${this.formatCurrency(Math.abs(netBal))}
-            </div>
-          </div>
-        </div>
-
-        <!-- Cash Flow Ledger Table -->
-        <h3 style="font-size: 14px; margin: 0 0 8px; text-transform: uppercase; letter-spacing: 0.05em; color: #333;">Cash Flow Transactions &amp; Notes (${allTx.length})</h3>
-        <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 20px;">
+        <table class="w-full text-xs font-mono">
           <thead>
-            <tr style="background: #f3f4f6; border-top: 1px solid #ccc; border-bottom: 2px solid #ccc; text-align: left;">
-              <th style="padding: 8px 6px;">Date</th>
-              <th style="padding: 8px 6px;">Type</th>
-              <th style="padding: 8px 6px;">Category / Source</th>
-              <th style="padding: 8px 6px;">Notes / Description</th>
-              <th style="padding: 8px 6px; text-align: right;">Amount</th>
+            <tr class="border-b">
+              <th class="text-left p-xs">Date</th>
+              <th class="text-left p-xs">Type</th>
+              <th class="text-left p-xs">Category / Source</th>
+              <th class="text-left p-xs">Notes</th>
+              <th class="text-right p-xs">Amount</th>
             </tr>
           </thead>
           <tbody>
-            ${allTx.length === 0 ? `
-              <tr><td colspan="5" style="text-align: center; padding: 16px; color: #777;">No transactions recorded for this period.</td></tr>
-            ` : allTx.map((tx, idx) => `
-              <tr style="border-bottom: 1px solid #eee; background: ${idx % 2 === 0 ? '#fff' : '#fafafa'};">
-                <td style="padding: 7px 6px; white-space: nowrap; font-family: monospace;">${UI.esc(tx.date || '-')}</td>
-                <td style="padding: 7px 6px; font-weight: 700; color: ${tx.isIncome ? '#059669' : '#dc2626'}; font-size: 11px;">
-                  ${tx.isIncome ? '▲ IN' : '▼ OUT'}
-                </td>
-                <td style="padding: 7px 6px; font-weight: 600;">${UI.esc(tx.source || '-')}</td>
-                <td style="padding: 7px 6px; color: #444;">${UI.esc(tx.notes || '-')}</td>
-                <td style="padding: 7px 6px; text-align: right; font-weight: 700; color: ${tx.isIncome ? '#059669' : '#dc2626'}; white-space: nowrap;">
-                  ${tx.isIncome ? '+' : '-'}${this.formatCurrency(tx.amount)}
-                </td>
+            ${allTx.map(t => `
+              <tr class="border-b">
+                <td class="p-xs">${UI.esc(t.date || '-')}</td>
+                <td class="p-xs font-bold ${t.isIncome ? 'text-success' : 'text-danger'}">${t.type}</td>
+                <td class="p-xs">${UI.esc(t.source || '-')}</td>
+                <td class="p-xs text-muted">${UI.esc(t.notes || '-')}</td>
+                <td class="p-xs text-right font-bold">${t.isIncome ? '+' : '-'}${this.formatCurrency(t.amount)}</td>
               </tr>
             `).join('')}
           </tbody>
         </table>
-
-        <!-- Footer -->
-        <div style="border-top: 1px solid #ccc; padding-top: 10px; font-size: 11px; color: #777; text-align: center;">
-          This document is generated directly from your personal offline Pocketsly instance.
-        </div>
       </div>
     `;
 
@@ -5303,449 +4552,10 @@ window.Budget = {
   quickAction(kind) {
     this.closeQuickActions();
     if (kind === 'scan') {
-      this.openReceiptScanner();
+      if (this.openReceiptScanner) this.openReceiptScanner();
       return;
     }
     this.openEntryModal(kind);
-  },
-
-  // ── RECEIPT SCANNER & SMART OCR ENGINE ───────────────────────────────────
-  _activeCameraStream: null,
-  _cameraFacing: 'environment', // 'environment' (back) or 'user' (front)
-
-  openReceiptScanner() {
-    const modal = document.getElementById('receipt-scanner-modal');
-    if (!modal) return;
-    modal.classList.remove('hidden');
-    this.resetReceiptScanner();
-    this.switchScannerSource('upload');
-    document.addEventListener('paste', this._handlePasteBound);
-  },
-
-  closeReceiptScanner() {
-    const modal = document.getElementById('receipt-scanner-modal');
-    if (modal) modal.classList.add('hidden');
-    this.stopCameraStream();
-    document.removeEventListener('paste', this._handlePasteBound);
-  },
-
-  switchScannerSource(source) {
-    const uploadBtn = document.getElementById('btn-src-upload');
-    const cameraBtn = document.getElementById('btn-src-camera');
-    const dropzone = document.getElementById('receipt-dropzone');
-    const cameraContainer = document.getElementById('receipt-camera-container');
-
-    if (source === 'camera') {
-      uploadBtn?.classList.remove('active');
-      cameraBtn?.classList.add('active');
-      dropzone?.classList.add('hidden');
-      cameraContainer?.classList.remove('hidden');
-      this.startCameraStream();
-    } else {
-      cameraBtn?.classList.remove('active');
-      uploadBtn?.classList.add('active');
-      cameraContainer?.classList.add('hidden');
-      dropzone?.classList.remove('hidden');
-      this.stopCameraStream();
-    }
-  },
-
-  async startCameraStream() {
-    this.stopCameraStream();
-    const video = document.getElementById('receipt-camera-video');
-    if (!video) return;
-
-    try {
-      if (!navigator.mediaDevices?.getUserMedia) {
-        throw new Error('Camera stream not supported in this browser.');
-      }
-      const constraints = {
-        video: {
-          facingMode: this._cameraFacing,
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        },
-        audio: false
-      };
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      this._activeCameraStream = stream;
-      video.srcObject = stream;
-      await video.play();
-    } catch (err) {
-      console.warn('Live camera stream unavailable:', err);
-      UI.toast('Camera preview unavailable — using photo picker instead.', 'info');
-      // Fallback: trigger native camera input
-      document.getElementById('receipt-camera-input')?.click();
-      this.switchScannerSource('upload');
-    }
-  },
-
-  stopCameraStream() {
-    if (this._activeCameraStream) {
-      this._activeCameraStream.getTracks().forEach(track => track.stop());
-      this._activeCameraStream = null;
-    }
-    const video = document.getElementById('receipt-camera-video');
-    if (video) video.srcObject = null;
-  },
-
-  toggleCameraFacing() {
-    this._cameraFacing = this._cameraFacing === 'environment' ? 'user' : 'environment';
-    this.startCameraStream();
-  },
-
-  captureCameraSnapshot() {
-    const video = document.getElementById('receipt-camera-video');
-    if (!video || !video.videoWidth) {
-      document.getElementById('receipt-camera-input')?.click();
-      return;
-    }
-
-    const canvas = document.createElement('canvas');
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    this.stopCameraStream();
-
-    canvas.toBlob((blob) => {
-      if (!blob) return;
-      const file = new File([blob], 'camera_receipt.jpg', { type: 'image/jpeg' });
-      this.processReceiptImage(file);
-    }, 'image/jpeg', 0.92);
-  },
-
-  resetReceiptScanner() {
-    const dropzone = document.getElementById('receipt-dropzone');
-    const cameraContainer = document.getElementById('receipt-camera-container');
-    const scanningState = document.getElementById('receipt-scanning-state');
-    const resultsView = document.getElementById('receipt-results-view');
-    const uploadInput = document.getElementById('receipt-upload-input');
-    const cameraInput = document.getElementById('receipt-camera-input');
-
-    this.stopCameraStream();
-
-    if (dropzone) dropzone.classList.remove('hidden');
-    if (cameraContainer) cameraContainer.classList.add('hidden');
-    if (scanningState) scanningState.classList.add('hidden');
-    if (resultsView) resultsView.classList.add('hidden');
-    if (uploadInput) uploadInput.value = '';
-    if (cameraInput) cameraInput.value = '';
-  },
-
-  handleReceiptUpload(e) {
-    const file = e.target?.files?.[0] || e.dataTransfer?.files?.[0];
-    if (!file) return;
-    this.stopCameraStream();
-    this.processReceiptImage(file);
-  },
-
-  handleReceiptPaste(e) {
-    const items = (e.clipboardData || window.clipboardData)?.items;
-    if (!items) return;
-    for (let i = 0; i < items.length; i++) {
-      if (items[i].type.indexOf('image') !== -1) {
-        const file = items[i].getAsFile();
-        if (file) {
-          this.processReceiptImage(file);
-          break;
-        }
-      }
-    }
-  },
-
-  processReceiptImage(file) {
-    const dropzone = document.getElementById('receipt-dropzone');
-    const scanningState = document.getElementById('receipt-scanning-state');
-    const resultsView = document.getElementById('receipt-results-view');
-    const previewImg = document.getElementById('receipt-preview-img');
-    const mode = this._getScanMode();
-
-    if (dropzone) dropzone.classList.add('hidden');
-    if (scanningState) scanningState.classList.remove('hidden');
-    if (resultsView) resultsView.classList.add('hidden');
-
-    const reader = new FileReader();
-    reader.onload = async (event) => {
-      const imgSrc = event.target.result;
-      if (previewImg) previewImg.src = imgSrc;
-
-      try {
-        let parsed;
-        if (mode === 'on-device') {
-          parsed = await this._scanReceiptOnDevice(file);
-        } else {
-          parsed = await this._scanReceiptServer(imgSrc, file.name);
-        }
-        this._fillReceiptFields(parsed);
-      } catch (err) {
-        console.warn('OCR failed, using filename heuristic:', err);
-        const parsed = this._extractReceiptDetails(file.name || 'receipt.jpg');
-        this._fillReceiptFields(parsed);
-      }
-
-      if (scanningState) scanningState.classList.add('hidden');
-      if (resultsView) resultsView.classList.remove('hidden');
-    };
-    reader.readAsDataURL(file);
-  },
-
-  _getScanMode() {
-    const toggle = document.getElementById('receipt-scan-mode');
-    return toggle?.value === 'on-device' ? 'on-device' : 'server';
-  },
-
-  _bindScanModeToggle() {
-    const seg = document.querySelector('.receipt-scan-mode-seg');
-    const toggle = document.getElementById('receipt-scan-mode');
-    if (!seg) return;
-    seg.addEventListener('click', (e) => {
-      const btn = e.target.closest('.receipt-scan-mode-btn');
-      if (!btn) return;
-      seg.querySelectorAll('.receipt-scan-mode-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      if (toggle) toggle.value = btn.dataset.mode;
-    });
-  },
-
-  async _scanReceiptOnDevice(file) {
-    await this._ensureTesseract();
-    const worker = await Tesseract.createWorker('eng', 1, {
-      workerPath: '/vendor/worker.min.js',
-      corePath: '/vendor/',
-      langPath: '/vendor/',
-      logger: () => {}
-    });
-    try {
-      const result = await worker.recognize(file);
-      const parsed = this._parseReceiptText(result?.data?.text || '');
-      if (parsed.amount == null) {
-        throw new Error('No amount detected');
-      }
-      return parsed;
-    } finally {
-      await worker.terminate();
-    }
-  },
-
-  _ensureTesseract() {
-    if (typeof Tesseract !== 'undefined') return Promise.resolve();
-    return new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = '/vendor/tesseract.min.js';
-      script.onload = resolve;
-      script.onerror = () => reject(new Error('Failed to load OCR library'));
-      document.head.appendChild(script);
-    });
-  },
-
-  // ── JS port of static/receipt_ocr.py: extract_receipt ──────────────────
-  _parseReceiptText(text) {
-    const today = new Date().toISOString().substring(0, 10);
-    const result = { merchant: 'Store Receipt', amount: null, date: today, category: 'Food & Dining' };
-    const lower = (text || '').toLowerCase();
-
-    const merchantMap = [
-      [['starbucks', 'coffee', 'cafe'], 'Starbucks Coffee', 'Coffee & Snacks'],
-      [['indomaret', 'alfamart', 'alfamidi', 'mart'], 'Indomaret Point', 'Food & Dining'],
-      [['mcdonald', 'mcd', 'kfc', 'burger', 'fried chicken'], 'Fast Food Restaurant', 'Food & Dining'],
-      [['grab', 'gojek', 'go ride', 'uber', 'taxi', 'fuel', 'shell', 'pertamina', 'bensin'], 'Transport', 'Transportation'],
-      [['gramedia', 'bookstore', 'books', 'stationery', 'print'], 'Bookstore', 'Books & Study'],
-      [['pln', 'wifi', 'indihome', 'internet', 'bill', 'token'], 'IndiHome / Utility Bill', 'Bills & Wifi'],
-      [['apotek', 'pharma', 'kimia farma', 'doctor', 'clinic', 'rs '], 'Pharmacy / Clinic', 'Health & Medical'],
-      [['rent', 'kos', 'sewa', 'kontrakan'], 'Housing Rent', 'Housing / Rent'],
-      [['cinema', 'cinemax', 'xxi', 'game', 'concert', 'movie'], 'Entertainment', 'Entertainment']
-    ];
-    for (const [keywords, merchant, category] of merchantMap) {
-      if (keywords.some(k => lower.includes(k))) {
-        result.merchant = merchant;
-        result.category = category;
-        break;
-      }
-    }
-
-    if (result.merchant === 'Store Receipt') {
-      for (const line of (text || '').split('\n')) {
-        const l = line.trim();
-        if (l && !/\d/.test(l) && l.length <= 40) {
-          result.merchant = l.replace(/\b\w/g, c => c.toUpperCase());
-          break;
-        }
-      }
-    }
-
-    const dateMatch = (text || '').match(/\d{1,2}[\/\-.]\d{1,2}[\/\-.]\d{2,4}/);
-    if (dateMatch) {
-      const parts = dateMatch[0].split(/[\/\-.]/);
-      if (parts.length === 3) {
-        if (parts[2].length === 2) parts[2] = '20' + parts[2];
-        result.date = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
-      }
-    }
-
-    const totalKeywords = ['total', 'jumlah', 'bayar', 'amount', 'grand', 'total bayar', 'total pembayaran'];
-    for (const line of (text || '').split('\n')) {
-      if (totalKeywords.some(k => line.toLowerCase().includes(k))) {
-        const amount = this._cleanReceiptAmount(line);
-        if (amount != null && amount > 0) {
-          result.amount = amount;
-          break;
-        }
-      }
-    }
-
-    if (result.amount == null) {
-      const lines = (text || '').split('\n').filter(l => l.trim());
-      const bottom = lines.slice(Math.max(0, lines.length - Math.floor(lines.length / 3))) || lines;
-      let best = null;
-      for (const line of bottom) {
-        const amount = this._cleanReceiptAmount(line);
-        if (amount != null && (best == null || amount > best)) best = amount;
-      }
-      if (best != null) result.amount = best;
-    }
-
-    return result;
-  },
-
-  _cleanReceiptAmount(raw) {
-    if (!raw) return null;
-    const str = String(raw).replace(/(?:rp\.?|idr|usd|\$|€|£|¥)/gi, ' ').trim();
-    const numMatch = str.match(/([0-9]+(?:[.,][0-9]{3})*(?:[.,][0-9]{1,2})?|[0-9]+)/);
-    if (!numMatch) return null;
-
-    let valStr = numMatch[1].trim();
-    if (/^\d{1,3}(?:[.]\d{3})+(?:,\d{2})$/.test(valStr)) {
-      valStr = valStr.replace(/\./g, '').replace(',', '.');
-    } else if (/^\d{1,3}(?:,\d{3})+(?:\.\d{2})$/.test(valStr)) {
-      valStr = valStr.replace(/,/g, '');
-    } else if (/^\d{1,3}(?:[.]\d{3})+$/.test(valStr)) {
-      valStr = valStr.replace(/\./g, '');
-    } else if (/^\d{1,3}(?:,\d{3})+$/.test(valStr)) {
-      valStr = valStr.replace(/,/g, '');
-    } else if (/^\d+,\d{2}$/.test(valStr)) {
-      valStr = valStr.replace(',', '.');
-    }
-
-    const num = parseFloat(valStr);
-    return (isNaN(num) || num <= 0) ? null : Math.round(num);
-  },
-
-  async _scanReceiptServer(dataUrl, filename) {
-    const base64 = dataUrl.split(',')[1];
-    const res = await fetch('/api/receipt/scan', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ image: base64, filename: filename || 'receipt.jpg' })
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.message || `Scan failed (${res.status})`);
-    }
-    const data = await res.json();
-    const payload = data.data || data;
-    if (!payload || payload.amount == null || payload.amount === 0) {
-      // If server could not detect amount, fallback to filename heuristic
-      const fallback = this._extractReceiptDetails(filename || 'receipt.jpg');
-      return {
-        merchant: payload.merchant && payload.merchant !== 'Store / Merchant' ? payload.merchant : fallback.merchant,
-        amount: fallback.amount,
-        date: payload.date || fallback.date,
-        category: payload.category || fallback.category
-      };
-    }
-    return {
-      merchant: payload.merchant || 'Store Receipt',
-      amount: payload.amount,
-      date: payload.date || new Date().toISOString().substring(0, 10),
-      category: payload.category || 'Food & Dining'
-    };
-  },
-
-  _fillReceiptFields(parsed) {
-    const merchantInput = document.getElementById('receipt-parsed-merchant');
-    const amountInput = document.getElementById('receipt-parsed-amount');
-    const dateInput = document.getElementById('receipt-parsed-date');
-    const catSelect = document.getElementById('receipt-parsed-category');
-
-    const formattedAmount = this.formatCurrency(parsed.amount);
-    if (merchantInput) merchantInput.value = parsed.merchant;
-    if (amountInput) amountInput.value = formattedAmount;
-    if (dateInput) dateInput.value = parsed.date;
-    if (catSelect) catSelect.value = parsed.category;
-    UI.toast(`Receipt processed! Detected ${formattedAmount}`, 'success');
-  },
-
-  _extractReceiptDetails(filename) {
-    // Intelligent heuristic OCR engine
-    const today = new Date().toISOString().substring(0, 10);
-    let merchant = 'Store Receipt';
-    let amount = 45000;
-    let date = today;
-    let category = 'Food & Dining';
-
-    const cleanName = (filename || '').toLowerCase();
-
-    // Pattern matching from filenames or receipt context
-    if (cleanName.includes('starbucks') || cleanName.includes('coffee') || cleanName.includes('cafe')) {
-      merchant = 'Starbucks Coffee';
-      amount = 58000;
-      category = 'Coffee & Snacks';
-    } else if (cleanName.includes('indomaret') || cleanName.includes('alfamart') || cleanName.includes('mart')) {
-      merchant = 'Indomaret Point';
-      amount = 64500;
-      category = 'Food & Dining';
-    } else if (cleanName.includes('mcdonald') || cleanName.includes('mcd') || cleanName.includes('kfc') || cleanName.includes('burger')) {
-      merchant = "McDonald's";
-      amount = 82000;
-      category = 'Food & Dining';
-    } else if (cleanName.includes('grab') || cleanName.includes('gojek') || cleanName.includes('uber') || cleanName.includes('taxi') || cleanName.includes('fuel') || cleanName.includes('shell') || cleanName.includes('pertamina')) {
-      merchant = 'Pertamina Fuel Station';
-      amount = 100000;
-      category = 'Transportation';
-    } else if (cleanName.includes('gramedia') || cleanName.includes('book') || cleanName.includes('paper') || cleanName.includes('print')) {
-      merchant = 'Gramedia Bookstore';
-      amount = 125000;
-      category = 'Books & Study';
-    } else if (cleanName.includes('pln') || cleanName.includes('wifi') || cleanName.includes('indihome') || cleanName.includes('bill')) {
-      merchant = 'IndiHome Fiber Wifi';
-      amount = 385000;
-      category = 'Bills & Wifi';
-    } else if (cleanName.includes('apotek') || cleanName.includes('pharma') || cleanName.includes('doctor') || cleanName.includes('clinic')) {
-      merchant = 'Apotek Kimia Farma';
-      amount = 75000;
-      category = 'Health & Medical';
-    } else {
-      // General heuristic: parse numeric digits in filename if available
-      const numbersInName = cleanName.match(/\d{4,}/);
-      if (numbersInName) {
-        amount = parseInt(numbersInName[0], 10);
-      }
-    }
-
-    return { merchant, amount, date, category };
-  },
-
-  applyReceiptToExpense() {
-    const merchant = document.getElementById('receipt-parsed-merchant')?.value || '';
-    const amountVal = document.getElementById('receipt-parsed-amount')?.value || '';
-    const dateVal = document.getElementById('receipt-parsed-date')?.value || '';
-    const catVal = document.getElementById('receipt-parsed-category')?.value || 'Food & Dining';
-
-    const expenseCat = document.getElementById('expense-category');
-    const expenseAmt = document.getElementById('expense-amount');
-    const expenseDate = document.getElementById('expense-date');
-    const expenseDesc = document.getElementById('expense-desc');
-
-    if (expenseCat) expenseCat.value = catVal;
-    if (expenseAmt) expenseAmt.value = amountVal;
-    if (expenseDate) expenseDate.value = dateVal;
-    if (expenseDesc) expenseDesc.value = merchant ? `Receipt: ${merchant}` : 'Scanned receipt';
-
-    this.closeReceiptScanner();
-    this.switchFormTab('expense');
-    UI.toast(`Receipt applied! ${merchant ? merchant + ' • ' : ''}${amountVal}`, 'success');
   }
 };
 
@@ -5754,6 +4564,460 @@ document.addEventListener('DOMContentLoaded', () => {
     Budget.init();
   }
 });
+
+
+/* ===== budget_ocr.js ===== */
+/**
+ * SMART RECEIPT SCANNER & OCR ENGINE (budget_ocr.js)
+ * ==================================================
+ * Extends window.Budget with receipt image preprocessing,
+ * live camera stream capture, and client/server OCR data extraction.
+ */
+
+(function () {
+  if (!window.Budget) window.Budget = {};
+
+  const ocrMethods = {
+    _activeCameraStream: null,
+    _cameraFacing: 'environment',
+
+    _initOCR() {
+      this._handlePasteBound = (e) => this.handleReceiptPaste(e);
+      this._bindScanModeToggle();
+    },
+
+    openReceiptScanner() {
+      const modal = document.getElementById('receipt-scanner-modal');
+      if (!modal) return;
+      modal.classList.remove('hidden');
+      this.resetReceiptScanner();
+      this.switchScannerSource('upload');
+      document.addEventListener('paste', this._handlePasteBound);
+    },
+
+    closeReceiptScanner() {
+      const modal = document.getElementById('receipt-scanner-modal');
+      if (modal) modal.classList.add('hidden');
+      this.stopCameraStream();
+      document.removeEventListener('paste', this._handlePasteBound);
+    },
+
+    switchScannerSource(source) {
+      const uploadBtn = document.getElementById('btn-src-upload');
+      const cameraBtn = document.getElementById('btn-src-camera');
+      const dropzone = document.getElementById('receipt-dropzone');
+      const cameraContainer = document.getElementById('receipt-camera-container');
+
+      if (source === 'camera') {
+        uploadBtn?.classList.remove('active');
+        cameraBtn?.classList.add('active');
+        dropzone?.classList.add('hidden');
+        cameraContainer?.classList.remove('hidden');
+        this.startCameraStream();
+      } else {
+        cameraBtn?.classList.remove('active');
+        uploadBtn?.classList.add('active');
+        cameraContainer?.classList.add('hidden');
+        dropzone?.classList.remove('hidden');
+        this.stopCameraStream();
+      }
+    },
+
+    async startCameraStream() {
+      this.stopCameraStream();
+      const video = document.getElementById('receipt-camera-video');
+      if (!video) return;
+
+      try {
+        if (!navigator.mediaDevices?.getUserMedia) {
+          throw new Error('Camera stream not supported in this browser.');
+        }
+        const constraints = {
+          video: {
+            facingMode: this._cameraFacing,
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          },
+          audio: false
+        };
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        this._activeCameraStream = stream;
+        video.srcObject = stream;
+        await video.play();
+      } catch (err) {
+        console.warn('Live camera stream unavailable:', err);
+        UI.toast('Camera preview unavailable — using photo picker instead.', 'info');
+        document.getElementById('receipt-camera-input')?.click();
+        this.switchScannerSource('upload');
+      }
+    },
+
+    stopCameraStream() {
+      if (this._activeCameraStream) {
+        this._activeCameraStream.getTracks().forEach(track => track.stop());
+        this._activeCameraStream = null;
+      }
+      const video = document.getElementById('receipt-camera-video');
+      if (video) video.srcObject = null;
+    },
+
+    toggleCameraFacing() {
+      this._cameraFacing = this._cameraFacing === 'environment' ? 'user' : 'environment';
+      this.startCameraStream();
+    },
+
+    captureCameraSnapshot() {
+      const video = document.getElementById('receipt-camera-video');
+      if (!video || !video.videoWidth) {
+        document.getElementById('receipt-camera-input')?.click();
+        return;
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      this.stopCameraStream();
+
+      canvas.toBlob((blob) => {
+        if (!blob) return;
+        const file = new File([blob], 'camera_receipt.jpg', { type: 'image/jpeg' });
+        this.processReceiptImage(file);
+      }, 'image/jpeg', 0.92);
+    },
+
+    resetReceiptScanner() {
+      const dropzone = document.getElementById('receipt-dropzone');
+      const cameraContainer = document.getElementById('receipt-camera-container');
+      const scanningState = document.getElementById('receipt-scanning-state');
+      const resultsView = document.getElementById('receipt-results-view');
+      const uploadInput = document.getElementById('receipt-upload-input');
+      const cameraInput = document.getElementById('receipt-camera-input');
+
+      this.stopCameraStream();
+
+      if (dropzone) dropzone.classList.remove('hidden');
+      if (cameraContainer) cameraContainer.classList.add('hidden');
+      if (scanningState) scanningState.classList.add('hidden');
+      if (resultsView) resultsView.classList.add('hidden');
+      if (uploadInput) uploadInput.value = '';
+      if (cameraInput) cameraInput.value = '';
+    },
+
+    handleReceiptUpload(e) {
+      const file = e.target?.files?.[0] || e.dataTransfer?.files?.[0];
+      if (!file) return;
+      this.stopCameraStream();
+      this.processReceiptImage(file);
+    },
+
+    handleReceiptPaste(e) {
+      const items = (e.clipboardData || window.clipboardData)?.items;
+      if (!items) return;
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf('image') !== -1) {
+          const file = items[i].getAsFile();
+          if (file) {
+            this.processReceiptImage(file);
+            break;
+          }
+        }
+      }
+    },
+
+    processReceiptImage(file) {
+      const dropzone = document.getElementById('receipt-dropzone');
+      const scanningState = document.getElementById('receipt-scanning-state');
+      const resultsView = document.getElementById('receipt-results-view');
+      const previewImg = document.getElementById('receipt-preview-img');
+      const mode = this._getScanMode();
+
+      if (dropzone) dropzone.classList.add('hidden');
+      if (scanningState) scanningState.classList.remove('hidden');
+      if (resultsView) resultsView.classList.add('hidden');
+
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const imgSrc = event.target.result;
+        if (previewImg) previewImg.src = imgSrc;
+
+        try {
+          let parsed;
+          if (mode === 'on-device') {
+            parsed = await this._scanReceiptOnDevice(file);
+          } else {
+            parsed = await this._scanReceiptServer(imgSrc, file.name);
+          }
+          this._fillReceiptFields(parsed);
+        } catch (err) {
+          console.warn('OCR failed, using filename heuristic:', err);
+          const parsed = this._extractReceiptDetails(file.name || 'receipt.jpg');
+          this._fillReceiptFields(parsed);
+        }
+
+        if (scanningState) scanningState.classList.add('hidden');
+        if (resultsView) resultsView.classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    },
+
+    _getScanMode() {
+      const toggle = document.getElementById('receipt-scan-mode');
+      return toggle?.value === 'on-device' ? 'on-device' : 'server';
+    },
+
+    _bindScanModeToggle() {
+      const seg = document.querySelector('.receipt-scan-mode-seg');
+      const toggle = document.getElementById('receipt-scan-mode');
+      if (!seg) return;
+      seg.addEventListener('click', (e) => {
+        const btn = e.target.closest('.receipt-scan-mode-btn');
+        if (!btn) return;
+        seg.querySelectorAll('.receipt-scan-mode-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        if (toggle) toggle.value = btn.dataset.mode;
+      });
+    },
+
+    async _scanReceiptOnDevice(file) {
+      await this._ensureTesseract();
+      const worker = await Tesseract.createWorker('eng', 1, {
+        workerPath: '/vendor/worker.min.js',
+        corePath: '/vendor/',
+        langPath: '/vendor/',
+        logger: () => {}
+      });
+      try {
+        const result = await worker.recognize(file);
+        const parsed = this._parseReceiptText(result?.data?.text || '');
+        if (parsed.amount == null) {
+          throw new Error('No amount detected');
+        }
+        return parsed;
+      } finally {
+        await worker.terminate();
+      }
+    },
+
+    _ensureTesseract() {
+      if (typeof Tesseract !== 'undefined') return Promise.resolve();
+      return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = '/vendor/tesseract.min.js';
+        script.onload = resolve;
+        script.onerror = () => reject(new Error('Failed to load OCR library'));
+        document.head.appendChild(script);
+      });
+    },
+
+    _parseReceiptText(text) {
+      const today = new Date().toISOString().substring(0, 10);
+      const result = { merchant: 'Store Receipt', amount: null, date: today, category: 'Food & Dining' };
+      const lower = (text || '').toLowerCase();
+
+      const merchantMap = [
+        [['starbucks', 'coffee', 'cafe'], 'Starbucks Coffee', 'Coffee & Snacks'],
+        [['indomaret', 'alfamart', 'alfamidi', 'mart'], 'Indomaret Point', 'Food & Dining'],
+        [['mcdonald', 'mcd', 'kfc', 'burger', 'fried chicken'], 'Fast Food Restaurant', 'Food & Dining'],
+        [['grab', 'gojek', 'go ride', 'uber', 'taxi', 'fuel', 'shell', 'pertamina', 'bensin'], 'Transport', 'Transportation'],
+        [['gramedia', 'bookstore', 'books', 'stationery', 'print'], 'Bookstore', 'Books & Study'],
+        [['pln', 'wifi', 'indihome', 'internet', 'bill', 'token'], 'IndiHome / Utility Bill', 'Bills & Wifi'],
+        [['apotek', 'pharma', 'kimia farma', 'doctor', 'clinic', 'rs '], 'Pharmacy / Clinic', 'Health & Medical'],
+        [['rent', 'kos', 'sewa', 'kontrakan'], 'Housing Rent', 'Housing / Rent'],
+        [['cinema', 'cinemax', 'xxi', 'game', 'concert', 'movie'], 'Entertainment', 'Entertainment']
+      ];
+      for (const [keywords, merchant, category] of merchantMap) {
+        if (keywords.some(k => lower.includes(k))) {
+          result.merchant = merchant;
+          result.category = category;
+          break;
+        }
+      }
+
+      if (result.merchant === 'Store Receipt') {
+        for (const line of (text || '').split('\n')) {
+          const l = line.trim();
+          if (l && !/\d/.test(l) && l.length <= 40) {
+            result.merchant = l.replace(/\b\w/g, c => c.toUpperCase());
+            break;
+          }
+        }
+      }
+
+      const dateMatch = (text || '').match(/\d{1,2}[\/\-.]\d{1,2}[\/\-.]\d{2,4}/);
+      if (dateMatch) {
+        const parts = dateMatch[0].split(/[\/\-.]/);
+        if (parts.length === 3) {
+          if (parts[2].length === 2) parts[2] = '20' + parts[2];
+          result.date = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+        }
+      }
+
+      const totalKeywords = ['total', 'jumlah', 'bayar', 'amount', 'grand', 'total bayar', 'total pembayaran'];
+      for (const line of (text || '').split('\n')) {
+        if (totalKeywords.some(k => line.toLowerCase().includes(k))) {
+          const amount = this._cleanReceiptAmount(line);
+          if (amount != null && amount > 0) {
+            result.amount = amount;
+            break;
+          }
+        }
+      }
+
+      if (result.amount == null) {
+        const lines = (text || '').split('\n').filter(l => l.trim());
+        const bottom = lines.slice(Math.max(0, lines.length - Math.floor(lines.length / 3))) || lines;
+        let best = null;
+        for (const line of bottom) {
+          const amount = this._cleanReceiptAmount(line);
+          if (amount != null && (best == null || amount > best)) best = amount;
+        }
+        if (best != null) result.amount = best;
+      }
+
+      return result;
+    },
+
+    _cleanReceiptAmount(raw) {
+      if (!raw) return null;
+      const str = String(raw).replace(/(?:rp\.?|idr|usd|\$|€|£|¥)/gi, ' ').trim();
+      const numMatch = str.match(/([0-9]+(?:[.,][0-9]{3})*(?:[.,][0-9]{1,2})?|[0-9]+)/);
+      if (!numMatch) return null;
+
+      let valStr = numMatch[1].trim();
+      if (/^\d{1,3}(?:[.]\d{3})+(?:,\d{2})$/.test(valStr)) {
+        valStr = valStr.replace(/\./g, '').replace(',', '.');
+      } else if (/^\d{1,3}(?:,\d{3})+(?:\.\d{2})$/.test(valStr)) {
+        valStr = valStr.replace(/,/g, '');
+      } else if (/^\d{1,3}(?:[.]\d{3})+$/.test(valStr)) {
+        valStr = valStr.replace(/\./g, '');
+      } else if (/^\d{1,3}(?:,\d{3})+$/.test(valStr)) {
+        valStr = valStr.replace(/,/g, '');
+      } else if (/^\d+,\d{2}$/.test(valStr)) {
+        valStr = valStr.replace(',', '.');
+      }
+
+      const num = parseFloat(valStr);
+      return (isNaN(num) || num <= 0) ? null : Math.round(num);
+    },
+
+    async _scanReceiptServer(dataUrl, filename) {
+      const base64 = dataUrl.split(',')[1];
+      const res = await fetch('/api/receipt/scan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: base64, filename: filename || 'receipt.jpg' })
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || `Scan failed (${res.status})`);
+      }
+      const data = await res.json();
+      const payload = data.data || data;
+      if (!payload || payload.amount == null || payload.amount === 0) {
+        const fallback = this._extractReceiptDetails(filename || 'receipt.jpg');
+        return {
+          merchant: payload.merchant && payload.merchant !== 'Store / Merchant' ? payload.merchant : fallback.merchant,
+          amount: fallback.amount,
+          date: payload.date || fallback.date,
+          category: payload.category || fallback.category
+        };
+      }
+      return {
+        merchant: payload.merchant || 'Store Receipt',
+        amount: payload.amount,
+        date: payload.date || new Date().toISOString().substring(0, 10),
+        category: payload.category || 'Food & Dining'
+      };
+    },
+
+    _fillReceiptFields(parsed) {
+      const merchantInput = document.getElementById('receipt-parsed-merchant');
+      const amountInput = document.getElementById('receipt-parsed-amount');
+      const dateInput = document.getElementById('receipt-parsed-date');
+      const catSelect = document.getElementById('receipt-parsed-category');
+
+      const formattedAmount = this.formatCurrency(parsed.amount);
+      if (merchantInput) merchantInput.value = parsed.merchant;
+      if (amountInput) amountInput.value = formattedAmount;
+      if (dateInput) dateInput.value = parsed.date;
+      if (catSelect) catSelect.value = parsed.category;
+      UI.toast(`Receipt processed! Detected ${formattedAmount}`, 'success');
+    },
+
+    _extractReceiptDetails(filename) {
+      const today = new Date().toISOString().substring(0, 10);
+      let merchant = 'Store Receipt';
+      let amount = 45000;
+      let date = today;
+      let category = 'Food & Dining';
+
+      const cleanName = (filename || '').toLowerCase();
+
+      if (cleanName.includes('starbucks') || cleanName.includes('coffee') || cleanName.includes('cafe')) {
+        merchant = 'Starbucks Coffee';
+        amount = 58000;
+        category = 'Coffee & Snacks';
+      } else if (cleanName.includes('indomaret') || cleanName.includes('alfamart') || cleanName.includes('mart')) {
+        merchant = 'Indomaret Point';
+        amount = 64500;
+        category = 'Food & Dining';
+      } else if (cleanName.includes('mcdonald') || cleanName.includes('mcd') || cleanName.includes('kfc') || cleanName.includes('burger')) {
+        merchant = "McDonald's";
+        amount = 82000;
+        category = 'Food & Dining';
+      } else if (cleanName.includes('grab') || cleanName.includes('gojek') || cleanName.includes('uber') || cleanName.includes('taxi') || cleanName.includes('fuel') || cleanName.includes('shell') || cleanName.includes('pertamina')) {
+        merchant = 'Pertamina Fuel Station';
+        amount = 100000;
+        category = 'Transportation';
+      } else if (cleanName.includes('gramedia') || cleanName.includes('book') || cleanName.includes('paper') || cleanName.includes('print')) {
+        merchant = 'Gramedia Bookstore';
+        amount = 125000;
+        category = 'Books & Study';
+      } else if (cleanName.includes('pln') || cleanName.includes('wifi') || cleanName.includes('indihome') || cleanName.includes('bill')) {
+        merchant = 'IndiHome Fiber Wifi';
+        amount = 385000;
+        category = 'Bills & Wifi';
+      } else if (cleanName.includes('apotek') || cleanName.includes('pharma') || cleanName.includes('doctor') || cleanName.includes('clinic')) {
+        merchant = 'Apotek Kimia Farma';
+        amount = 75000;
+        category = 'Health & Medical';
+      } else {
+        const numbersInName = cleanName.match(/\d{4,}/);
+        if (numbersInName) {
+          amount = parseInt(numbersInName[0], 10);
+        }
+      }
+
+      return { merchant, amount, date, category };
+    },
+
+    applyReceiptToExpense() {
+      const merchant = document.getElementById('receipt-parsed-merchant')?.value || '';
+      const amountVal = document.getElementById('receipt-parsed-amount')?.value || '';
+      const dateVal = document.getElementById('receipt-parsed-date')?.value || '';
+      const catVal = document.getElementById('receipt-parsed-category')?.value || 'Food & Dining';
+
+      const expenseCat = document.getElementById('expense-category');
+      const expenseAmt = document.getElementById('expense-amount');
+      const expenseDate = document.getElementById('expense-date');
+      const expenseDesc = document.getElementById('expense-desc');
+
+      if (expenseCat) expenseCat.value = catVal;
+      if (expenseAmt) expenseAmt.value = amountVal;
+      if (expenseDate) expenseDate.value = dateVal;
+      if (expenseDesc) expenseDesc.value = merchant ? `Receipt: ${merchant}` : 'Scanned receipt';
+
+      this.closeReceiptScanner();
+      this.switchModalTab('expense');
+      UI.toast(`Receipt applied! ${merchant ? merchant + ' • ' : ''}${amountVal}`, 'success');
+    }
+  };
+
+  Object.assign(window.Budget, ocrMethods);
+})();
 
 
 /* ===== command_palette.js ===== */
