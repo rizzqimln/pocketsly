@@ -173,7 +173,7 @@ export async function onRequest(context) {
       if (path === '/api/dashboard') return jsonResponse(await routes.handleGetDashboard(db, userId));
       if (path === '/api/habits') return jsonResponse(await routes.handleGetHabits(db, userId));
       if (path === '/api/tasks') return jsonResponse(await routes.handleGetTasks(db, userId, query));
-      if (path === '/api/events') return jsonResponse(await routes.handleGetEvents(db, userId));
+      if (path === '/api/events' || path === '/api/schedules') return jsonResponse(await routes.handleGetEvents(db, userId));
       if (path === '/api/notes') return jsonResponse(await routes.handleGetNotes(db, userId));
       if (path === '/api/courses') return jsonResponse(await routes.handleGetCourses(db, userId));
       if (path === '/api/lecturers') return jsonResponse(await routes.handleGetLecturers(db, userId));
@@ -197,7 +197,7 @@ export async function onRequest(context) {
     if (method === 'POST') {
       if (path === '/api/habits') return jsonResponse(await routes.handlePostHabit(db, userId, body));
       if (path === '/api/tasks') return jsonResponse(await routes.handlePostTask(db, userId, body));
-      if (path === '/api/events') return jsonResponse(await routes.handlePostEvent(db, userId, body));
+      if (path === '/api/events' || path === '/api/schedules') return jsonResponse(await routes.handlePostEvent(db, userId, body));
       if (path === '/api/notes') return jsonResponse(await routes.handlePostNote(db, userId, body));
       if (path === '/api/courses') return jsonResponse(await routes.handlePostCourse(db, userId, body));
       if (path === '/api/lecturers') return jsonResponse(await routes.handlePostLecturer(db, userId, body));
@@ -238,7 +238,7 @@ export async function onRequest(context) {
       const taskMatch = path.match(/^\/api\/tasks\/(\d+)$/);
       if (taskMatch) return jsonResponse(await routes.handleDeleteTask(db, userId, Number(taskMatch[1])));
 
-      const eventMatch = path.match(/^\/api\/events\/(\d+)$/);
+      const eventMatch = path.match(/^\/api\/(?:events|schedules)\/(\d+)$/);
       if (eventMatch) return jsonResponse(await routes.handleDeleteEvent(db, userId, Number(eventMatch[1])));
 
       const noteMatch = path.match(/^\/api\/notes\/(\d+)$/);

@@ -98,38 +98,38 @@ class _MainShellScreenState extends State<MainShellScreen> {
     return Scaffold(
       backgroundColor: AppColors.bgMain,
       appBar: AppBar(
-        titleSpacing: 16,
+        titleSpacing: 10,
         title: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // Glowing brand dot
             Container(
-              width: 10,
-              height: 10,
+              width: 8,
+              height: 8,
               decoration: BoxDecoration(
                 color: AppColors.primaryLight,
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
                     color: AppColors.primaryLight.withAlpha(180),
-                    blurRadius: 10,
-                    spreadRadius: 2,
+                    blurRadius: 8,
+                    spreadRadius: 1,
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: 8),
             const Text(
               'Pocketsly',
               style: TextStyle(
                 color: AppColors.textPrimary,
                 fontWeight: FontWeight.w800,
-                fontSize: 19,
+                fontSize: 17,
                 letterSpacing: -0.5,
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 6),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
                 color: AppColors.primary.withAlpha(40),
                 borderRadius: BorderRadius.circular(99),
@@ -139,7 +139,7 @@ class _MainShellScreenState extends State<MainShellScreen> {
                 _viewTitles[_currentTabIndex].split(' ').first.toUpperCase(),
                 style: const TextStyle(
                   color: AppColors.primaryLight,
-                  fontSize: 9,
+                  fontSize: 8,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 0.5,
                 ),
@@ -156,15 +156,20 @@ class _MainShellScreenState extends State<MainShellScreen> {
               onOpenProfile: _openAuthProfile,
               onOpenQuickEntry: () => BudgetEntrySheet.show(context, onSaved: _refreshAllViews),
             ),
-            icon: const Icon(Icons.search_rounded, color: AppColors.textSecondary, size: 21),
+            padding: const EdgeInsets.all(6),
+            constraints: const BoxConstraints(minWidth: 34, minHeight: 34),
+            icon: const Icon(Icons.search_rounded, color: AppColors.textSecondary, size: 20),
             tooltip: 'Global Quick Search',
           ),
           // Pomodoro Focus Timer Icon
           IconButton(
             onPressed: () => PomodoroTimerDialog.show(context),
-            icon: const Icon(Icons.timer_outlined, color: AppColors.textSecondary, size: 20),
+            padding: const EdgeInsets.all(6),
+            constraints: const BoxConstraints(minWidth: 34, minHeight: 34),
+            icon: const Icon(Icons.timer_outlined, color: AppColors.textSecondary, size: 19),
             tooltip: 'Pomodoro Focus Timer',
           ),
+          const SizedBox(width: 2),
           // User Profile & Login Button
           ValueListenableBuilder<UserModel?>(
             valueListenable: ApiClient.instance.currentUserNotifier,
@@ -175,12 +180,12 @@ class _MainShellScreenState extends State<MainShellScreen> {
                 onTap: _openAuthProfile,
                 borderRadius: BorderRadius.circular(20),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
                   child: Row(
                     children: [
                       Container(
-                        width: 32,
-                        height: 32,
+                        width: 30,
+                        height: 30,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: isAuth ? (isDemo ? AppColors.warning : AppColors.primary) : AppColors.bgSurfaceAlt,
@@ -204,15 +209,15 @@ class _MainShellScreenState extends State<MainShellScreen> {
                           style: TextStyle(
                             color: isAuth ? Colors.white : AppColors.textSecondary,
                             fontWeight: FontWeight.w800,
-                            fontSize: 13,
+                            fontSize: 12,
                           ),
                         ),
                       ),
                       if (!isAuth) ...[
-                        const SizedBox(width: 6),
+                        const SizedBox(width: 4),
                         const Text(
                           'Sign In',
-                          style: TextStyle(color: AppColors.primaryLight, fontSize: 11.5, fontWeight: FontWeight.w800),
+                          style: TextStyle(color: AppColors.primaryLight, fontSize: 11, fontWeight: FontWeight.w800),
                         ),
                       ],
                     ],
@@ -221,7 +226,7 @@ class _MainShellScreenState extends State<MainShellScreen> {
               );
             },
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 6),
         ],
       ),
       body: IndexedStack(

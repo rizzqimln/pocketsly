@@ -122,13 +122,32 @@ class ScheduleItem {
   });
 
   factory ScheduleItem.fromJson(Map<String, dynamic> json) {
+    String dayStr = 'Monday';
+    final rawDay = json['day_of_week'] ?? json['day'];
+    if (rawDay is int || rawDay is num) {
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      final idx = (rawDay as num).toInt();
+      if (idx >= 0 && idx < days.length) {
+        dayStr = days[idx];
+      }
+    } else if (rawDay is String && rawDay.isNotEmpty) {
+      dayStr = rawDay;
+    }
+
+    String timeStr = '08:00 - 10:00';
+    if (json['time'] is String && (json['time'] as String).isNotEmpty) {
+      timeStr = json['time'] as String;
+    } else if (json['start_time'] != null) {
+      timeStr = '${json['start_time']} - ${json['end_time'] ?? ""}';
+    }
+
     return ScheduleItem(
       id: json['id'] as int? ?? 0,
-      day: json['day'] as String? ?? (json['day_of_week'] as String? ?? 'Monday'),
-      time: json['time'] as String? ?? '${json['start_time'] ?? "08:00"} - ${json['end_time'] ?? "10:00"}',
+      day: dayStr,
+      time: timeStr,
       subject: json['subject'] as String? ?? (json['title'] as String? ?? ''),
-      room: json['room'] as String? ?? '',
-      lecturer: json['lecturer'] as String? ?? '',
+      room: json['room'] as String? ?? (json['location'] as String? ?? ''),
+      lecturer: json['lecturer'] as String? ?? (json['lecturer_name'] as String? ?? ''),
     );
   }
 

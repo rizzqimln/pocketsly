@@ -468,13 +468,49 @@ class _BudgetViewState extends State<BudgetView> {
           const SizedBox(height: 8),
 
           if (filteredTransactions.isEmpty)
-            const GlassCard(
+            GlassCard(
               borderRadius: 18,
-              child: Padding(
-                padding: EdgeInsets.all(24),
-                child: Center(
-                  child: Text('No transactions for this month.', style: TextStyle(color: AppColors.textMuted, fontWeight: FontWeight.w600)),
-                ),
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                children: [
+                  const Icon(Icons.account_balance_wallet_outlined, size: 36, color: AppColors.textMuted),
+                  const SizedBox(height: 10),
+                  const Text('No transactions recorded for this month.', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700, fontSize: 13)),
+                  const SizedBox(height: 4),
+                  const Text('Log your income, expenses, or explore with demo data.', style: TextStyle(color: AppColors.textMuted, fontSize: 11.5)),
+                  const SizedBox(height: 14),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: () => _openEntry('expense'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.danger,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                        icon: const Icon(Icons.add_rounded, size: 16),
+                        label: const Text('+ Expense', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700)),
+                      ),
+                      const SizedBox(width: 8),
+                      OutlinedButton.icon(
+                        onPressed: () async {
+                          await ApiClient.instance.loginAsDemoUser();
+                          _loadBudgetData();
+                        },
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: AppColors.primaryLight),
+                          foregroundColor: AppColors.primaryLight,
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                        icon: const Icon(Icons.auto_awesome_rounded, size: 16),
+                        label: const Text('Try Demo Mode', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700)),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             )
           else

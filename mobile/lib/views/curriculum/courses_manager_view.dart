@@ -160,11 +160,17 @@ class _CoursesManagerViewState extends State<CoursesManagerView> {
                       final hours = double.tryParse(hoursController.text) ?? 1.0;
                       Navigator.pop(ctx);
                       final today = DateTime.now().toIso8601String().substring(0, 10);
+                      final matchedCourse = _courses.firstWhere(
+                        (c) => c.id == selectedCourseId,
+                        orElse: () => CourseItem(id: 0, code: '', name: 'Independent Study'),
+                      );
                       await ApiClient.instance.post(ApiEndpoints.studyLogs, {
                         'course_id': selectedCourseId,
+                        'course_name': matchedCourse.name,
                         'hours': hours,
                         'notes': topicController.text.trim(),
                         'date': today,
+                        'log_date': today,
                       });
                       _loadCoursesAndLogs();
                     },

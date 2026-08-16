@@ -231,12 +231,14 @@ class _NotesViewState extends State<NotesView> with SingleTickerProviderStateMix
                               await ApiClient.instance.post(ApiEndpoints.notes, {
                                 'title': title.isEmpty ? 'Untitled Reflection' : title,
                                 'content': content,
+                                'body': content,
                                 'mood': currentMood,
                               });
                             } else {
                               await ApiClient.instance.patch(ApiEndpoints.note(note.id), {
                                 'title': title.isEmpty ? 'Untitled Reflection' : title,
                                 'content': content,
+                                'body': content,
                                 'mood': currentMood,
                               });
                             }

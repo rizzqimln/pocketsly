@@ -137,11 +137,26 @@ class _ScheduleViewState extends State<ScheduleView> {
                       final subj = subjectController.text.trim();
                       if (subj.isEmpty) return;
                       Navigator.pop(ctx);
+
+                      final timeParts = timeController.text.split('-');
+                      final startTime = timeParts.isNotEmpty ? timeParts[0].trim() : '08:00';
+                      final endTime = timeParts.length > 1 ? timeParts[1].trim() : '10:00';
+                      final dayMap = {
+                        'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 'Wednesday': 3,
+                        'Thursday': 4, 'Friday': 5, 'Saturday': 6,
+                      };
+                      final dayIdx = dayMap[day] ?? 1;
+
                       await ApiClient.instance.post(ApiEndpoints.schedules, {
+                        'title': subj,
                         'subject': subj,
                         'day': day,
+                        'day_of_week': dayIdx,
                         'time': timeController.text.trim(),
+                        'start_time': startTime,
+                        'end_time': endTime,
                         'room': roomController.text.trim(),
+                        'location': roomController.text.trim(),
                         'lecturer': lecturerController.text.trim(),
                       });
                       _loadSchedule();
@@ -244,15 +259,38 @@ class _ScheduleViewState extends State<ScheduleView> {
                                 style: const TextStyle(color: AppColors.textMuted, fontSize: 13),
                               ),
                               const SizedBox(height: 14),
-                              ElevatedButton.icon(
-                                onPressed: _openAddScheduleModal,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.primary,
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                ),
-                                icon: const Icon(Icons.add_rounded, size: 16),
-                                label: const Text('Add Lecture', style: TextStyle(fontWeight: FontWeight.w700)),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ElevatedButton.icon(
+                                    onPressed: _openAddScheduleModal,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: AppColors.primary,
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                    ),
+                                    icon: const Icon(Icons.add_rounded, size: 16),
+                                    label: const Text('Add Lecture', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
+                                  ),
+                                  if (ApiClient.instance.currentUser == null) ...[
+                                    const SizedBox(width: 8),
+                                    OutlinedButton.icon(
+                                      onPressed: () async {
+                                        await ApiClient.instance.loginAsDemoUser();
+                                        _loadSchedule();
+                                      },
+                                      style: OutlinedButton.styleFrom(
+                                        side: const BorderSide(color: AppColors.primaryLight),
+                                        foregroundColor: AppColors.primaryLight,
+                                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                      ),
+                                      icon: const Icon(Icons.auto_awesome_rounded, size: 16),
+                                      label: const Text('Try Demo', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
+                                    ),
+                                  ],
+                                ],
                               ),
                             ],
                           ),
