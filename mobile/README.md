@@ -42,26 +42,29 @@ mobile/
 
 ### 1. Install Dependencies
 ```bash
-# Using Flutter
 flutter pub get
-
-# Or using Bun
-bun run dev
 ```
 
-### 2. Run in Debug Mode
+### 2. Run the App (Desktop / Mobile / Web)
 ```bash
-# Run on connected Android device / emulator
-flutter run -d android
+# Run directly on your Linux desktop (instant preview!)
+bun run dev:linux
+# or: flutter run -d linux
 
-# Or on Desktop / Chrome
-flutter run -d chrome
+# Run on connected Android device / emulator
+bun run dev:android
+# or: flutter run -d android
+
+# Run on Chrome / Web
+bun run dev:web
+# or: flutter run -d chrome
 ```
 
 ### 3. Build Production APK for Android
 ```bash
 # Build release APK
-flutter build apk --release
+bun run build:apk
+# or: flutter build apk --release
 
 # The installable APK is located at:
 # build/app/outputs/flutter-apk/app-release.apk
