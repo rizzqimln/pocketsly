@@ -87,13 +87,16 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
         return False
 
     def _get_security_headers(self) -> dict:
-        """Returns defense-in-depth HTTP security headers."""
+        """Returns defense-in-depth HTTP security headers and CORS configuration."""
         return {
             "X-Content-Type-Options": "nosniff",
             "X-Frame-Options": "DENY",
             "X-XSS-Protection": "1; mode=block",
             "Referrer-Policy": "strict-origin-when-cross-origin",
             "Permissions-Policy": "geolocation=(), microphone=(), camera=()",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization, Cookie, X-Requested-With, Accept",
             "Content-Security-Policy": (
                 "default-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; "
                 "img-src 'self' data: https: blob:; "
@@ -101,7 +104,7 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
                 "font-src 'self' https://fonts.gstatic.com data:; "
                 "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
                 "worker-src 'self' blob:; "
-                "connect-src 'self';"
+                "connect-src 'self' *;"
             ),
         }
 
@@ -299,6 +302,16 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
     # HTTP METHOD ROUTERS — thin dispatchers over the route tables below
     # =========================================================================
 
+    def do_OPTIONS(self):
+        """Handles CORS preflight OPTIONS requests for mobile and web clients."""
+        self.send_response(204)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization, Cookie, X-Requested-With, Accept")
+        self.send_header("Access-Control-Max-Age", "86400")
+        self.send_header("Content-Length", "0")
+        self.end_headers()
+
     def do_GET(self):
         """Handles HTTP GET requests."""
         if not self.path.startswith("/api/"):
@@ -381,6 +394,15 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
     # =========================================================================
     # GET HANDLERS
     # =========================================================================
+
+    def _get_health(self, user_id, query_params):
+        """GET /api/health — public health check and network ping endpoint."""
+        return self.send_json({
+            "status": "ok",
+            "service": "pocketsly-api",
+            "version": "1.0.0",
+            "timestamp": int(time.time()),
+        })
 
     def _get_session(self, user_id, query_params):
         """GET /api/session — public session check (no auth required)."""
@@ -1236,10 +1258,11 @@ def _resolve_route(route_table, patterns, path):
 # =============================================================================
 
 # Endpoints reachable without a session cookie
-_PUBLIC_GET = {"/api/session"}
+_PUBLIC_GET = {"/api/session", "/api/health"}
 _PUBLIC_POST = {"/api/register", "/api/login", "/api/request-otp", "/api/reset-password", "/api/logout"}
 
 _GET_ROUTES = {
+    "/api/health": AppRequestHandler._get_health,
     "/api/session": AppRequestHandler._get_session,
     "/api/dashboard": AppRequestHandler._get_dashboard,
     "/api/budget/summary": AppRequestHandler._get_budget_summary,

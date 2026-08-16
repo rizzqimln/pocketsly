@@ -15,6 +15,9 @@ class AuthProfileSheet extends StatefulWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: AppColors.bgSurface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
       builder: (context) => AuthProfileSheet(onStateChanged: onStateChanged),
     );
   }
@@ -27,8 +30,12 @@ class _AuthProfileSheetState extends State<AuthProfileSheet> {
   // Guest Form Tabs: 'login', 'register', 'forgot'
   String _guestTab = 'login';
   bool _isLoading = false;
+  bool _isTestingPing = false;
+  bool _showServerConfig = false;
   String? _errorMessage;
   String? _successMessage;
+  String? _pingResult;
+  bool? _pingSuccess;
 
   // Controllers for Login
   final TextEditingController _loginUsernameController = TextEditingController();
@@ -50,8 +57,9 @@ class _AuthProfileSheetState extends State<AuthProfileSheet> {
   final TextEditingController _profUsernameController = TextEditingController();
   final TextEditingController _profEmailController = TextEditingController();
   final TextEditingController _profPhoneController = TextEditingController();
-  final TextEditingController _profNewPasswordController = TextEditingController();
-  final TextEditingController _profOtpController = TextEditingController();
+
+  // Controller for Custom Server Base URL
+  final TextEditingController _customServerController = TextEditingController();
 
   @override
   void initState() {
@@ -62,13 +70,61 @@ class _AuthProfileSheetState extends State<AuthProfileSheet> {
       _profEmailController.text = user.email;
       _profPhoneController.text = user.phone;
     }
+    _customServerController.text = ApiEndpoints.baseUrl;
   }
 
   void _clearFeedback() {
     setState(() {
       _errorMessage = null;
       _successMessage = null;
+      _pingResult = null;
+      _pingSuccess = null;
     });
+  }
+
+  // ── Server Switching & Diagnostics ────────────────────────────────────────
+
+  Future<void> _handleSwitchServer(String url) async {
+    final normalized = ApiEndpoints.normalizeBaseUrl(url);
+    await ApiClient.instance.setBaseUrl(normalized);
+    _customServerController.text = normalized;
+    setState(() {
+      _errorMessage = null;
+      _successMessage = 'API server changed to $normalized';
+    });
+    await _handleTestPing(normalized);
+  }
+
+  Future<void> _handleTestPing([String? url]) async {
+    setState(() {
+      _isTestingPing = true;
+      _pingResult = null;
+    });
+
+    final target = url ?? _customServerController.text.trim();
+    final res = await ApiClient.instance.testConnection(target);
+
+    if (mounted) {
+      setState(() {
+        _isTestingPing = false;
+        _pingSuccess = res['success'] == true;
+        _pingResult = res['message'];
+      });
+    }
+  }
+
+  Future<void> _handleEnterDemoMode() async {
+    await ApiClient.instance.loginAsDemoUser();
+    widget.onStateChanged();
+    if (mounted) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: AppColors.primary,
+          content: Text('Entered Offline Demo Mode! Explore all features.'),
+        ),
+      );
+    }
   }
 
   // ── Auth Handlers ─────────────────────────────────────────────────────────
@@ -169,7 +225,7 @@ class _AuthProfileSheetState extends State<AuthProfileSheet> {
       if (res['success'] == true) {
         final otp = res['otp_code'] ?? '';
         _forgotOtpController.text = otp;
-        setState(() => _successMessage = 'OTP sent! (Demo Code: $otp)');
+        setState(() => _successMessage = 'OTP generated! Code: $otp');
       } else {
         setState(() => _errorMessage = res['error'] ?? 'No account found with provided info.');
       }
@@ -224,8 +280,6 @@ class _AuthProfileSheetState extends State<AuthProfileSheet> {
     final username = _profUsernameController.text.trim();
     final email = _profEmailController.text.trim();
     final phone = _profPhoneController.text.trim();
-    final newPass = _profNewPasswordController.text;
-    final otp = _profOtpController.text.trim();
 
     setState(() {
       _isLoading = true;
@@ -238,10 +292,6 @@ class _AuthProfileSheetState extends State<AuthProfileSheet> {
       'email': email,
       'phone': phone,
     };
-    if (newPass.isNotEmpty) {
-      body['new_password'] = newPass;
-      body['otp_code'] = otp;
-    }
 
     final res = await ApiClient.instance.updateProfile(body);
 
@@ -285,7 +335,7 @@ class _AuthProfileSheetState extends State<AuthProfileSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // ── Drag Handle Pill ────────────────────────────────────────────
+            // Drag Handle
             Center(
               child: Container(
                 width: 44,
@@ -298,7 +348,7 @@ class _AuthProfileSheetState extends State<AuthProfileSheet> {
             ),
             const SizedBox(height: 14),
 
-            // ── Modal Title ─────────────────────────────────────────────────
+            // Modal Header
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -307,14 +357,14 @@ class _AuthProfileSheetState extends State<AuthProfileSheet> {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withAlpha(35),
+                        gradient: AppColors.primaryGradient,
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Icon(Icons.person_rounded, color: AppColors.primaryLight, size: 20),
+                      child: const Icon(Icons.person_rounded, color: Colors.white, size: 20),
                     ),
                     const SizedBox(width: 10),
                     Text(
-                      isAuth ? 'Profile & Account Settings' : 'Pocketsly Authentication',
+                      isAuth ? 'Profile & Server Settings' : 'Pocketsly Authentication',
                       style: const TextStyle(
                         color: AppColors.textPrimary,
                         fontSize: 17,
@@ -332,22 +382,62 @@ class _AuthProfileSheetState extends State<AuthProfileSheet> {
             ),
             const SizedBox(height: 12),
 
-            // ── Alert Messages (Error / Success) ────────────────────────────
+            // Alert Messages (Error / Success)
             if (_errorMessage != null) ...[
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.danger.withAlpha(30),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: AppColors.danger.withAlpha(90)),
+                  color: AppColors.danger.withAlpha(25),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: AppColors.danger.withAlpha(80)),
                 ),
-                child: Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.error_outline_rounded, color: AppColors.danger, size: 18),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(_errorMessage!, style: const TextStyle(color: AppColors.danger, fontSize: 12, fontWeight: FontWeight.w600)),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(Icons.error_outline_rounded, color: AppColors.danger, size: 18),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            _errorMessage!,
+                            style: const TextStyle(color: AppColors.danger, fontSize: 12, fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                      ],
                     ),
+                    if (_errorMessage!.contains('Cannot reach') || _errorMessage!.contains('Connection refused') || _errorMessage!.contains('host lookup')) ...[
+                      const SizedBox(height: 10),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 6,
+                        children: [
+                          OutlinedButton.icon(
+                            onPressed: () => _handleSwitchServer(ApiEndpoints.emulatorBaseUrl),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: AppColors.primaryLight,
+                              side: const BorderSide(color: AppColors.primary),
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              visualDensity: VisualDensity.compact,
+                            ),
+                            icon: const Icon(Icons.android_rounded, size: 14),
+                            label: const Text('Switch to Emulator (10.0.2.2:8000)', style: TextStyle(fontSize: 11)),
+                          ),
+                          OutlinedButton.icon(
+                            onPressed: () => _handleSwitchServer(ApiEndpoints.localhostBaseUrl),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: AppColors.cyan,
+                              side: const BorderSide(color: AppColors.cyan),
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              visualDensity: VisualDensity.compact,
+                            ),
+                            icon: const Icon(Icons.computer_rounded, size: 14),
+                            label: const Text('Switch to 127.0.0.1:8000', style: TextStyle(fontSize: 11)),
+                          ),
+                        ],
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -358,9 +448,9 @@ class _AuthProfileSheetState extends State<AuthProfileSheet> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.success.withAlpha(30),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: AppColors.success.withAlpha(90)),
+                  color: AppColors.success.withAlpha(25),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: AppColors.success.withAlpha(80)),
                 ),
                 child: Row(
                   children: [
@@ -375,7 +465,11 @@ class _AuthProfileSheetState extends State<AuthProfileSheet> {
               const SizedBox(height: 12),
             ],
 
-            // ── MAIN BODY CONTENT ───────────────────────────────────────────
+            // ── Server Connection Status Strip (Always Accessible) ───────────
+            _buildServerStatusStrip(),
+            const SizedBox(height: 14),
+
+            // Main Body Content
             if (isAuth && user != null)
               _buildSignedInView(user)
             else
@@ -386,8 +480,204 @@ class _AuthProfileSheetState extends State<AuthProfileSheet> {
     );
   }
 
+  // ── SERVER STATUS STRIP & CONFIG PANEL ────────────────────────────────────
+  Widget _buildServerStatusStrip() {
+    final activeUrl = ApiEndpoints.baseUrl;
+    final isEmulator = activeUrl.contains('10.0.2.2');
+    final isLocalhost = activeUrl.contains('127.0.0.1') || activeUrl.contains('localhost');
+    final isCloud = activeUrl.contains('pages.dev');
+
+    String presetBadge = 'Custom Server';
+    Color badgeColor = AppColors.cyan;
+    if (isCloud) {
+      presetBadge = 'Cloud 24/7';
+      badgeColor = AppColors.primaryLight;
+    } else if (isEmulator) {
+      presetBadge = 'Android Emulator';
+      badgeColor = AppColors.success;
+    } else if (isLocalhost) {
+      presetBadge = 'Localhost (127.0.0.1)';
+      badgeColor = AppColors.warning;
+    }
+
+    return GlassCard(
+      padding: const EdgeInsets.all(12),
+      borderRadius: 16,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: _pingSuccess == true ? AppColors.success : (_pingSuccess == false ? AppColors.danger : badgeColor),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: (_pingSuccess == true ? AppColors.success : badgeColor).withAlpha(150),
+                          blurRadius: 6,
+                          spreadRadius: 1,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    presetBadge,
+                    style: TextStyle(color: badgeColor, fontSize: 12, fontWeight: FontWeight.w800),
+                  ),
+                ],
+              ),
+              InkWell(
+                onTap: () => setState(() => _showServerConfig = !_showServerConfig),
+                borderRadius: BorderRadius.circular(6),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _showServerConfig ? 'Hide Config' : 'Change Server ⚙️',
+                        style: const TextStyle(color: AppColors.primaryLight, fontSize: 11, fontWeight: FontWeight.w700),
+                      ),
+                      Icon(
+                        _showServerConfig ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
+                        color: AppColors.primaryLight,
+                        size: 16,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            activeUrl,
+            style: const TextStyle(color: AppColors.textMuted, fontSize: 11, fontFamily: 'monospace'),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+
+          // Ping status banner
+          if (_pingResult != null) ...[
+            const SizedBox(height: 6),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: (_pingSuccess == true ? AppColors.success : AppColors.danger).withAlpha(25),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    _pingSuccess == true ? Icons.check_circle_rounded : Icons.cancel_rounded,
+                    color: _pingSuccess == true ? AppColors.success : AppColors.danger,
+                    size: 14,
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      _pingResult!,
+                      style: TextStyle(
+                        color: _pingSuccess == true ? AppColors.success : AppColors.danger,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+
+          // Expandable Config Drawer
+          if (_showServerConfig) ...[
+            const Divider(color: AppColors.border, height: 18),
+            const Text(
+              'Select API Host Preset:',
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 11, fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: [
+                _buildPresetButton('Cloud Edge', ApiEndpoints.productionBaseUrl, Icons.cloud_queue_rounded),
+                _buildPresetButton('10.0.2.2 (Emulator)', ApiEndpoints.emulatorBaseUrl, Icons.android_rounded),
+                _buildPresetButton('127.0.0.1 (Local)', ApiEndpoints.localhostBaseUrl, Icons.computer_rounded),
+              ],
+            ),
+            const SizedBox(height: 10),
+
+            // Custom Base URL input
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _customServerController,
+                    style: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
+                    decoration: const InputDecoration(
+                      hintText: 'http://192.168.1.5:8000/api',
+                      labelText: 'Custom Server URL',
+                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: () => _handleSwitchServer(_customServerController.text),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: const Text('Save', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+
+            // Ping Test Button
+            OutlinedButton.icon(
+              onPressed: _isTestingPing ? null : () => _handleTestPing(),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: AppColors.border),
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              icon: _isTestingPing
+                  ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primaryLight))
+                  : const Icon(Icons.network_ping_rounded, size: 16),
+              label: Text(_isTestingPing ? 'Testing Connection...' : 'Test Connection / Ping', style: const TextStyle(fontSize: 11)),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPresetButton(String label, String url, IconData icon) {
+    final isSelected = ApiEndpoints.baseUrl == url;
+    return ChoiceChip(
+      avatar: Icon(icon, size: 14, color: isSelected ? Colors.white : AppColors.textSecondary),
+      label: Text(label, style: TextStyle(fontSize: 11, fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500)),
+      selected: isSelected,
+      selectedColor: AppColors.primary,
+      backgroundColor: AppColors.bgSurfaceAlt,
+      side: BorderSide(color: isSelected ? AppColors.primary : AppColors.border),
+      onSelected: (_) => _handleSwitchServer(url),
+    );
+  }
+
   // ── SIGNED-IN PROFILE VIEW ────────────────────────────────────────────────
   Widget _buildSignedInView(UserModel user) {
+    final isDemo = user.id == 999;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -396,14 +686,14 @@ class _AuthProfileSheetState extends State<AuthProfileSheet> {
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: AppColors.bgSurfaceAlt,
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(18),
             border: Border.all(color: AppColors.primary.withAlpha(40)),
           ),
           child: Row(
             children: [
               CircleAvatar(
                 radius: 24,
-                backgroundColor: AppColors.primary,
+                backgroundColor: isDemo ? AppColors.warning : AppColors.primary,
                 child: Text(
                   user.username.isNotEmpty ? user.username[0].toUpperCase() : 'U',
                   style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 18),
@@ -420,7 +710,7 @@ class _AuthProfileSheetState extends State<AuthProfileSheet> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      user.email.isNotEmpty ? user.email : 'Synchronized User Account',
+                      user.email.isNotEmpty ? user.email : (isDemo ? 'Offline Demo Session' : 'Synchronized User Account'),
                       style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
                     ),
                   ],
@@ -429,12 +719,16 @@ class _AuthProfileSheetState extends State<AuthProfileSheet> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: AppColors.success.withAlpha(30),
+                  color: (isDemo ? AppColors.warning : AppColors.success).withAlpha(30),
                   borderRadius: BorderRadius.circular(6),
                 ),
-                child: const Text(
-                  'Active',
-                  style: TextStyle(color: AppColors.success, fontSize: 10, fontWeight: FontWeight.w700),
+                child: Text(
+                  isDemo ? 'Demo Mode' : 'Online',
+                  style: TextStyle(
+                    color: isDemo ? AppColors.warning : AppColors.success,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ],
@@ -470,7 +764,7 @@ class _AuthProfileSheetState extends State<AuthProfileSheet> {
             backgroundColor: AppColors.primary,
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 13),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           ),
           child: _isLoading
               ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
@@ -478,71 +772,16 @@ class _AuthProfileSheetState extends State<AuthProfileSheet> {
         ),
         const SizedBox(height: 16),
 
-        // Server Connection Switcher
-        GlassCard(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Row(
-                children: [
-                  Icon(Icons.dns_rounded, color: AppColors.info, size: 16),
-                  SizedBox(width: 6),
-                  Text('Cloud Server Connection', style: TextStyle(color: AppColors.textPrimary, fontSize: 12, fontWeight: FontWeight.w700)),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Text(
-                'Active: ${ApiEndpoints.baseUrl}',
-                style: const TextStyle(color: AppColors.textMuted, fontSize: 11, fontFamily: 'monospace'),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () async {
-                        await ApiClient.instance.setBaseUrl(ApiEndpoints.productionBaseUrl);
-                        setState(() {});
-                      },
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: ApiEndpoints.baseUrl == ApiEndpoints.productionBaseUrl ? AppColors.primary : AppColors.border),
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                      ),
-                      child: const Text('24/7 Cloud Edge', style: TextStyle(fontSize: 11)),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () async {
-                        await ApiClient.instance.setBaseUrl(ApiEndpoints.localBaseUrl);
-                        setState(() {});
-                      },
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: ApiEndpoints.baseUrl == ApiEndpoints.localBaseUrl ? AppColors.primary : AppColors.border),
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                      ),
-                      child: const Text('Localhost (Python)', style: TextStyle(fontSize: 11)),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-
         // Sign Out Button
         ElevatedButton.icon(
           onPressed: _handleLogout,
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.danger.withAlpha(30),
+            backgroundColor: AppColors.danger.withAlpha(25),
             foregroundColor: AppColors.danger,
             elevation: 0,
             side: BorderSide(color: AppColors.danger.withAlpha(80)),
             padding: const EdgeInsets.symmetric(vertical: 13),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           ),
           icon: const Icon(Icons.logout_rounded, size: 18),
           label: const Text('Sign Out', style: TextStyle(fontWeight: FontWeight.w700)),
@@ -561,7 +800,7 @@ class _AuthProfileSheetState extends State<AuthProfileSheet> {
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
             color: AppColors.bgSurfaceAlt,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(14),
             border: Border.all(color: AppColors.border),
           ),
           child: Row(
@@ -612,11 +851,25 @@ class _AuthProfileSheetState extends State<AuthProfileSheet> {
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             ),
             child: _isLoading
                 ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                 : const Text('Sign In to Pocketsly', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+          ),
+          const SizedBox(height: 12),
+
+          // Offline Demo Mode Button
+          OutlinedButton.icon(
+            onPressed: _handleEnterDemoMode,
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.cyan,
+              side: const BorderSide(color: AppColors.cyan),
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            ),
+            icon: const Icon(Icons.explore_outlined, size: 18),
+            label: const Text('Explore in Offline Demo Mode', style: TextStyle(fontWeight: FontWeight.w700)),
           ),
         ] else if (_guestTab == 'register') ...[
           // REGISTER FORM
@@ -651,7 +904,7 @@ class _AuthProfileSheetState extends State<AuthProfileSheet> {
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             ),
             child: _isLoading
                 ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
@@ -678,7 +931,7 @@ class _AuthProfileSheetState extends State<AuthProfileSheet> {
                   foregroundColor: AppColors.primaryLight,
                   side: const BorderSide(color: AppColors.primary),
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 ),
                 child: const Text('Get OTP', style: TextStyle(fontWeight: FontWeight.w700)),
               ),
@@ -714,7 +967,7 @@ class _AuthProfileSheetState extends State<AuthProfileSheet> {
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             ),
             child: _isLoading
                 ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))

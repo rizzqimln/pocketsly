@@ -5,11 +5,47 @@ class ApiEndpoints {
   /// 24/7 Serverless Edge Production Base URL (Cloudflare Pages + D1)
   static const String productionBaseUrl = 'https://pocketsly.pages.dev/api';
 
-  /// Local Development Base URL (Python server on Android emulator localhost)
-  static const String localBaseUrl = 'http://10.0.2.2:8000/api';
+  /// Android Emulator Loopback Base URL (Python server on host machine)
+  static const String emulatorBaseUrl = 'http://10.0.2.2:8000/api';
+
+  /// Localhost / iOS Simulator / Desktop Base URL
+  static const String localhostBaseUrl = 'http://127.0.0.1:8000/api';
+
+  /// Local Development Base URL alias for backwards compatibility
+  static const String localBaseUrl = emulatorBaseUrl;
 
   /// Active Base URL
   static String baseUrl = productionBaseUrl;
+
+  /// Helper to sanitize and normalize server base URLs entered by the user
+  static String normalizeBaseUrl(String input) {
+    String trimmed = input.trim();
+    if (trimmed.isEmpty) return productionBaseUrl;
+
+    // Auto prepend scheme if missing
+    if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://')) {
+      if (trimmed.startsWith('localhost') || trimmed.startsWith('10.') || trimmed.startsWith('192.') || trimmed.startsWith('127.')) {
+        trimmed = 'http://$trimmed';
+      } else {
+        trimmed = 'https://$trimmed';
+      }
+    }
+
+    // Strip trailing slash
+    while (trimmed.endsWith('/')) {
+      trimmed = trimmed.substring(0, trimmed.length - 1);
+    }
+
+    // Ensure /api suffix exists
+    if (!trimmed.endsWith('/api')) {
+      trimmed = '$trimmed/api';
+    }
+
+    return trimmed;
+  }
+
+  // ── Diagnostics & Health ──────────────────────────────────────────────────
+  static String get health => '$baseUrl/health';
 
   // ── Authentication ────────────────────────────────────────────────────────
   static String get login => '$baseUrl/login';

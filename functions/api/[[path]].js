@@ -105,6 +105,10 @@ export async function onRequest(context) {
   try {
     // ── 1. PUBLIC ROUTES ────────────────────────────────────────────────────
 
+    if (method === 'GET' && path === '/api/health') {
+      return jsonResponse({ status: 'ok', service: 'cloudflare-d1-edge', version: '1.0.0', timestamp: Math.floor(Date.now() / 1000) });
+    }
+
     if (method === 'GET' && path === '/api/session') {
       const res = await routes.handleSession(db, user);
       return jsonResponse(res);

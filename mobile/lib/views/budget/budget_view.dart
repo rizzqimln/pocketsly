@@ -86,7 +86,7 @@ class _BudgetViewState extends State<BudgetView> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+      return const Center(child: CircularProgressIndicator(color: AppColors.primaryLight));
     }
 
     final balance = _totalIncome - _totalExpense;
@@ -101,15 +101,19 @@ class _BudgetViewState extends State<BudgetView> {
     }).toList();
 
     return RefreshIndicator(
-      color: AppColors.primary,
+      color: AppColors.primaryLight,
       backgroundColor: AppColors.bgSurface,
       onRefresh: _loadBudgetData,
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // ── Cashflow Hero Balance Card ─────────────────────────────────────
+          // ── Cashflow Hero Balance Card (Reference 1 & 2) ───────────────────
           GlassCard(
             padding: const EdgeInsets.all(20),
+            borderRadius: 22,
+            gradient: AppColors.glassGradient,
+            border: Border.all(color: AppColors.primaryLight.withAlpha(60), width: 1.2),
+            glowColor: balance >= 0 ? AppColors.primaryLight : AppColors.danger,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -126,40 +130,43 @@ class _BudgetViewState extends State<BudgetView> {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
                         color: balance >= 0 ? AppColors.success.withAlpha(35) : AppColors.danger.withAlpha(35),
-                        borderRadius: BorderRadius.circular(6),
+                        borderRadius: BorderRadius.circular(99),
+                        border: Border.all(
+                          color: balance >= 0 ? AppColors.success.withAlpha(80) : AppColors.danger.withAlpha(80),
+                        ),
                       ),
                       child: Text(
                         balance >= 0 ? 'Healthy Surplus' : 'Deficit Spending',
                         style: TextStyle(
                           color: balance >= 0 ? AppColors.success : AppColors.danger,
                           fontSize: 11,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 10),
                 Text(
                   '${balance >= 0 ? "+" : "-"}Rp ${balance.abs().toStringAsFixed(0)}',
                   style: TextStyle(
                     color: balance >= 0 ? AppColors.textPrimary : AppColors.danger,
-                    fontSize: 28,
-                    fontWeight: FontWeight.w800,
-                    fontFamily: 'monospace',
+                    fontSize: 30,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -1,
                   ),
                 ),
                 const SizedBox(height: 16),
 
                 // Flow strip (Income vs Expense)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   decoration: BoxDecoration(
                     color: AppColors.bgSurfaceAlt,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(16),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -167,21 +174,23 @@ class _BudgetViewState extends State<BudgetView> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Total Income', style: TextStyle(color: AppColors.textMuted, fontSize: 11)),
+                          const Text('Total Income', style: TextStyle(color: AppColors.textMuted, fontSize: 11, fontWeight: FontWeight.w600)),
+                          const SizedBox(height: 2),
                           Text(
                             '+Rp ${_totalIncome.toStringAsFixed(0)}',
-                            style: const TextStyle(color: AppColors.success, fontSize: 14, fontWeight: FontWeight.w700),
+                            style: const TextStyle(color: AppColors.success, fontSize: 15, fontWeight: FontWeight.w800),
                           ),
                         ],
                       ),
-                      Container(height: 24, width: 1, color: AppColors.border),
+                      Container(height: 28, width: 1, color: AppColors.border),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Total Spent', style: TextStyle(color: AppColors.textMuted, fontSize: 11)),
+                          const Text('Total Spent', style: TextStyle(color: AppColors.textMuted, fontSize: 11, fontWeight: FontWeight.w600)),
+                          const SizedBox(height: 2),
                           Text(
                             '-Rp ${_totalExpense.toStringAsFixed(0)}',
-                            style: const TextStyle(color: AppColors.danger, fontSize: 14, fontWeight: FontWeight.w700),
+                            style: const TextStyle(color: AppColors.danger, fontSize: 15, fontWeight: FontWeight.w800),
                           ),
                         ],
                       ),
@@ -191,19 +200,21 @@ class _BudgetViewState extends State<BudgetView> {
                 const SizedBox(height: 12),
 
                 // Usage Progress Bar
-                LinearProgressIndicator(
-                  value: usagePct / 100.0,
-                  backgroundColor: AppColors.bgSurfaceAlt,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    usagePct > 85 ? AppColors.danger : (usagePct > 70 ? AppColors.warning : AppColors.primary),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(99),
+                  child: LinearProgressIndicator(
+                    value: usagePct / 100.0,
+                    backgroundColor: AppColors.bgSurfaceAlt,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      usagePct > 85 ? AppColors.danger : (usagePct > 70 ? AppColors.warning : AppColors.primaryLight),
+                    ),
+                    minHeight: 6,
                   ),
-                  minHeight: 6,
-                  borderRadius: BorderRadius.circular(3),
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  '$usagePct% of monthly earnings spent',
-                  style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
+                  '$usagePct% of monthly earnings utilized',
+                  style: const TextStyle(color: AppColors.textMuted, fontSize: 11, fontWeight: FontWeight.w600),
                 ),
               ],
             ),
@@ -219,11 +230,11 @@ class _BudgetViewState extends State<BudgetView> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.danger,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(vertical: 13),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
                   icon: const Icon(Icons.remove_circle_outline_rounded, size: 18),
-                  label: const Text('- Expense', style: TextStyle(fontWeight: FontWeight.w700)),
+                  label: const Text('- Expense', style: TextStyle(fontWeight: FontWeight.w800)),
                 ),
               ),
               const SizedBox(width: 8),
@@ -233,11 +244,11 @@ class _BudgetViewState extends State<BudgetView> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.success,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(vertical: 13),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
                   icon: const Icon(Icons.add_circle_outline_rounded, size: 18),
-                  label: const Text('+ Income', style: TextStyle(fontWeight: FontWeight.w700)),
+                  label: const Text('+ Income', style: TextStyle(fontWeight: FontWeight.w800)),
                 ),
               ),
               const SizedBox(width: 8),
@@ -245,7 +256,8 @@ class _BudgetViewState extends State<BudgetView> {
                 onPressed: () => _openEntry('budget'),
                 style: IconButton.styleFrom(
                   backgroundColor: AppColors.primary,
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(13),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 ),
                 icon: const Icon(Icons.track_changes_rounded, color: Colors.white),
                 tooltip: 'Set Target Limit',
@@ -274,36 +286,41 @@ class _BudgetViewState extends State<BudgetView> {
 
               return GlassCard(
                 margin: const EdgeInsets.only(bottom: 8),
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(14),
+                borderRadius: 16,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(l.category, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: AppColors.textPrimary)),
+                        Text(l.category, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5, color: AppColors.textPrimary)),
                         Row(
                           children: [
                             Text(
                               'Rp ${spent.toStringAsFixed(0)} / ${l.amount.toStringAsFixed(0)}',
-                              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, fontFamily: 'monospace'),
+                              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, fontFamily: 'monospace', fontWeight: FontWeight.w700),
                             ),
-                            const SizedBox(width: 4),
+                            const SizedBox(width: 6),
                             InkWell(
                               onTap: () => _deleteBudgetLimit(l),
-                              child: const Icon(Icons.close_rounded, size: 14, color: AppColors.textMuted),
+                              child: const Icon(Icons.close_rounded, size: 16, color: AppColors.textMuted),
                             ),
                           ],
                         ),
                       ],
                     ),
-                    const SizedBox(height: 6),
-                    LinearProgressIndicator(
-                      value: pct / 100.0,
-                      backgroundColor: AppColors.bgSurfaceAlt,
-                      valueColor: AlwaysStoppedAnimation<Color>(pct > 90 ? AppColors.danger : (pct > 70 ? AppColors.warning : AppColors.primary)),
-                      minHeight: 5,
-                      borderRadius: BorderRadius.circular(3),
+                    const SizedBox(height: 8),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(99),
+                      child: LinearProgressIndicator(
+                        value: pct / 100.0,
+                        backgroundColor: AppColors.bgSurfaceAlt,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          pct > 90 ? AppColors.danger : (pct > 70 ? AppColors.warning : AppColors.primaryLight),
+                        ),
+                        minHeight: 5,
+                      ),
                     ),
                   ],
                 ),
@@ -340,27 +357,32 @@ class _BudgetViewState extends State<BudgetView> {
 
           if (filteredTransactions.isEmpty)
             const GlassCard(
+              borderRadius: 18,
               child: Padding(
-                padding: EdgeInsets.all(16),
-                child: Center(child: Text('No transactions logged yet.', style: TextStyle(color: AppColors.textMuted))),
+                padding: EdgeInsets.all(24),
+                child: Center(
+                  child: Text('No transactions logged yet.', style: TextStyle(color: AppColors.textMuted, fontWeight: FontWeight.w600)),
+                ),
               ),
             )
           else
             ...filteredTransactions.map((t) => GlassCard(
-              margin: const EdgeInsets.only(bottom: 6),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              borderRadius: 16,
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    width: 36,
+                    height: 36,
                     decoration: BoxDecoration(
-                      color: t.isIncome ? AppColors.success.withAlpha(35) : AppColors.danger.withAlpha(35),
-                      shape: BoxShape.circle,
+                      color: (t.isIncome ? AppColors.success : AppColors.danger).withAlpha(30),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(
                       t.isIncome ? Icons.arrow_downward_rounded : Icons.arrow_upward_rounded,
                       color: t.isIncome ? AppColors.success : AppColors.danger,
-                      size: 16,
+                      size: 18,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -369,11 +391,11 @@ class _BudgetViewState extends State<BudgetView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          t.categoryOrSource,
-                          style: const TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w700),
+                          t.description.isNotEmpty ? t.description : t.categoryOrSource,
+                          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5, color: AppColors.textPrimary),
                         ),
                         Text(
-                          '${t.date}${t.description.isNotEmpty ? " • ${t.description}" : ""}',
+                          '${t.date} • ${t.categoryOrSource}',
                           style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
                         ),
                       ],
@@ -383,15 +405,14 @@ class _BudgetViewState extends State<BudgetView> {
                     '${t.isIncome ? "+" : "-"}Rp ${t.amount.toStringAsFixed(0)}',
                     style: TextStyle(
                       color: t.isIncome ? AppColors.success : AppColors.danger,
-                      fontSize: 14,
                       fontWeight: FontWeight.w800,
-                      fontFamily: 'monospace',
+                      fontSize: 14,
                     ),
                   ),
                   const SizedBox(width: 4),
                   IconButton(
                     onPressed: () => _deleteTransaction(t),
-                    icon: const Icon(Icons.close_rounded, color: AppColors.textMuted, size: 16),
+                    icon: const Icon(Icons.delete_outline_rounded, color: AppColors.textMuted, size: 18),
                   ),
                 ],
               ),
@@ -403,24 +424,19 @@ class _BudgetViewState extends State<BudgetView> {
 
   Widget _buildLedgerFilterChip(String filter, String label) {
     final isSelected = _ledgerFilter == filter;
-    return InkWell(
-      onTap: () => setState(() => _ledgerFilter = filter),
-      borderRadius: BorderRadius.circular(6),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : AppColors.bgSurfaceAlt,
-          borderRadius: BorderRadius.circular(6),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? Colors.white : AppColors.textSecondary,
-            fontSize: 10,
-            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-          ),
-        ),
+    return ChoiceChip(
+      label: Text(label),
+      selected: isSelected,
+      selectedColor: AppColors.primary,
+      backgroundColor: AppColors.bgSurfaceAlt,
+      side: BorderSide(color: isSelected ? AppColors.primary : AppColors.border),
+      labelStyle: TextStyle(
+        color: isSelected ? Colors.white : AppColors.textSecondary,
+        fontSize: 10,
+        fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
       ),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      onSelected: (_) => setState(() => _ledgerFilter = filter),
     );
   }
 }

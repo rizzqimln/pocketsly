@@ -18,16 +18,16 @@ class AppTheme {
         onSurface: AppColors.textPrimary,
         error: AppColors.danger,
       ),
-      textTheme: GoogleFonts.interTextTheme(
+      textTheme: GoogleFonts.plusJakartaSansTextTheme(
         ThemeData.dark().textTheme,
       ).copyWith(
-        displayLarge: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w800),
-        displayMedium: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w800),
-        titleLarge: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700),
-        titleMedium: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600),
-        bodyLarge: const TextStyle(color: AppColors.textPrimary),
-        bodyMedium: const TextStyle(color: AppColors.textSecondary),
-        bodySmall: const TextStyle(color: AppColors.textMuted),
+        displayLarge: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w800, letterSpacing: -1.0),
+        displayMedium: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w800, letterSpacing: -0.5),
+        titleLarge: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w800, fontSize: 18),
+        titleMedium: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700, fontSize: 15),
+        bodyLarge: const TextStyle(color: AppColors.textPrimary, fontSize: 14),
+        bodyMedium: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+        bodySmall: const TextStyle(color: AppColors.textMuted, fontSize: 11),
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.bgMain,
@@ -39,7 +39,7 @@ class AppTheme {
         color: AppColors.bgSurface,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
           side: const BorderSide(color: AppColors.border, width: 1),
         ),
       ),
@@ -47,28 +47,41 @@ class AppTheme {
         backgroundColor: AppColors.bgSurface,
         modalBackgroundColor: AppColors.bgSurface,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         ),
-        elevation: 16,
+        elevation: 20,
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor: AppColors.bgSurfaceAlt,
+        disabledColor: AppColors.bgSurfaceAlt,
+        selectedColor: AppColors.primary,
+        secondarySelectedColor: AppColors.primaryLight,
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(99),
+          side: const BorderSide(color: AppColors.border, width: 1),
+        ),
+        labelStyle: const TextStyle(color: AppColors.textPrimary, fontSize: 12, fontWeight: FontWeight.w600),
+        secondaryLabelStyle: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.bgSurfaceAlt,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(14),
           borderSide: const BorderSide(color: AppColors.border, width: 1),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(14),
           borderSide: const BorderSide(color: AppColors.border, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: AppColors.primaryLight, width: 1.5),
         ),
-        hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 14),
-        labelStyle: const TextStyle(color: AppColors.textSecondary, fontSize: 14, fontWeight: FontWeight.w600),
+        hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 13),
+        labelStyle: const TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.w600),
       ),
     );
   }

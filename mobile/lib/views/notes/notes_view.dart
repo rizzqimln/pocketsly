@@ -68,16 +68,16 @@ class _NotesViewState extends State<NotesView> with SingleTickerProviderStateMix
   String _getMoodLabel(String mood) {
     switch (mood.toLowerCase()) {
       case 'productive':
-        return 'Productive';
+        return '🚀 Productive';
       case 'happy':
-        return 'Positive';
+        return '😊 Positive';
       case 'stressed':
-        return 'Urgent';
+        return '⚡ Urgent';
       case 'tired':
-        return 'Review Later';
+        return '😴 Review Later';
       case 'neutral':
       default:
-        return 'General';
+        return '🧘 Calm';
     }
   }
 
@@ -92,6 +92,9 @@ class _NotesViewState extends State<NotesView> with SingleTickerProviderStateMix
       context: context,
       isScrollControlled: true,
       backgroundColor: AppColors.bgSurface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
       builder: (ctx) {
         return StatefulBuilder(
           builder: (context, setSheetState) {
@@ -111,10 +114,9 @@ class _NotesViewState extends State<NotesView> with SingleTickerProviderStateMix
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Handle
                   Center(
                     child: Container(
-                      width: 40,
+                      width: 44,
                       height: 4,
                       decoration: BoxDecoration(
                         color: AppColors.borderLight,
@@ -122,9 +124,8 @@ class _NotesViewState extends State<NotesView> with SingleTickerProviderStateMix
                       ),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
 
-                  // Header
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -136,69 +137,71 @@ class _NotesViewState extends State<NotesView> with SingleTickerProviderStateMix
                           fontWeight: FontWeight.w800,
                         ),
                       ),
-                      Text(
-                        '$wordCount words • $charCount chars',
-                        style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Title Input & Mood Dropdown
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: titleController,
-                          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
-                          decoration: const InputDecoration(
-                            hintText: 'Untitled Reflection / Note',
-                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
                           color: AppColors.bgSurfaceAlt,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppColors.border),
+                          borderRadius: BorderRadius.circular(99),
                         ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            value: currentMood,
-                            dropdownColor: AppColors.bgSurfaceAlt,
-                            items: const [
-                              DropdownMenuItem(value: 'neutral', child: Text('General', style: TextStyle(fontSize: 12))),
-                              DropdownMenuItem(value: 'productive', child: Text('Productive', style: TextStyle(fontSize: 12))),
-                              DropdownMenuItem(value: 'happy', child: Text('Positive', style: TextStyle(fontSize: 12))),
-                              DropdownMenuItem(value: 'tired', child: Text('Review Later', style: TextStyle(fontSize: 12))),
-                              DropdownMenuItem(value: 'stressed', child: Text('Urgent', style: TextStyle(fontSize: 12))),
-                            ],
-                            onChanged: (val) {
-                              if (val != null) setSheetState(() => currentMood = val);
-                            },
-                          ),
+                        child: Text(
+                          '$wordCount words • $charCount chars',
+                          style: const TextStyle(color: AppColors.textMuted, fontSize: 10, fontWeight: FontWeight.w700),
                         ),
                       ),
                     ],
-                  ),
-                  const SizedBox(height: 10),
-
-                  // Body Input
-                  TextField(
-                    controller: bodyController,
-                    maxLines: 8,
-                    onChanged: (_) => setSheetState(() {}),
-                    decoration: const InputDecoration(
-                      hintText: 'Start writing... your thoughts, class notes, reflections, or ideas.',
-                      contentPadding: EdgeInsets.all(12),
-                    ),
                   ),
                   const SizedBox(height: 14),
 
-                  // Action Buttons
+                  // Mood Selector Pills (Reference 3)
+                  const Text('How are you feeling about this topic?', style: TextStyle(color: AppColors.textSecondary, fontSize: 12, fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 6),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: ['productive', 'happy', 'neutral', 'tired', 'stressed'].map((m) {
+                        final isSelected = currentMood == m;
+                        final color = _getMoodColor(m);
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 6),
+                          child: ChoiceChip(
+                            label: Text(_getMoodLabel(m)),
+                            selected: isSelected,
+                            selectedColor: color.withAlpha(50),
+                            backgroundColor: AppColors.bgSurfaceAlt,
+                            side: BorderSide(color: isSelected ? color : AppColors.border),
+                            labelStyle: TextStyle(
+                              color: isSelected ? color : AppColors.textSecondary,
+                              fontSize: 11,
+                              fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
+                            ),
+                            onSelected: (_) => setSheetState(() => currentMood = m),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  TextField(
+                    controller: titleController,
+                    decoration: const InputDecoration(
+                      labelText: 'Note Title / Headline',
+                      hintText: 'e.g. Asymptotic Complexity in Algorithms',
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  TextField(
+                    controller: bodyController,
+                    maxLines: 5,
+                    onChanged: (_) => setSheetState(() {}),
+                    decoration: const InputDecoration(
+                      labelText: 'Journal Content / Insights',
+                      hintText: 'Type your insights, formulas, code snippets...',
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
                   Row(
                     children: [
                       if (!isNew) ...[
@@ -209,9 +212,10 @@ class _NotesViewState extends State<NotesView> with SingleTickerProviderStateMix
                             _loadNotesAndLibrary();
                           },
                           style: IconButton.styleFrom(
-                            backgroundColor: AppColors.danger.withAlpha(40),
+                            backgroundColor: AppColors.danger.withAlpha(30),
+                            padding: const EdgeInsets.all(12),
                           ),
-                          icon: const Icon(Icons.delete_outline_rounded, color: AppColors.danger, size: 20),
+                          icon: const Icon(Icons.delete_outline_rounded, color: AppColors.danger),
                         ),
                         const SizedBox(width: 8),
                       ],
@@ -223,23 +227,17 @@ class _NotesViewState extends State<NotesView> with SingleTickerProviderStateMix
                             if (title.isEmpty && content.isEmpty) return;
 
                             Navigator.pop(ctx);
-                            final today = DateTime.now().toIso8601String().substring(0, 10);
-
                             if (isNew) {
                               await ApiClient.instance.post(ApiEndpoints.notes, {
-                                'title': title.isEmpty ? 'Untitled Note' : title,
+                                'title': title.isEmpty ? 'Untitled Reflection' : title,
                                 'content': content,
                                 'mood': currentMood,
-                                'tags': currentMood,
-                                'updated_at': today,
                               });
                             } else {
-                              await ApiClient.instance.post(ApiEndpoints.note(note.id), {
-                                'title': title.isEmpty ? 'Untitled Note' : title,
+                              await ApiClient.instance.patch(ApiEndpoints.note(note.id), {
+                                'title': title.isEmpty ? 'Untitled Reflection' : title,
                                 'content': content,
                                 'mood': currentMood,
-                                'tags': currentMood,
-                                'updated_at': today,
                               });
                             }
                             _loadNotesAndLibrary();
@@ -247,11 +245,11 @@ class _NotesViewState extends State<NotesView> with SingleTickerProviderStateMix
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
                             foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                           ),
                           icon: const Icon(Icons.save_outlined, size: 18),
-                          label: Text(isNew ? 'Save Note' : 'Update Note', style: const TextStyle(fontWeight: FontWeight.w700)),
+                          label: Text(isNew ? 'Save Note' : 'Update Note', style: const TextStyle(fontWeight: FontWeight.w800)),
                         ),
                       ),
                     ],
@@ -278,6 +276,9 @@ class _NotesViewState extends State<NotesView> with SingleTickerProviderStateMix
       context: context,
       isScrollControlled: true,
       backgroundColor: AppColors.bgSurface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
       builder: (ctx) {
         return StatefulBuilder(
           builder: (context, setSheetState) {
@@ -295,7 +296,7 @@ class _NotesViewState extends State<NotesView> with SingleTickerProviderStateMix
                 children: [
                   Center(
                     child: Container(
-                      width: 40,
+                      width: 44,
                       height: 4,
                       decoration: BoxDecoration(
                         color: AppColors.borderLight,
@@ -303,15 +304,15 @@ class _NotesViewState extends State<NotesView> with SingleTickerProviderStateMix
                       ),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   const Text(
-                    'Add Research Resource / Book',
+                    'Add Academic Resource / Paper',
                     style: TextStyle(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.w800),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: titleController,
-                    decoration: const InputDecoration(labelText: 'Title / Paper Name'),
+                    decoration: const InputDecoration(labelText: 'Title / Paper Name', hintText: 'e.g. Distributed Consensus in Cloudflare D1'),
                   ),
                   const SizedBox(height: 8),
                   Row(
@@ -319,7 +320,7 @@ class _NotesViewState extends State<NotesView> with SingleTickerProviderStateMix
                       Expanded(
                         child: TextField(
                           controller: authorController,
-                          decoration: const InputDecoration(labelText: 'Author / Publisher'),
+                          decoration: const InputDecoration(labelText: 'Author / Publisher', hintText: 'e.g. MIT CS / MDN'),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -327,7 +328,7 @@ class _NotesViewState extends State<NotesView> with SingleTickerProviderStateMix
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         decoration: BoxDecoration(
                           color: AppColors.bgSurfaceAlt,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(14),
                           border: Border.all(color: AppColors.border),
                         ),
                         child: DropdownButtonHideUnderline(
@@ -352,15 +353,15 @@ class _NotesViewState extends State<NotesView> with SingleTickerProviderStateMix
                   const SizedBox(height: 8),
                   TextField(
                     controller: urlController,
-                    decoration: const InputDecoration(labelText: 'URL / Online Reference Link'),
+                    decoration: const InputDecoration(labelText: 'URL / Reference Link', hintText: 'https://developer.mozilla.org'),
                   ),
                   const SizedBox(height: 8),
                   TextField(
                     controller: summaryController,
                     maxLines: 2,
-                    decoration: const InputDecoration(labelText: 'Key Takeaways / Abstract Summary'),
+                    decoration: const InputDecoration(labelText: 'Key Takeaways / Abstract Summary', hintText: 'Core concepts and summaries...'),
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () async {
                       final title = titleController.text.trim();
@@ -380,10 +381,10 @@ class _NotesViewState extends State<NotesView> with SingleTickerProviderStateMix
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 13),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     ),
-                    child: const Text('Add to Academic Library', style: TextStyle(fontWeight: FontWeight.w700)),
+                    child: const Text('Save to Academic Library', style: TextStyle(fontWeight: FontWeight.w800)),
                   ),
                 ],
               ),
@@ -420,14 +421,14 @@ class _NotesViewState extends State<NotesView> with SingleTickerProviderStateMix
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
             color: AppColors.bgSurfaceAlt,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(14),
           ),
           child: TabBar(
             controller: _tabController,
             indicatorSize: TabBarIndicatorSize.tab,
             indicator: BoxDecoration(
-              color: AppColors.primary,
-              borderRadius: BorderRadius.circular(10),
+              gradient: AppColors.primaryGradient,
+              borderRadius: BorderRadius.circular(12),
             ),
             labelColor: Colors.white,
             unselectedLabelColor: AppColors.textSecondary,
@@ -442,7 +443,7 @@ class _NotesViewState extends State<NotesView> with SingleTickerProviderStateMix
         // ── Tab Views ───────────────────────────────────────────────────────
         Expanded(
           child: _isLoading
-              ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+              ? const Center(child: CircularProgressIndicator(color: AppColors.primaryLight))
               : TabBarView(
                   controller: _tabController,
                   children: [
@@ -450,7 +451,7 @@ class _NotesViewState extends State<NotesView> with SingleTickerProviderStateMix
                     // TAB 1: JOURNAL & NOTES PANE
                     // ═════════════════════════════════════════════════════════
                     RefreshIndicator(
-                      color: AppColors.primary,
+                      color: AppColors.primaryLight,
                       onRefresh: _loadNotesAndLibrary,
                       child: ListView(
                         padding: const EdgeInsets.all(16),
@@ -461,13 +462,10 @@ class _NotesViewState extends State<NotesView> with SingleTickerProviderStateMix
                               Expanded(
                                 child: TextField(
                                   onChanged: (val) => setState(() => _notesSearch = val),
-                                  decoration: InputDecoration(
-                                    hintText: 'Search notes by title or content...',
-                                    prefixIcon: const Icon(Icons.search_rounded, size: 18, color: AppColors.textMuted),
-                                    contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                                    filled: true,
-                                    fillColor: AppColors.bgSurfaceAlt,
-                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                                  decoration: const InputDecoration(
+                                    hintText: 'Search notes by keyword...',
+                                    prefixIcon: Icon(Icons.search_rounded, size: 18, color: AppColors.textMuted),
+                                    contentPadding: EdgeInsets.symmetric(vertical: 10),
                                   ),
                                 ),
                               ),
@@ -476,7 +474,7 @@ class _NotesViewState extends State<NotesView> with SingleTickerProviderStateMix
                                 onPressed: () => _openNoteEditor(),
                                 style: IconButton.styleFrom(
                                   backgroundColor: AppColors.primary,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                                   padding: const EdgeInsets.all(12),
                                 ),
                                 icon: const Icon(Icons.add_rounded, color: Colors.white),
@@ -486,7 +484,7 @@ class _NotesViewState extends State<NotesView> with SingleTickerProviderStateMix
                           ),
                           const SizedBox(height: 10),
 
-                          // Mood Filter Chips
+                          // Mood Filter Chips (Reference 3)
                           SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: Row(
@@ -495,7 +493,7 @@ class _NotesViewState extends State<NotesView> with SingleTickerProviderStateMix
                                 return Padding(
                                   padding: const EdgeInsets.only(right: 6),
                                   child: ChoiceChip(
-                                    label: Text(_getMoodLabel(m)),
+                                    label: Text(m == 'all' ? 'All Moods' : _getMoodLabel(m)),
                                     selected: isSelected,
                                     selectedColor: AppColors.primary,
                                     backgroundColor: AppColors.bgSurfaceAlt,
@@ -517,6 +515,7 @@ class _NotesViewState extends State<NotesView> with SingleTickerProviderStateMix
                           if (filteredNotes.isEmpty)
                             GlassCard(
                               padding: const EdgeInsets.all(32),
+                              borderRadius: 20,
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
@@ -528,7 +527,7 @@ class _NotesViewState extends State<NotesView> with SingleTickerProviderStateMix
                                   ),
                                   const SizedBox(height: 4),
                                   const Text(
-                                    'Capture your class reflections, insights, or code ideas.',
+                                    'Capture your insights, learning reflections, or formulas.',
                                     textAlign: TextAlign.center,
                                     style: TextStyle(color: AppColors.textMuted, fontSize: 12),
                                   ),
@@ -538,6 +537,7 @@ class _NotesViewState extends State<NotesView> with SingleTickerProviderStateMix
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: AppColors.primary,
                                       foregroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                     ),
                                     icon: const Icon(Icons.add_rounded, size: 16),
                                     label: const Text('Create First Note', style: TextStyle(fontWeight: FontWeight.w700)),
@@ -550,6 +550,8 @@ class _NotesViewState extends State<NotesView> with SingleTickerProviderStateMix
                               final moodColor = _getMoodColor(n.mood);
                               return GlassCard(
                                 margin: const EdgeInsets.only(bottom: 10),
+                                padding: const EdgeInsets.all(16),
+                                borderRadius: 18,
                                 onTap: () => _openNoteEditor(n),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -559,24 +561,26 @@ class _NotesViewState extends State<NotesView> with SingleTickerProviderStateMix
                                       children: [
                                         Expanded(
                                           child: Text(
-                                            n.title.isEmpty ? 'Untitled Note' : n.title,
+                                            n.title,
                                             style: const TextStyle(
                                               color: AppColors.textPrimary,
                                               fontSize: 15,
-                                              fontWeight: FontWeight.w700,
+                                              fontWeight: FontWeight.w800,
                                             ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
                                         Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                           decoration: BoxDecoration(
                                             color: moodColor.withAlpha(35),
-                                            borderRadius: BorderRadius.circular(6),
-                                            border: Border.all(color: moodColor.withAlpha(80)),
+                                            borderRadius: BorderRadius.circular(99),
+                                            border: Border.all(color: moodColor.withAlpha(70)),
                                           ),
                                           child: Text(
                                             _getMoodLabel(n.mood),
-                                            style: TextStyle(color: moodColor, fontSize: 10, fontWeight: FontWeight.w700),
+                                            style: TextStyle(color: moodColor, fontSize: 10, fontWeight: FontWeight.w800),
                                           ),
                                         ),
                                       ],
@@ -584,17 +588,21 @@ class _NotesViewState extends State<NotesView> with SingleTickerProviderStateMix
                                     const SizedBox(height: 6),
                                     Text(
                                       n.content,
+                                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 13, height: 1.4),
                                       maxLines: 3,
                                       overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 13, height: 1.3),
                                     ),
-                                    if (n.updatedAt.isNotEmpty) ...[
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        'Updated: ${n.updatedAt}',
-                                        style: const TextStyle(color: AppColors.textMuted, fontSize: 10),
-                                      ),
-                                    ],
+                                    const SizedBox(height: 8),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          n.updatedAt.isNotEmpty ? n.updatedAt.substring(0, 10) : 'Recent',
+                                          style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
+                                        ),
+                                        const Icon(Icons.arrow_outward_rounded, size: 14, color: AppColors.textMuted),
+                                      ],
+                                    ),
                                   ],
                                 ),
                               );
@@ -607,24 +615,20 @@ class _NotesViewState extends State<NotesView> with SingleTickerProviderStateMix
                     // TAB 2: ACADEMIC LIBRARY PANE
                     // ═════════════════════════════════════════════════════════
                     RefreshIndicator(
-                      color: AppColors.primary,
+                      color: AppColors.primaryLight,
                       onRefresh: _loadNotesAndLibrary,
                       child: ListView(
                         padding: const EdgeInsets.all(16),
                         children: [
-                          // Search bar & Add Resource action
                           Row(
                             children: [
                               Expanded(
                                 child: TextField(
                                   onChanged: (val) => setState(() => _librarySearch = val),
-                                  decoration: InputDecoration(
-                                    hintText: 'Search title, author, journal...',
-                                    prefixIcon: const Icon(Icons.search_rounded, size: 18, color: AppColors.textMuted),
-                                    contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                                    filled: true,
-                                    fillColor: AppColors.bgSurfaceAlt,
-                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                                  decoration: const InputDecoration(
+                                    hintText: 'Search academic papers & articles...',
+                                    prefixIcon: Icon(Icons.search_rounded, size: 18, color: AppColors.textMuted),
+                                    contentPadding: EdgeInsets.symmetric(vertical: 10),
                                   ),
                                 ),
                               ),
@@ -633,17 +637,16 @@ class _NotesViewState extends State<NotesView> with SingleTickerProviderStateMix
                                 onPressed: _openAddResourceModal,
                                 style: IconButton.styleFrom(
                                   backgroundColor: AppColors.primary,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                                   padding: const EdgeInsets.all(12),
                                 ),
-                                icon: const Icon(Icons.add_rounded, color: Colors.white),
-                                tooltip: 'Add Paper / Book',
+                                icon: const Icon(Icons.bookmark_add_outlined, color: Colors.white),
+                                tooltip: 'Add Resource',
                               ),
                             ],
                           ),
                           const SizedBox(height: 10),
 
-                          // Category Filter Chips
                           SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: Row(
@@ -656,12 +659,12 @@ class _NotesViewState extends State<NotesView> with SingleTickerProviderStateMix
                                     selected: isSelected,
                                     selectedColor: AppColors.primary,
                                     backgroundColor: AppColors.bgSurfaceAlt,
+                                    side: BorderSide(color: isSelected ? AppColors.primary : AppColors.border),
                                     labelStyle: TextStyle(
                                       color: isSelected ? Colors.white : AppColors.textSecondary,
                                       fontSize: 10,
-                                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                      fontWeight: FontWeight.w800,
                                     ),
-                                    side: BorderSide(color: isSelected ? AppColors.primary : AppColors.border),
                                     onSelected: (_) => setState(() => _selectedCategory = c),
                                   ),
                                 );
@@ -670,98 +673,50 @@ class _NotesViewState extends State<NotesView> with SingleTickerProviderStateMix
                           ),
                           const SizedBox(height: 14),
 
-                          // Resources List
-                          if (filteredResources.isEmpty)
-                            GlassCard(
-                              padding: const EdgeInsets.all(32),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(Icons.menu_book_rounded, color: AppColors.textMuted.withAlpha(100), size: 48),
-                                  const SizedBox(height: 12),
-                                  const Text(
-                                    'No academic resources found.',
-                                    style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  const Text(
-                                    'Catalog research papers, documentation, and online textbooks.',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(color: AppColors.textMuted, fontSize: 12),
-                                  ),
-                                  const SizedBox(height: 14),
-                                  ElevatedButton.icon(
-                                    onPressed: _openAddResourceModal,
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: AppColors.primary,
-                                      foregroundColor: Colors.white,
-                                    ),
-                                    icon: const Icon(Icons.add_rounded, size: 16),
-                                    label: const Text('Add First Resource', style: TextStyle(fontWeight: FontWeight.w700)),
-                                  ),
-                                ],
-                              ),
-                            )
-                          else
-                            ...filteredResources.map((r) {
-                              return GlassCard(
-                                margin: const EdgeInsets.only(bottom: 10),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                          ...filteredResources.map((r) => GlassCard(
+                            margin: const EdgeInsets.only(bottom: 10),
+                            padding: const EdgeInsets.all(16),
+                            borderRadius: 18,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            r.title,
-                                            style: const TextStyle(
-                                              color: AppColors.textPrimary,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ),
-                                        ),
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                          decoration: BoxDecoration(
-                                            color: AppColors.primary.withAlpha(40),
-                                            borderRadius: BorderRadius.circular(6),
-                                          ),
-                                          child: Text(
-                                            r.category.toUpperCase(),
-                                            style: const TextStyle(color: AppColors.primaryLight, fontSize: 9, fontWeight: FontWeight.w800),
-                                          ),
-                                        ),
-                                      ],
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.primary.withAlpha(35),
+                                        borderRadius: BorderRadius.circular(99),
+                                      ),
+                                      child: Text(
+                                        r.category.toUpperCase(),
+                                        style: const TextStyle(color: AppColors.primaryLight, fontSize: 9, fontWeight: FontWeight.w800),
+                                      ),
                                     ),
-                                    if (r.author.isNotEmpty) ...[
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        'Author: ${r.author}',
-                                        style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
-                                      ),
-                                    ],
-                                    if (r.summary.isNotEmpty) ...[
-                                      const SizedBox(height: 6),
-                                      Text(
-                                        r.summary,
-                                        style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
-                                      ),
-                                    ],
-                                    if (r.url.isNotEmpty) ...[
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        r.url,
-                                        style: const TextStyle(color: AppColors.info, fontSize: 11, decoration: TextDecoration.underline),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ],
+                                    Text(
+                                      r.author.isNotEmpty ? r.author : 'Academic Reference',
+                                      style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
+                                    ),
                                   ],
                                 ),
-                              );
-                            }),
+                                const SizedBox(height: 6),
+                                Text(
+                                  r.title,
+                                  style: const TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w800),
+                                ),
+                                if (r.summary.isNotEmpty) ...[
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    r.summary,
+                                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ],
+                            ),
+                          )),
                         ],
                       ),
                     ),

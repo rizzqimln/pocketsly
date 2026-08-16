@@ -638,6 +638,13 @@ async checkSession() {
     window.App?.onLoginSuccess();
   },
 
+  /** Logs in as a demo scholar without requiring a server connection */
+  exploreDemo() {
+    this.currentUser = { id: 999, username: 'demo_scholar', email: 'demo@pocketsly.app', phone: '+6280000000', currency: 'IDR' };
+    UI.toast('Entered Offline Demo Mode!', 'success');
+    this.showApp();
+  },
+
   /** Hides the app and returns to the landing page. */
   showLogin() {
     this.showLanding();

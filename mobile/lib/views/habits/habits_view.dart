@@ -80,6 +80,7 @@ class _HabitsViewState extends State<HabitsView> {
       context: context,
       isScrollControlled: true,
       backgroundColor: AppColors.bgSurface,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
       builder: (ctx) {
         return StatefulBuilder(
           builder: (context, setSheetState) {
@@ -97,7 +98,7 @@ class _HabitsViewState extends State<HabitsView> {
                 children: [
                   Center(
                     child: Container(
-                      width: 40,
+                      width: 44,
                       height: 4,
                       decoration: BoxDecoration(
                         color: AppColors.borderLight,
@@ -105,9 +106,9 @@ class _HabitsViewState extends State<HabitsView> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   const Text(
-                    'Create New Daily Habit',
+                    'Create New Daily Routine',
                     style: TextStyle(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.w800),
                   ),
                   const SizedBox(height: 12),
@@ -120,7 +121,7 @@ class _HabitsViewState extends State<HabitsView> {
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
                     decoration: BoxDecoration(
                       color: AppColors.bgSurfaceAlt,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(14),
                       border: Border.all(color: AppColors.border),
                     ),
                     child: DropdownButtonHideUnderline(
@@ -129,11 +130,11 @@ class _HabitsViewState extends State<HabitsView> {
                         isExpanded: true,
                         dropdownColor: AppColors.bgSurfaceAlt,
                         items: const [
-                          DropdownMenuItem(value: 'Morning Routine', child: Text('Morning Routine')),
-                          DropdownMenuItem(value: 'Deep Work', child: Text('Deep Work / Coding')),
-                          DropdownMenuItem(value: 'Study & Reading', child: Text('Study & Reading')),
-                          DropdownMenuItem(value: 'Health & Fitness', child: Text('Health & Fitness')),
-                          DropdownMenuItem(value: 'Night Routine', child: Text('Night Routine')),
+                          DropdownMenuItem(value: 'Morning Routine', child: Text('🌅 Morning Routine')),
+                          DropdownMenuItem(value: 'Deep Work', child: Text('💻 Deep Work / Coding')),
+                          DropdownMenuItem(value: 'Study & Reading', child: Text('📚 Study & Reading')),
+                          DropdownMenuItem(value: 'Health & Fitness', child: Text('💪 Health & Fitness')),
+                          DropdownMenuItem(value: 'Night Routine', child: Text('🌙 Night Routine')),
                         ],
                         onChanged: (val) {
                           if (val != null) setSheetState(() => selectedCategory = val);
@@ -158,10 +159,10 @@ class _HabitsViewState extends State<HabitsView> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 13),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     ),
-                    child: const Text('Start Habit Streak', style: TextStyle(fontWeight: FontWeight.w700)),
+                    child: const Text('Start Habit Streak 🔥', style: TextStyle(fontWeight: FontWeight.w800)),
                   ),
                 ],
               ),
@@ -181,6 +182,7 @@ class _HabitsViewState extends State<HabitsView> {
       context: context,
       isScrollControlled: true,
       backgroundColor: AppColors.bgSurface,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
       builder: (ctx) {
         return StatefulBuilder(
           builder: (context, setSheetState) {
@@ -198,7 +200,7 @@ class _HabitsViewState extends State<HabitsView> {
                 children: [
                   Center(
                     child: Container(
-                      width: 40,
+                      width: 44,
                       height: 4,
                       decoration: BoxDecoration(
                         color: AppColors.borderLight,
@@ -206,9 +208,9 @@ class _HabitsViewState extends State<HabitsView> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   const Text(
-                    'Add Priority Task',
+                    'Add Priority Task / Homework',
                     style: TextStyle(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.w800),
                   ),
                   const SizedBox(height: 12),
@@ -216,10 +218,10 @@ class _HabitsViewState extends State<HabitsView> {
                     controller: titleController,
                     decoration: const InputDecoration(labelText: 'Task Title', hintText: 'e.g. Finish Algorithms Homework 3'),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 12),
                   Row(
                     children: [
-                      const Text('Priority:', style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w600, fontSize: 13)),
+                      const Text('Priority:', style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w700, fontSize: 13)),
                       const SizedBox(width: 12),
                       Wrap(
                         spacing: 6,
@@ -248,10 +250,10 @@ class _HabitsViewState extends State<HabitsView> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 13),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     ),
-                    child: const Text('Add Task', style: TextStyle(fontWeight: FontWeight.w700)),
+                    child: const Text('Add Task', style: TextStyle(fontWeight: FontWeight.w800)),
                   ),
                 ],
               ),
@@ -265,7 +267,7 @@ class _HabitsViewState extends State<HabitsView> {
   Widget _buildPriorityChip(String value, String label, String current, ValueChanged<String> onSelected) {
     final isSelected = current == value;
     return ChoiceChip(
-      label: Text(label, style: TextStyle(fontSize: 11, fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500)),
+      label: Text(label, style: TextStyle(fontSize: 11, fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500)),
       selected: isSelected,
       selectedColor: AppColors.primary,
       backgroundColor: AppColors.bgSurfaceAlt,
@@ -277,7 +279,7 @@ class _HabitsViewState extends State<HabitsView> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+      return const Center(child: CircularProgressIndicator(color: AppColors.primaryLight));
     }
 
     final filteredTasks = _tasks.where((t) {
@@ -288,7 +290,7 @@ class _HabitsViewState extends State<HabitsView> {
     }).toList();
 
     return RefreshIndicator(
-      color: AppColors.primary,
+      color: AppColors.primaryLight,
       backgroundColor: AppColors.bgSurface,
       onRefresh: _loadData,
       child: ListView(
@@ -299,7 +301,7 @@ class _HabitsViewState extends State<HabitsView> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                'DAILY HABIT STREAKS',
+                'DAILY ROUTINE STREAKS',
                 style: TextStyle(
                   color: AppColors.textMuted,
                   fontSize: 11,
@@ -314,37 +316,43 @@ class _HabitsViewState extends State<HabitsView> {
                   padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   child: Text(
                     '+ New Habit',
-                    style: TextStyle(color: AppColors.primaryLight, fontSize: 12, fontWeight: FontWeight.w700),
+                    style: TextStyle(color: AppColors.primaryLight, fontSize: 12, fontWeight: FontWeight.w800),
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
 
           if (_habits.isEmpty)
             GlassCard(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(28),
+              borderRadius: 20,
               child: Column(
                 children: [
                   Icon(Icons.check_circle_outline_rounded, color: AppColors.textMuted.withAlpha(100), size: 40),
                   const SizedBox(height: 8),
-                  const Text('No daily habits configured yet.', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700)),
+                  const Text('No daily habits configured yet.', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w800)),
                   const SizedBox(height: 4),
                   const Text('Build consistency with daily routine streaks.', style: TextStyle(color: AppColors.textMuted, fontSize: 12)),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   ElevatedButton(
                     onPressed: _openCreateHabitModal,
-                    style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
-                    child: const Text('Add Habit'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    child: const Text('Add Habit Streak'),
                   ),
                 ],
               ),
             )
           else
             ..._habits.map((h) => GlassCard(
-              margin: const EdgeInsets.only(bottom: 8),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              borderRadius: 18,
               child: Row(
                 children: [
                   IconButton(
@@ -352,7 +360,7 @@ class _HabitsViewState extends State<HabitsView> {
                     icon: Icon(
                       h.completedToday ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
                       color: h.completedToday ? AppColors.success : AppColors.textMuted,
-                      size: 24,
+                      size: 26,
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -364,18 +372,41 @@ class _HabitsViewState extends State<HabitsView> {
                           h.name,
                           style: TextStyle(
                             color: AppColors.textPrimary,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w800,
                             decoration: h.completedToday ? TextDecoration.lineThrough : null,
                           ),
                         ),
+                        const SizedBox(height: 2),
                         Text(
-                          '${h.category} • ${h.streak} day streak 🔥',
+                          h.category,
                           style: const TextStyle(color: AppColors.textSecondary, fontSize: 11),
                         ),
                       ],
                     ),
                   ),
+
+                  // Flame Streak Badge (Reference 1)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.orange.withAlpha(30),
+                      borderRadius: BorderRadius.circular(99),
+                      border: Border.all(color: AppColors.orange.withAlpha(70)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.local_fire_department_rounded, color: AppColors.orange, size: 14),
+                        const SizedBox(width: 3),
+                        Text(
+                          '${h.streak}d',
+                          style: const TextStyle(color: AppColors.orange, fontSize: 11, fontWeight: FontWeight.w800),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 4),
                   IconButton(
                     onPressed: () => _deleteHabit(h),
                     icon: const Icon(Icons.delete_outline_rounded, color: AppColors.textMuted, size: 18),
@@ -391,7 +422,7 @@ class _HabitsViewState extends State<HabitsView> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                'TODO & HOMEWORK TASKS',
+                'TODO & ASSIGNMENTS',
                 style: TextStyle(
                   color: AppColors.textMuted,
                   fontSize: 11,
@@ -406,7 +437,7 @@ class _HabitsViewState extends State<HabitsView> {
                   padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   child: Text(
                     '+ New Task',
-                    style: TextStyle(color: AppColors.primaryLight, fontSize: 12, fontWeight: FontWeight.w700),
+                    style: TextStyle(color: AppColors.primaryLight, fontSize: 12, fontWeight: FontWeight.w800),
                   ),
                 ),
               ),
@@ -419,10 +450,10 @@ class _HabitsViewState extends State<HabitsView> {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                _buildTaskFilterPill('all', 'All'),
-                _buildTaskFilterPill('high', 'High Priority'),
+                _buildTaskFilterPill('all', 'All Tasks'),
+                _buildTaskFilterPill('high', 'High Priority 🔥'),
                 _buildTaskFilterPill('pending', 'Pending'),
-                _buildTaskFilterPill('completed', 'Done'),
+                _buildTaskFilterPill('completed', 'Done ✅'),
               ],
             ),
           ),
@@ -444,61 +475,92 @@ class _HabitsViewState extends State<HabitsView> {
               const SizedBox(width: 8),
               IconButton.filled(
                 onPressed: _addQuickTask,
-                style: IconButton.styleFrom(backgroundColor: AppColors.primary),
+                style: IconButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  padding: const EdgeInsets.all(12),
+                ),
                 icon: const Icon(Icons.add_rounded, color: Colors.white),
               ),
             ],
           ),
           const SizedBox(height: 12),
 
+          // Tasks List
           if (filteredTasks.isEmpty)
             GlassCard(
-              padding: const EdgeInsets.all(20),
-              child: Center(
-                child: Text('No tasks found in this view.', style: TextStyle(color: AppColors.textMuted.withAlpha(180), fontSize: 13)),
+              padding: const EdgeInsets.all(28),
+              borderRadius: 20,
+              child: Column(
+                children: [
+                  Icon(Icons.done_all_rounded, color: AppColors.textMuted.withAlpha(100), size: 40),
+                  const SizedBox(height: 8),
+                  const Text('No tasks in this view.', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w800)),
+                  const SizedBox(height: 4),
+                  const Text('All caught up or create a new task above.', style: TextStyle(color: AppColors.textMuted, fontSize: 12)),
+                ],
               ),
             )
           else
             ...filteredTasks.map((t) => GlassCard(
-              margin: const EdgeInsets.only(bottom: 6),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              borderRadius: 18,
               child: Row(
                 children: [
-                  Checkbox(
-                    value: t.done,
-                    activeColor: AppColors.primary,
-                    checkColor: Colors.white,
-                    onChanged: (_) => _toggleTask(t),
+                  IconButton(
+                    onPressed: () => _toggleTask(t),
+                    icon: Icon(
+                      t.done ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
+                      color: t.done ? AppColors.success : AppColors.primaryLight,
+                      size: 22,
+                    ),
                   ),
+                  const SizedBox(width: 8),
                   Expanded(
-                    child: Text(
-                      t.title,
-                      style: TextStyle(
-                        color: t.done ? AppColors.textMuted : AppColors.textPrimary,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        decoration: t.done ? TextDecoration.lineThrough : null,
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          t.title,
+                          style: TextStyle(
+                            color: t.done ? AppColors.textMuted : AppColors.textPrimary,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            decoration: t.done ? TextDecoration.lineThrough : null,
+                          ),
+                        ),
+                        if (t.dueDate.isNotEmpty) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            'Due: ${t.dueDate}',
+                            style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
+                          ),
+                        ],
+                      ],
                     ),
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: t.priority == 'high' ? AppColors.danger.withAlpha(35) : AppColors.primary.withAlpha(35),
-                      borderRadius: BorderRadius.circular(6),
+                      color: t.priority == 'high' ? AppColors.danger.withAlpha(30) : AppColors.primary.withAlpha(30),
+                      borderRadius: BorderRadius.circular(99),
+                      border: Border.all(
+                        color: t.priority == 'high' ? AppColors.danger.withAlpha(70) : AppColors.primaryLight.withAlpha(70),
+                      ),
                     ),
                     child: Text(
                       t.priority.toUpperCase(),
                       style: TextStyle(
                         color: t.priority == 'high' ? AppColors.danger : AppColors.primaryLight,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
+                        fontSize: 9,
+                        fontWeight: FontWeight.w800,
                       ),
                     ),
                   ),
                   IconButton(
                     onPressed: () => _deleteTask(t),
-                    icon: const Icon(Icons.close_rounded, color: AppColors.textMuted, size: 16),
+                    icon: const Icon(Icons.delete_outline_rounded, color: AppColors.textMuted, size: 18),
                   ),
                 ],
               ),
@@ -517,12 +579,12 @@ class _HabitsViewState extends State<HabitsView> {
         selected: isSelected,
         selectedColor: AppColors.primary,
         backgroundColor: AppColors.bgSurfaceAlt,
+        side: BorderSide(color: isSelected ? AppColors.primary : AppColors.border),
         labelStyle: TextStyle(
           color: isSelected ? Colors.white : AppColors.textSecondary,
           fontSize: 11,
-          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+          fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
         ),
-        side: BorderSide(color: isSelected ? AppColors.primary : AppColors.border),
         onSelected: (_) => setState(() => _taskFilter = filter),
       ),
     );

@@ -21,7 +21,7 @@ void main() async {
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.light,
-      systemNavigationBarColor: AppColors.bgSurface,
+      systemNavigationBarColor: AppColors.bgMain,
       systemNavigationBarIconBrightness: Brightness.light,
     ),
   );
@@ -109,8 +109,8 @@ class _MainShellScreenState extends State<MainShellScreen> {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primaryLight.withAlpha(150),
-                    blurRadius: 8,
+                    color: AppColors.primaryLight.withAlpha(180),
+                    blurRadius: 10,
                     spreadRadius: 2,
                   ),
                 ],
@@ -122,16 +122,17 @@ class _MainShellScreenState extends State<MainShellScreen> {
               style: TextStyle(
                 color: AppColors.textPrimary,
                 fontWeight: FontWeight.w800,
-                fontSize: 18,
+                fontSize: 19,
                 letterSpacing: -0.5,
               ),
             ),
             const SizedBox(width: 8),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: AppColors.primary.withAlpha(50),
-                borderRadius: BorderRadius.circular(6),
+                color: AppColors.primary.withAlpha(40),
+                borderRadius: BorderRadius.circular(99),
+                border: Border.all(color: AppColors.primaryLight.withAlpha(60)),
               ),
               child: Text(
                 _viewTitles[_currentTabIndex].split(' ').first.toUpperCase(),
@@ -139,6 +140,7 @@ class _MainShellScreenState extends State<MainShellScreen> {
                   color: AppColors.primaryLight,
                   fontSize: 9,
                   fontWeight: FontWeight.w800,
+                  letterSpacing: 0.5,
                 ),
               ),
             ),
@@ -151,19 +153,12 @@ class _MainShellScreenState extends State<MainShellScreen> {
             icon: const Icon(Icons.timer_outlined, color: AppColors.textSecondary, size: 20),
             tooltip: 'Pomodoro Focus Timer',
           ),
-          // Quick Entry Button
-          IconButton(
-            onPressed: () {
-              BudgetEntrySheet.show(context, onSaved: _refreshAllViews);
-            },
-            icon: const Icon(Icons.add_circle_outline_rounded, color: AppColors.primaryLight, size: 22),
-            tooltip: 'Quick Entry',
-          ),
           // User Profile & Login Button
           ValueListenableBuilder<UserModel?>(
             valueListenable: ApiClient.instance.currentUserNotifier,
             builder: (context, user, _) {
               final isAuth = user != null;
+              final isDemo = user?.id == 999;
               return InkWell(
                 onTap: _openAuthProfile,
                 borderRadius: BorderRadius.circular(20),
@@ -176,11 +171,20 @@ class _MainShellScreenState extends State<MainShellScreen> {
                         height: 32,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: isAuth ? AppColors.primary : AppColors.bgSurfaceAlt,
+                          color: isAuth ? (isDemo ? AppColors.warning : AppColors.primary) : AppColors.bgSurfaceAlt,
                           border: Border.all(
-                            color: isAuth ? AppColors.primaryLight : AppColors.border,
+                            color: isAuth ? (isDemo ? AppColors.warning : AppColors.primaryLight) : AppColors.border,
                             width: 1.5,
                           ),
+                          boxShadow: isAuth
+                              ? [
+                                  BoxShadow(
+                                    color: (isDemo ? AppColors.warning : AppColors.primaryLight).withAlpha(100),
+                                    blurRadius: 8,
+                                    spreadRadius: 1,
+                                  ),
+                                ]
+                              : null,
                         ),
                         alignment: Alignment.center,
                         child: Text(
@@ -193,10 +197,10 @@ class _MainShellScreenState extends State<MainShellScreen> {
                         ),
                       ),
                       if (!isAuth) ...[
-                        const SizedBox(width: 4),
+                        const SizedBox(width: 6),
                         const Text(
                           'Sign In',
-                          style: TextStyle(color: AppColors.primaryLight, fontSize: 11, fontWeight: FontWeight.w700),
+                          style: TextStyle(color: AppColors.primaryLight, fontSize: 11.5, fontWeight: FontWeight.w800),
                         ),
                       ],
                     ],
@@ -205,7 +209,7 @@ class _MainShellScreenState extends State<MainShellScreen> {
               );
             },
           ),
-          const SizedBox(width: 6),
+          const SizedBox(width: 8),
         ],
       ),
       body: IndexedStack(
@@ -215,6 +219,9 @@ class _MainShellScreenState extends State<MainShellScreen> {
       bottomNavigationBar: BottomNavBar(
         currentIndex: _currentTabIndex,
         onTabSelected: _onTabSelected,
+        onQuickAction: () {
+          BudgetEntrySheet.show(context, onSaved: _refreshAllViews);
+        },
       ),
     );
   }

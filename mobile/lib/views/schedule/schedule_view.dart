@@ -52,6 +52,7 @@ class _ScheduleViewState extends State<ScheduleView> {
       context: context,
       isScrollControlled: true,
       backgroundColor: AppColors.bgSurface,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
       builder: (ctx) {
         return StatefulBuilder(
           builder: (context, setSheetState) {
@@ -69,7 +70,7 @@ class _ScheduleViewState extends State<ScheduleView> {
                 children: [
                   Center(
                     child: Container(
-                      width: 40,
+                      width: 44,
                       height: 4,
                       decoration: BoxDecoration(
                         color: AppColors.borderLight,
@@ -77,7 +78,7 @@ class _ScheduleViewState extends State<ScheduleView> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   const Text(
                     'Add Class / Lecture to Timetable',
                     style: TextStyle(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.w800),
@@ -95,7 +96,7 @@ class _ScheduleViewState extends State<ScheduleView> {
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           decoration: BoxDecoration(
                             color: AppColors.bgSurfaceAlt,
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(14),
                             border: Border.all(color: AppColors.border),
                           ),
                           child: DropdownButtonHideUnderline(
@@ -148,10 +149,10 @@ class _ScheduleViewState extends State<ScheduleView> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 13),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     ),
-                    child: const Text('Add to Schedule', style: TextStyle(fontWeight: FontWeight.w700)),
+                    child: const Text('Add Lecture to Schedule', style: TextStyle(fontWeight: FontWeight.w800)),
                   ),
                 ],
               ),
@@ -168,33 +169,31 @@ class _ScheduleViewState extends State<ScheduleView> {
 
     return Column(
       children: [
-        // ── Day Pill Selector ────────────────────────────────────────────────
+        // ── Day Selector Horizontal Scroll ──────────────────────────────────
         Container(
-          height: 48,
-          margin: const EdgeInsets.only(top: 12),
+          height: 44,
+          margin: const EdgeInsets.symmetric(vertical: 8),
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 14),
             itemCount: _days.length,
             itemBuilder: (context, index) {
-              final day = _days[index];
-              final isSelected = day == _selectedDay;
-              final dayCount = _schedules.where((s) => s.day.toLowerCase() == day.toLowerCase()).length;
-
+              final d = _days[index];
+              final isSelected = d == _selectedDay;
               return Padding(
                 padding: const EdgeInsets.only(right: 6),
                 child: ChoiceChip(
-                  label: Text('${day.substring(0, 3)}${dayCount > 0 ? " ($dayCount)" : ""}'),
+                  label: Text(d),
                   selected: isSelected,
                   selectedColor: AppColors.primary,
                   backgroundColor: AppColors.bgSurfaceAlt,
+                  side: BorderSide(color: isSelected ? AppColors.primary : AppColors.border),
                   labelStyle: TextStyle(
                     color: isSelected ? Colors.white : AppColors.textSecondary,
-                    fontSize: 11,
-                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                    fontSize: 11.5,
+                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
                   ),
-                  side: BorderSide(color: isSelected ? AppColors.primary : AppColors.border),
-                  onSelected: (_) => setState(() => _selectedDay = day),
+                  onSelected: (_) => setState(() => _selectedDay = d),
                 ),
               );
             },
@@ -203,7 +202,7 @@ class _ScheduleViewState extends State<ScheduleView> {
 
         // ── Header Bar ──────────────────────────────────────────────────────
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -218,7 +217,7 @@ class _ScheduleViewState extends State<ScheduleView> {
                   padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   child: Text(
                     '+ Add Lecture',
-                    style: TextStyle(color: AppColors.primaryLight, fontSize: 12, fontWeight: FontWeight.w700),
+                    style: TextStyle(color: AppColors.primaryLight, fontSize: 12, fontWeight: FontWeight.w800),
                   ),
                 ),
               ),
@@ -229,9 +228,9 @@ class _ScheduleViewState extends State<ScheduleView> {
         // ── Schedule List ───────────────────────────────────────────────────
         Expanded(
           child: _isLoading
-              ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+              ? const Center(child: CircularProgressIndicator(color: AppColors.primaryLight))
               : RefreshIndicator(
-                  color: AppColors.primary,
+                  color: AppColors.primaryLight,
                   onRefresh: _loadSchedule,
                   child: filtered.isEmpty
                       ? Center(
@@ -244,12 +243,16 @@ class _ScheduleViewState extends State<ScheduleView> {
                                 'No lectures scheduled on $_selectedDay',
                                 style: const TextStyle(color: AppColors.textMuted, fontSize: 13),
                               ),
-                              const SizedBox(height: 12),
+                              const SizedBox(height: 14),
                               ElevatedButton.icon(
                                 onPressed: _openAddScheduleModal,
-                                style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primary,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                ),
                                 icon: const Icon(Icons.add_rounded, size: 16),
-                                label: const Text('Add Lecture'),
+                                label: const Text('Add Lecture', style: TextStyle(fontWeight: FontWeight.w700)),
                               ),
                             ],
                           ),
@@ -261,13 +264,15 @@ class _ScheduleViewState extends State<ScheduleView> {
                             final item = filtered[index];
                             return GlassCard(
                               margin: const EdgeInsets.only(bottom: 10),
+                              padding: const EdgeInsets.all(16),
+                              borderRadius: 18,
                               child: Row(
                                 children: [
                                   Container(
                                     width: 4,
                                     height: 52,
                                     decoration: BoxDecoration(
-                                      color: AppColors.primaryLight,
+                                      gradient: AppColors.primaryGradient,
                                       borderRadius: BorderRadius.circular(2),
                                     ),
                                   ),
@@ -281,7 +286,7 @@ class _ScheduleViewState extends State<ScheduleView> {
                                           style: const TextStyle(
                                             color: AppColors.textPrimary,
                                             fontSize: 15,
-                                            fontWeight: FontWeight.w700,
+                                            fontWeight: FontWeight.w800,
                                           ),
                                         ),
                                         const SizedBox(height: 4),
@@ -299,6 +304,19 @@ class _ScheduleViewState extends State<ScheduleView> {
                                       ],
                                     ),
                                   ),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.primary.withAlpha(30),
+                                      borderRadius: BorderRadius.circular(99),
+                                      border: Border.all(color: AppColors.primaryLight.withAlpha(50)),
+                                    ),
+                                    child: Text(
+                                      item.room.isNotEmpty ? item.room : 'Online',
+                                      style: const TextStyle(color: AppColors.primaryLight, fontSize: 10, fontWeight: FontWeight.w800),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
                                   IconButton(
                                     onPressed: () => _deleteSchedule(item),
                                     icon: const Icon(Icons.delete_outline_rounded, color: AppColors.textMuted, size: 18),

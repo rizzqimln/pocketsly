@@ -7,8 +7,10 @@ class GlassCard extends StatelessWidget {
   final EdgeInsetsGeometry padding;
   final EdgeInsetsGeometry? margin;
   final double borderRadius;
-  final Border? border;
+  final BoxBorder? border;
   final Color? color;
+  final Gradient? gradient;
+  final Color? glowColor;
   final VoidCallback? onTap;
 
   const GlassCard({
@@ -16,37 +18,59 @@ class GlassCard extends StatelessWidget {
     required this.child,
     this.padding = const EdgeInsets.all(16),
     this.margin,
-    this.borderRadius = 16,
+    this.borderRadius = 18,
     this.border,
     this.color,
+    this.gradient,
+    this.glowColor,
     this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final effectiveBorder = border ?? Border.all(color: AppColors.border, width: 1);
+    final List<BoxShadow> shadows = [
+      const BoxShadow(
+        color: Color(0x24000000),
+        blurRadius: 16,
+        offset: Offset(0, 4),
+      ),
+      if (glowColor != null)
+        BoxShadow(
+          color: glowColor!.withAlpha(45),
+          blurRadius: 20,
+          spreadRadius: 1,
+        ),
+    ];
+
     Widget card = Container(
       margin: margin,
-      padding: padding,
       decoration: BoxDecoration(
-        color: color ?? AppColors.bgSurface,
+        color: gradient == null ? (color ?? AppColors.bgSurface) : null,
+        gradient: gradient,
         borderRadius: BorderRadius.circular(borderRadius),
-        border: border ?? Border.all(color: AppColors.border, width: 1),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x1A000000),
-            blurRadius: 16,
-            offset: Offset(0, 4),
-          ),
-        ],
+        border: effectiveBorder,
+        boxShadow: shadows,
       ),
-      child: child,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(borderRadius),
+        child: Padding(
+          padding: padding,
+          child: child,
+        ),
+      ),
     );
 
     if (onTap != null) {
-      return InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(borderRadius),
-        child: card,
+      return Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(borderRadius),
+          splashColor: AppColors.primaryLight.withAlpha(30),
+          highlightColor: AppColors.primary.withAlpha(20),
+          child: card,
+        ),
       );
     }
     return card;

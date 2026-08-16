@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,8 +21,8 @@ class ApiClient {
   Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
     _sessionToken = prefs.getString('pocketsly_session_token');
-    
-    // Restore custom base URL if set
+
+    // Restore custom base URL if previously saved
     final customBaseUrl = prefs.getString('pocketsly_base_url');
     if (customBaseUrl != null && customBaseUrl.isNotEmpty) {
       ApiEndpoints.baseUrl = customBaseUrl;
@@ -39,7 +40,7 @@ class ApiClient {
       } catch (_) {}
     }
 
-    // Validate session with the backend
+    // Validate session with the backend asynchronously
     await checkSession();
   }
 
@@ -55,10 +56,8 @@ class ApiClient {
   }
 
   Future<void> _extractCookies(http.Response response) async {
-    // Check both lowercase and titlecase header keys
     final rawCookie = response.headers['set-cookie'] ?? response.headers['Set-Cookie'];
     if (rawCookie != null) {
-      // Look for session_id= or session=
       final parts = rawCookie.split(';');
       for (final part in parts) {
         final trimmed = part.trim();
@@ -76,12 +75,101 @@ class ApiClient {
   }
 
   Future<void> setBaseUrl(String url) async {
-    ApiEndpoints.baseUrl = url;
+    final normalized = ApiEndpoints.normalizeBaseUrl(url);
+    ApiEndpoints.baseUrl = normalized;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('pocketsly_base_url', url);
+    await prefs.setString('pocketsly_base_url', normalized);
+  }
+
+  /// Parses technical network exceptions into human-friendly error messages
+  String _humanizeError(dynamic error, String url) {
+    final errStr = error.toString().toLowerCase();
+    Uri? uri;
+    try {
+      uri = Uri.parse(url);
+    } catch (_) {}
+    final host = uri?.host ?? url;
+
+    if (errStr.contains('failed host lookup') || errStr.contains('no address associated with hostname') || errStr.contains('socketexception')) {
+      return "Cannot reach '$host'. Failed host lookup (DNS not found). If developing locally or using Android emulator, switch server to Localhost (10.0.2.2:8000).";
+    }
+    if (errStr.contains('connection refused') || errStr.contains('errno = 111')) {
+      return "Connection refused by '$host'. Ensure your backend server (python server.py) is running on port 8000.";
+    }
+    if (errStr.contains('timed out') || errStr.contains('timeoutexception')) {
+      return "Connection to '$host' timed out. Please check your network or Wi-Fi connection.";
+    }
+    if (errStr.contains('handshake') || errStr.contains('certificate')) {
+      return "SSL/TLS handshake failed with '$host'. Please verify SSL certificate or use http:// for local servers.";
+    }
+    return "Network error connecting to '$host': $error";
+  }
+
+  /// Tests connectivity and latency to an API base URL (defaults to active base URL)
+  Future<Map<String, dynamic>> testConnection([String? targetBaseUrl]) async {
+    final base = ApiEndpoints.normalizeBaseUrl(targetBaseUrl ?? ApiEndpoints.baseUrl);
+    final stopwatch = Stopwatch()..start();
+
+    try {
+      // 1. Try health endpoint
+      final healthUri = Uri.parse('$base/health');
+      final res = await http.get(healthUri, headers: {'Accept': 'application/json'}).timeout(const Duration(seconds: 4));
+      stopwatch.stop();
+
+      if (res.statusCode >= 200 && res.statusCode < 300) {
+        return {
+          'success': true,
+          'latencyMs': stopwatch.elapsedMilliseconds,
+          'message': 'Connected (${res.statusCode} OK • ${stopwatch.elapsedMilliseconds}ms)',
+          'url': base,
+        };
+      }
+
+      // 2. Fallback to /session
+      final sessionUri = Uri.parse('$base/session');
+      final sRes = await http.get(sessionUri, headers: {'Accept': 'application/json'}).timeout(const Duration(seconds: 4));
+      if (sRes.statusCode >= 200 && sRes.statusCode < 400) {
+        return {
+          'success': true,
+          'latencyMs': stopwatch.elapsedMilliseconds,
+          'message': 'Connected (${sRes.statusCode} OK • ${stopwatch.elapsedMilliseconds}ms)',
+          'url': base,
+        };
+      }
+
+      return {
+        'success': false,
+        'latencyMs': stopwatch.elapsedMilliseconds,
+        'message': 'Server responded with HTTP status ${res.statusCode}',
+        'url': base,
+      };
+    } catch (e) {
+      stopwatch.stop();
+      return {
+        'success': false,
+        'latencyMs': stopwatch.elapsedMilliseconds,
+        'message': _humanizeError(e, base),
+        'url': base,
+      };
+    }
   }
 
   // ── Authentication Endpoints ───────────────────────────────────────────────
+
+  /// Enters Demo / Offline Mode with sample data
+  Future<void> loginAsDemoUser() async {
+    final demoUser = UserModel(
+      id: 999,
+      username: 'alex_demo',
+      email: 'alex.demo@pocketsly.app',
+      phone: '+1 555-0199',
+    );
+    _currentUser = demoUser;
+    currentUserNotifier.value = demoUser;
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('pocketsly_user_data', jsonEncode(demoUser.toJson()));
+  }
 
   /// Checks if active session is valid on backend
   Future<bool> checkSession() async {
@@ -94,8 +182,11 @@ class ApiClient {
         await prefs.setString('pocketsly_user_data', jsonEncode(res['user']));
         return true;
       } else {
-        _currentUser = null;
-        currentUserNotifier.value = null;
+        // Only clear if not in offline demo mode
+        if (_currentUser?.id != 999) {
+          _currentUser = null;
+          currentUserNotifier.value = null;
+        }
         return false;
       }
     } catch (_) {
@@ -118,7 +209,10 @@ class ApiClient {
       return {'success': true, 'user': _currentUser};
     }
 
-    return {'success': false, 'error': res['error'] ?? 'Sign in failed. Please check credentials.'};
+    final err = (res is Map && res['error'] != null)
+        ? res['error']
+        : 'Sign in failed. Please check your credentials.';
+    return {'success': false, 'error': err};
   }
 
   /// Register a new account
@@ -143,7 +237,10 @@ class ApiClient {
       return {'success': true, 'user': _currentUser};
     }
 
-    return {'success': false, 'error': res['error'] ?? 'Registration failed. Username may already exist.'};
+    final err = (res is Map && res['error'] != null)
+        ? res['error']
+        : 'Registration failed. Username may already exist.';
+    return {'success': false, 'error': err};
   }
 
   /// Request 6-digit OTP code for password reset
@@ -197,15 +294,15 @@ class ApiClient {
     await prefs.remove('pocketsly_user_data');
   }
 
-  // ── Generic HTTP Methods ───────────────────────────────────────────────────
+  // ── Generic HTTP Methods with Timeout and Humanized Errors ─────────────────
 
   Future<dynamic> get(String url) async {
     try {
-      final res = await http.get(Uri.parse(url), headers: _headers);
+      final res = await http.get(Uri.parse(url), headers: _headers).timeout(const Duration(seconds: 8));
       await _extractCookies(res);
       return jsonDecode(res.body);
     } catch (e) {
-      return {'error': 'Network connection failed: $e'};
+      return {'error': _humanizeError(e, url)};
     }
   }
 
@@ -215,11 +312,11 @@ class ApiClient {
         Uri.parse(url),
         headers: _headers,
         body: jsonEncode(body),
-      );
+      ).timeout(const Duration(seconds: 10));
       await _extractCookies(res);
       return jsonDecode(res.body);
     } catch (e) {
-      return {'error': 'Network connection failed: $e'};
+      return {'error': _humanizeError(e, url)};
     }
   }
 
@@ -229,21 +326,21 @@ class ApiClient {
         Uri.parse(url),
         headers: _headers,
         body: jsonEncode(body),
-      );
+      ).timeout(const Duration(seconds: 10));
       await _extractCookies(res);
       return jsonDecode(res.body);
     } catch (e) {
-      return {'error': 'Network connection failed: $e'};
+      return {'error': _humanizeError(e, url)};
     }
   }
 
   Future<dynamic> delete(String url) async {
     try {
-      final res = await http.delete(Uri.parse(url), headers: _headers);
+      final res = await http.delete(Uri.parse(url), headers: _headers).timeout(const Duration(seconds: 8));
       await _extractCookies(res);
       return jsonDecode(res.body);
     } catch (e) {
-      return {'error': 'Network connection failed: $e'};
+      return {'error': _humanizeError(e, url)};
     }
   }
 }

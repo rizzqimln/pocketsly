@@ -23,6 +23,14 @@ class _PomodoroTimerDialogState extends State<PomodoroTimerDialog> {
   int _completedCycles = 0;
   bool _isRunning = false;
   Timer? _timer;
+  String _selectedIntent = 'Deep Focus 🎯';
+
+  final List<String> _intents = [
+    'Deep Focus 🎯',
+    'Coding Lab 💻',
+    'Revision 📚',
+    'Problem Solving ⚡',
+  ];
 
   @override
   void dispose() {
@@ -87,13 +95,13 @@ class _PomodoroTimerDialogState extends State<PomodoroTimerDialog> {
     final progress = _totalSeconds > 0 ? (_totalSeconds - _secondsLeft) / _totalSeconds : 0.0;
 
     return Dialog(
-      backgroundColor: AppColors.bgSurface,
+      backgroundColor: AppColors.bgSurfaceElevated,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
         side: const BorderSide(color: AppColors.border),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(22),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -101,12 +109,19 @@ class _PomodoroTimerDialogState extends State<PomodoroTimerDialog> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Row(
+                Row(
                   children: [
-                    Icon(Icons.timer_outlined, color: AppColors.primaryLight, size: 22),
-                    SizedBox(width: 8),
-                    Text(
-                      'Pomodoro Focus',
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withAlpha(35),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(Icons.timer_outlined, color: AppColors.primaryLight, size: 20),
+                    ),
+                    const SizedBox(width: 10),
+                    const Text(
+                      'Focus & Flow Studio',
                       style: TextStyle(
                         color: AppColors.textPrimary,
                         fontSize: 16,
@@ -121,14 +136,51 @@ class _PomodoroTimerDialogState extends State<PomodoroTimerDialog> {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 14),
 
-            // Mode Selector
+            // Intent Selector Tags
+            SizedBox(
+              height: 32,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: _intents.map((intent) {
+                  final isSelected = _selectedIntent == intent;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: InkWell(
+                      onTap: () => setState(() => _selectedIntent = intent),
+                      borderRadius: BorderRadius.circular(99),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: isSelected ? AppColors.primary.withAlpha(50) : AppColors.bgSurfaceAlt,
+                          borderRadius: BorderRadius.circular(99),
+                          border: Border.all(
+                            color: isSelected ? AppColors.primaryLight : AppColors.border,
+                          ),
+                        ),
+                        child: Text(
+                          intent,
+                          style: TextStyle(
+                            color: isSelected ? AppColors.primaryLight : AppColors.textSecondary,
+                            fontSize: 11,
+                            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+            const SizedBox(height: 14),
+
+            // Mode Selector Pills
             Container(
-              padding: const EdgeInsets.all(3),
+              padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
                 color: AppColors.bgSurfaceAlt,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
                 children: [
@@ -140,10 +192,24 @@ class _PomodoroTimerDialogState extends State<PomodoroTimerDialog> {
             ),
             const SizedBox(height: 24),
 
-            // Circular Progress Countdown
+            // Glowing Circular Progress Countdown
             Stack(
               alignment: Alignment.center,
               children: [
+                Container(
+                  width: 160,
+                  height: 160,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: (_isRunning ? AppColors.primaryLight : Colors.transparent).withAlpha(40),
+                        blurRadius: 24,
+                        spreadRadius: 4,
+                      ),
+                    ],
+                  ),
+                ),
                 SizedBox(
                   width: 150,
                   height: 150,
@@ -151,7 +217,7 @@ class _PomodoroTimerDialogState extends State<PomodoroTimerDialog> {
                     value: progress,
                     strokeWidth: 8,
                     backgroundColor: AppColors.bgSurfaceAlt,
-                    valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
+                    valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primaryLight),
                   ),
                 ),
                 Column(
@@ -161,17 +227,16 @@ class _PomodoroTimerDialogState extends State<PomodoroTimerDialog> {
                       _formatTime(_secondsLeft),
                       style: const TextStyle(
                         color: AppColors.textPrimary,
-                        fontSize: 32,
+                        fontSize: 34,
                         fontWeight: FontWeight.w800,
                         fontFamily: 'monospace',
+                        letterSpacing: -1,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      _mode == 'pomodoro'
-                          ? 'Focus Mode'
-                          : (_mode == 'short_break' ? 'Short Break' : 'Long Break'),
-                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                      _isRunning ? 'Active Flow' : 'Ready to Start',
+                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 12, fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),
@@ -188,31 +253,37 @@ class _PomodoroTimerDialogState extends State<PomodoroTimerDialog> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _isRunning ? AppColors.warning : AppColors.primary,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 13),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
-                  icon: Icon(_isRunning ? Icons.pause_rounded : Icons.play_arrow_rounded, size: 18),
-                  label: Text(_isRunning ? 'Pause' : 'Start', style: const TextStyle(fontWeight: FontWeight.w700)),
+                  icon: Icon(_isRunning ? Icons.pause_rounded : Icons.play_arrow_rounded, size: 20),
+                  label: Text(_isRunning ? 'Pause Flow' : 'Start Focus', style: const TextStyle(fontWeight: FontWeight.w800)),
                 ),
-                const SizedBox(width: 12),
-                OutlinedButton.icon(
+                const SizedBox(width: 10),
+                OutlinedButton(
                   onPressed: _resetTimer,
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.textSecondary,
                     side: const BorderSide(color: AppColors.border),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
-                  icon: const Icon(Icons.refresh_rounded, size: 16),
-                  label: const Text('Reset', style: TextStyle(fontWeight: FontWeight.w600)),
+                  child: const Icon(Icons.refresh_rounded, size: 18),
                 ),
               ],
             ),
             const SizedBox(height: 14),
 
-            Text(
-              'Completed Cycles: $_completedCycles 🔥',
-              style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.local_fire_department_rounded, color: AppColors.orange, size: 16),
+                const SizedBox(width: 4),
+                Text(
+                  'Completed Cycles: $_completedCycles',
+                  style: const TextStyle(color: AppColors.textMuted, fontSize: 12, fontWeight: FontWeight.w600),
+                ),
+              ],
             ),
           ],
         ),
@@ -225,12 +296,12 @@ class _PomodoroTimerDialogState extends State<PomodoroTimerDialog> {
     return Expanded(
       child: InkWell(
         onTap: () => _setMode(mode),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(10),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 6),
+          padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
             color: isActive ? AppColors.primary : Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(10),
           ),
           child: Text(
             label,
