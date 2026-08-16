@@ -79,16 +79,40 @@ window.Budget = {
 
   initCurrencyFormatters() {
     document.querySelectorAll('.currency-formatted-input').forEach(input => {
-      input.addEventListener('input', (e) => {
-        const raw = e.target.value.replace(/,/g, '').replace(/[^\d]/g, '');
+      input.addEventListener('input', () => {
+        const cursorPosition = input.selectionStart || 0;
+        const originalLength = input.value.length;
+        const raw = input.value.replace(/,/g, '').replace(/[^\d]/g, '');
         if (!raw) {
-          e.target.value = '';
+          input.value = '';
           return;
         }
         const num = parseInt(raw, 10);
-        e.target.value = isNaN(num) ? '' : num.toLocaleString('en-US');
+        const formatted = isNaN(num) ? '' : num.toLocaleString('en-US');
+        input.value = formatted;
+        const newLength = formatted.length;
+        const newPosition = Math.max(0, cursorPosition + (newLength - originalLength));
+        try {
+          input.setSelectionRange(newPosition, newPosition);
+        } catch (e) {}
       });
     });
+  },
+
+  addQuickAmount(inputId, delta) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    const current = this._parseAmount(input.value);
+    const updated = Math.max(0, current + delta);
+    input.value = updated > 0 ? updated.toLocaleString('en-US') : '';
+    input.focus();
+  },
+
+  clearAmount(inputId) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    input.value = '';
+    input.focus();
   },
 
   setDefaultDates() {
@@ -499,6 +523,7 @@ window.Budget = {
     modal.classList.remove('hidden');
     this.switchModalTab(tab);
     document.body.classList.add('modal-open');
+    this._initModalTouchDismiss();
   },
 
   closeEntryModal() {
@@ -528,6 +553,31 @@ window.Budget = {
       else if (tab === 'income') titleEl.textContent = 'Log Incoming Cashflow';
       else titleEl.textContent = 'Set Monthly Category Limit';
     }
+
+    requestAnimationFrame(() => {
+      const targetInput = document.getElementById(`${tab}-amount`);
+      if (targetInput) {
+        targetInput.focus();
+      }
+    });
+  },
+
+  _touchDismissAttached: false,
+  _initModalTouchDismiss() {
+    if (this._touchDismissAttached) return;
+    const bar = document.querySelector('#budget-entry-modal .modal-drag-indicator-bar');
+    if (!bar) return;
+    let startY = 0;
+    bar.addEventListener('touchstart', (e) => {
+      startY = e.touches[0].clientY;
+    }, { passive: true });
+    bar.addEventListener('touchend', (e) => {
+      const endY = e.changedTouches[0].clientY;
+      if (endY - startY > 40) {
+        this.closeEntryModal();
+      }
+    }, { passive: true });
+    this._touchDismissAttached = true;
   },
 
   // ── EXPORT & PRINT STATEMENTS ─────────────────────────────────────────────

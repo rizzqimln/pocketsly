@@ -755,78 +755,6 @@
   }
 }
 
-.btn-action-expense {
-  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
-  color: #ffffff !important;
-  font-weight: 700;
-  padding: 0.85rem 1.15rem;
-  border-radius: var(--radius-lg);
-  border: none;
-  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.28);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  min-height: 48px;
-  touch-action: manipulation;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
-}
-
-.btn-action-expense:hover,
-.btn-action-expense:active {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.45);
-}
-
-.btn-action-income {
-  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
-  color: #ffffff !important;
-  font-weight: 700;
-  padding: 0.85rem 1.15rem;
-  border-radius: var(--radius-lg);
-  border: none;
-  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.28);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  min-height: 48px;
-  touch-action: manipulation;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
-}
-
-.btn-action-income:hover,
-.btn-action-income:active {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.45);
-}
-
-.btn-action-budget {
-  background: var(--bg-surface-alt);
-  color: var(--text-primary);
-  font-weight: 700;
-  padding: 0.85rem 1.15rem;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-color);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  min-height: 48px;
-  touch-action: manipulation;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, background 0.2s ease;
-}
-
-.btn-action-budget:hover,
-.btn-action-budget:active {
-  border-color: var(--primary);
-  background: var(--primary-light);
-  transform: translateY(-2px);
-}
-
 /* ── BUDGET DASHBOARD GRID ─────────────────────────────────────────────────── */
 .budget-dashboard-grid {
   display: grid;
@@ -843,8 +771,10 @@
 
 /* ── BUDGET ENTRY MODAL & TABS ─────────────────────────────────────────────── */
 .budget-modal-card {
-  max-width: 520px;
+  max-width: 500px;
   width: 100%;
+  transform: translate3d(0, 0, 0);
+  will-change: transform, opacity;
 }
 
 .budget-modal-tabs {
@@ -854,6 +784,7 @@
   background: var(--bg-surface-alt);
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-color);
+  user-select: none;
 }
 
 .budget-modal-tab-btn {
@@ -866,9 +797,14 @@
   color: var(--text-secondary);
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
   text-align: center;
   min-height: 40px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.budget-modal-tab-btn:active {
+  transform: scale(0.97);
 }
 
 .budget-modal-tab-btn.active-expense {
@@ -887,6 +823,101 @@
   background: var(--primary) !important;
   color: #ffffff !important;
   box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35);
+}
+
+/* ── FINTECH INPUT CURRENCY WRAPPER & QUICK CHIPS ─────────────────────────── */
+.input-currency-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.input-currency-prefix {
+  position: absolute;
+  left: 14px;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  pointer-events: none;
+  user-select: none;
+}
+
+.input-currency-wrapper input.currency-formatted-input {
+  padding-left: 44px !important;
+  font-family: var(--font-mono, monospace), system-ui;
+  font-size: 1.25rem !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em;
+  background: var(--bg-surface-alt);
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input-currency-wrapper input.currency-formatted-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+  background: var(--bg-surface);
+}
+
+.quick-amount-chips {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.quick-amount-chips .preset-chip {
+  padding: 0.25rem 0.6rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface-alt);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease, color 0.15s ease;
+}
+
+.quick-amount-chips .preset-chip:active {
+  transform: scale(0.94);
+  background: var(--bg-hover);
+}
+
+.btn-action-expense {
+  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%) !important;
+  color: #FFFFFF !important;
+  border: none;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-action-expense:active {
+  transform: scale(0.98);
+}
+
+.btn-action-income {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
+  color: #FFFFFF !important;
+  border: none;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-action-income:active {
+  transform: scale(0.98);
+}
+
+.btn-action-budget {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-700) 100%) !important;
+  color: #FFFFFF !important;
+  border: none;
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-action-budget:active {
+  transform: scale(0.98);
 }
 
 .kpi-hero-balance {
