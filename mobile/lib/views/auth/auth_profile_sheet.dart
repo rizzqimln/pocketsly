@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/network/api_client.dart';
 import '../../core/network/api_endpoints.dart';
@@ -315,6 +317,95 @@ class _AuthProfileSheetState extends State<AuthProfileSheet> {
         const SnackBar(content: Text('Logged out successfully.')),
       );
     }
+  }
+
+  Future<void> _handleExportBackup() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+      _successMessage = null;
+    });
+
+    try {
+      final res = await ApiClient.instance.get(ApiEndpoints.backupExport);
+      if (res is Map) {
+        final jsonStr = jsonEncode(res);
+        await Clipboard.setData(ClipboardData(text: jsonStr));
+        setState(() {
+          _successMessage = 'Full JSON Backup copied to clipboard! (${jsonStr.length} bytes)';
+        });
+      } else {
+        setState(() => _errorMessage = 'Failed to generate backup export.');
+      }
+    } catch (e) {
+      setState(() => _errorMessage = 'Export failed: $e');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  void _openRestoreModal() {
+    final jsonController = TextEditingController();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.bgSurface,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+      builder: (ctx) {
+        final bottomInset = MediaQuery.of(ctx).viewInsets.bottom;
+        return Padding(
+          padding: EdgeInsets.only(left: 18, right: 18, top: 12, bottom: bottomInset + 18),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(child: Container(width: 44, height: 4, decoration: BoxDecoration(color: AppColors.borderLight, borderRadius: BorderRadius.circular(99)))),
+              const SizedBox(height: 14),
+              const Text('Restore Data from JSON Backup', style: TextStyle(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 6),
+              const Text('Paste your valid Pocketsly JSON backup payload below to restore records.', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+              const SizedBox(height: 12),
+              TextField(
+                controller: jsonController,
+                maxLines: 6,
+                style: const TextStyle(fontFamily: 'monospace', fontSize: 11),
+                decoration: const InputDecoration(hintText: '{\n  "version": 1,\n  "habits": [...]\n}'),
+              ),
+              const SizedBox(height: 14),
+              ElevatedButton(
+                onPressed: () async {
+                  final raw = jsonController.text.trim();
+                  if (raw.isEmpty) return;
+                  Navigator.pop(ctx);
+                  try {
+                    final parsed = jsonDecode(raw);
+                    setState(() => _isLoading = true);
+                    final res = await ApiClient.instance.post(ApiEndpoints.backupRestore, parsed);
+                    if (res is Map && res['success'] == true) {
+                      widget.onStateChanged();
+                      setState(() => _successMessage = 'Data restored successfully from backup!');
+                    } else {
+                      setState(() => _errorMessage = res['error'] ?? 'Restore failed.');
+                    }
+                  } catch (e) {
+                    setState(() => _errorMessage = 'Invalid JSON syntax: $e');
+                  } finally {
+                    if (mounted) setState(() => _isLoading = false);
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                ),
+                child: const Text('Execute Restore', style: TextStyle(fontWeight: FontWeight.w800)),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -769,6 +860,42 @@ class _AuthProfileSheetState extends State<AuthProfileSheet> {
           child: _isLoading
               ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
               : const Text('Save Profile Changes', style: TextStyle(fontWeight: FontWeight.w700)),
+        ),
+        const SizedBox(height: 16),
+
+        // Data Backup & Disaster Recovery Section
+        const Text('DATA BACKUP & DISASTER RECOVERY', style: TextStyle(color: AppColors.textMuted, fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 0.8)),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: _isLoading ? null : _handleExportBackup,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.cyan,
+                  side: const BorderSide(color: AppColors.cyan),
+                  padding: const EdgeInsets.symmetric(vertical: 11),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                icon: const Icon(Icons.download_rounded, size: 16),
+                label: const Text('Export JSON', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: _isLoading ? null : _openRestoreModal,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.orange,
+                  side: const BorderSide(color: AppColors.orange),
+                  padding: const EdgeInsets.symmetric(vertical: 11),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                icon: const Icon(Icons.upload_rounded, size: 16),
+                label: const Text('Restore Data', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 16),
 

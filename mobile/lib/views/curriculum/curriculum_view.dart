@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
+import 'interactive_quiz_view.dart';
+import 'sorting_visualizer_view.dart';
+import 'courses_manager_view.dart';
 import 'academic_faculty_view.dart';
-import 'performance_analytics_view.dart';
 import 'backend_inspector_view.dart';
 import 'flexbox_sandbox_view.dart';
 import 'regex_validator_view.dart';
@@ -20,12 +22,14 @@ class _CurriculumViewState extends State<CurriculumView> with SingleTickerProvid
   late TabController _tabController;
 
   final List<String> _tabs = [
-    'SQL D1 Sandbox',
-    'Backend API Flow',
-    'CSS Flexbox',
-    'Regex Validator',
-    'Academic Faculty',
-    'Velocity & GPA',
+    'CS Quizzer 🧠',
+    'Sort Visualizer 📊',
+    'Courses & Study 📚',
+    'SQL D1 Sandbox ⚡',
+    'Backend API Flow 🔌',
+    'CSS Flexbox 🎨',
+    'Regex Validator 🔍',
+    'Academic Faculty 👨‍🏫',
   ];
 
   @override
@@ -35,20 +39,26 @@ class _CurriculumViewState extends State<CurriculumView> with SingleTickerProvid
   }
 
   @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         // ── Sub-navigation horizontal scroll tabs ────────────────────────────
         Container(
-          height: 48,
-          margin: const EdgeInsets.only(top: 8),
+          height: 46,
+          margin: const EdgeInsets.only(top: 8, bottom: 4),
           child: TabBar(
             controller: _tabController,
             isScrollable: true,
             indicatorSize: TabBarIndicatorSize.tab,
             indicator: BoxDecoration(
-              color: AppColors.primary,
-              borderRadius: BorderRadius.circular(10),
+              gradient: AppColors.primaryGradient,
+              borderRadius: BorderRadius.circular(12),
             ),
             labelColor: Colors.white,
             unselectedLabelColor: AppColors.textSecondary,
@@ -60,22 +70,20 @@ class _CurriculumViewState extends State<CurriculumView> with SingleTickerProvid
         Expanded(
           child: TabBarView(
             controller: _tabController,
-            children: [
-              _buildSqlSandboxTab(),
-              const BackendInspectorView(),
-              const FlexboxSandboxView(),
-              const RegexValidatorView(),
-              const AcademicFacultyView(),
-              const PerformanceAnalyticsView(),
+            children: const [
+              InteractiveQuizView(),
+              SortingVisualizerView(),
+              CoursesManagerView(),
+              _SqlD1SandboxComponent(),
+              BackendInspectorView(),
+              FlexboxSandboxView(),
+              RegexValidatorView(),
+              AcademicFacultyView(),
             ],
           ),
         ),
       ],
     );
-  }
-
-  Widget _buildSqlSandboxTab() {
-    return const _SqlD1SandboxComponent();
   }
 }
 
@@ -130,6 +138,8 @@ class _SqlD1SandboxComponentState extends State<_SqlD1SandboxComponent> {
         ),
         const SizedBox(height: 8),
         GlassCard(
+          borderRadius: 20,
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -162,6 +172,7 @@ class _SqlD1SandboxComponentState extends State<_SqlD1SandboxComponent> {
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                     icon: _isExecutingSql
                         ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
@@ -176,7 +187,7 @@ class _SqlD1SandboxComponentState extends State<_SqlD1SandboxComponent> {
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: AppColors.bgMain,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: AppColors.border),
                 ),
                 child: Text(
@@ -198,10 +209,10 @@ class _SqlD1SandboxComponentState extends State<_SqlD1SandboxComponent> {
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
           color: AppColors.bgSurfaceAlt,
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(8),
           border: Border.all(color: AppColors.border),
         ),
-        child: Text(label, style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
+        child: Text(label, style: const TextStyle(fontSize: 11, color: AppColors.primaryLight, fontWeight: FontWeight.w700)),
       ),
     );
   }

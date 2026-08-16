@@ -289,6 +289,9 @@ class _HabitsViewState extends State<HabitsView> {
       return true;
     }).toList();
 
+    final todayWeekday = DateTime.now().weekday; // 1 = Mon, 7 = Sun
+    final weekdayLabels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+
     return RefreshIndicator(
       color: AppColors.primaryLight,
       backgroundColor: AppColors.bgSurface,
@@ -301,7 +304,7 @@ class _HabitsViewState extends State<HabitsView> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                'DAILY ROUTINE STREAKS',
+                'DAILY ROUTINE STREAKS & 7-DAY MATRIX',
                 style: TextStyle(
                   color: AppColors.textMuted,
                   fontSize: 11,
@@ -351,65 +354,117 @@ class _HabitsViewState extends State<HabitsView> {
           else
             ..._habits.map((h) => GlassCard(
               margin: const EdgeInsets.only(bottom: 10),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              padding: const EdgeInsets.all(14),
               borderRadius: 18,
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  IconButton(
-                    onPressed: () => _toggleHabit(h),
-                    icon: Icon(
-                      h.completedToday ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
-                      color: h.completedToday ? AppColors.success : AppColors.textMuted,
-                      size: 26,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          h.name,
-                          style: TextStyle(
-                            color: AppColors.textPrimary,
-                            fontSize: 14.5,
-                            fontWeight: FontWeight.w800,
-                            decoration: h.completedToday ? TextDecoration.lineThrough : null,
-                          ),
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: () => _toggleHabit(h),
+                        icon: Icon(
+                          h.completedToday ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
+                          color: h.completedToday ? AppColors.success : AppColors.textMuted,
+                          size: 26,
                         ),
-                        const SizedBox(height: 2),
-                        Text(
-                          h.category,
-                          style: const TextStyle(color: AppColors.textSecondary, fontSize: 11),
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              h.name,
+                              style: TextStyle(
+                                color: AppColors.textPrimary,
+                                fontSize: 14.5,
+                                fontWeight: FontWeight.w800,
+                                decoration: h.completedToday ? TextDecoration.lineThrough : null,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              h.category,
+                              style: const TextStyle(color: AppColors.textSecondary, fontSize: 11),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
+                      ),
 
-                  // Flame Streak Badge (Reference 1)
+                      // Flame Streak Badge (Reference 1)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: AppColors.orange.withAlpha(30),
+                          borderRadius: BorderRadius.circular(99),
+                          border: Border.all(color: AppColors.orange.withAlpha(70)),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.local_fire_department_rounded, color: AppColors.orange, size: 14),
+                            const SizedBox(width: 3),
+                            Text(
+                              '${h.streak}d',
+                              style: const TextStyle(color: AppColors.orange, fontSize: 11, fontWeight: FontWeight.w800),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      IconButton(
+                        onPressed: () => _deleteHabit(h),
+                        icon: const Icon(Icons.delete_outline_rounded, color: AppColors.textMuted, size: 18),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+
+                  // ── 7-Day Consistency Matrix Heatmap Strip ────────────────
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                     decoration: BoxDecoration(
-                      color: AppColors.orange.withAlpha(30),
-                      borderRadius: BorderRadius.circular(99),
-                      border: Border.all(color: AppColors.orange.withAlpha(70)),
+                      color: AppColors.bgSurfaceAlt,
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.local_fire_department_rounded, color: AppColors.orange, size: 14),
-                        const SizedBox(width: 3),
-                        Text(
-                          '${h.streak}d',
-                          style: const TextStyle(color: AppColors.orange, fontSize: 11, fontWeight: FontWeight.w800),
-                        ),
-                      ],
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: List.generate(7, (idx) {
+                        final dayNum = idx + 1;
+                        final isToday = dayNum == todayWeekday;
+                        final isCompleted = (isToday && h.completedToday) || (dayNum < todayWeekday && h.streak >= (todayWeekday - dayNum));
+
+                        return Column(
+                          children: [
+                            Text(
+                              weekdayLabels[idx],
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: isToday ? FontWeight.w900 : FontWeight.w600,
+                                color: isToday ? AppColors.primaryLight : AppColors.textMuted,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Container(
+                              width: 22,
+                              height: 22,
+                              decoration: BoxDecoration(
+                                color: isCompleted ? AppColors.success : (isToday ? AppColors.primary.withAlpha(30) : AppColors.bgSurface),
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: isCompleted ? AppColors.success : (isToday ? AppColors.primaryLight : AppColors.border),
+                                  width: isToday ? 1.5 : 1,
+                                ),
+                              ),
+                              child: isCompleted
+                                  ? const Icon(Icons.check_rounded, color: Colors.white, size: 14)
+                                  : null,
+                            ),
+                          ],
+                        );
+                      }),
                     ),
-                  ),
-                  const SizedBox(width: 4),
-                  IconButton(
-                    onPressed: () => _deleteHabit(h),
-                    icon: const Icon(Icons.delete_outline_rounded, color: AppColors.textMuted, size: 18),
                   ),
                 ],
               ),

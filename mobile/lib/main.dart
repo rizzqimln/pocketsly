@@ -6,6 +6,7 @@ import 'core/network/api_client.dart';
 import 'core/models/models.dart';
 import 'widgets/bottom_nav_bar.dart';
 import 'widgets/pomodoro_timer_dialog.dart';
+import 'widgets/command_search_dialog.dart';
 import 'views/auth/auth_profile_sheet.dart';
 import 'views/dashboard/dashboard_view.dart';
 import 'views/habits/habits_view.dart';
@@ -147,6 +148,17 @@ class _MainShellScreenState extends State<MainShellScreen> {
           ],
         ),
         actions: [
+          // Global Quick Search
+          IconButton(
+            onPressed: () => CommandSearchDialog.show(
+              context,
+              onNavigate: _onTabSelected,
+              onOpenProfile: _openAuthProfile,
+              onOpenQuickEntry: () => BudgetEntrySheet.show(context, onSaved: _refreshAllViews),
+            ),
+            icon: const Icon(Icons.search_rounded, color: AppColors.textSecondary, size: 21),
+            tooltip: 'Global Quick Search',
+          ),
           // Pomodoro Focus Timer Icon
           IconButton(
             onPressed: () => PomodoroTimerDialog.show(context),

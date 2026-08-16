@@ -5,6 +5,7 @@ import '../../core/network/api_endpoints.dart';
 import '../../core/models/models.dart';
 import '../../widgets/glass_card.dart';
 import 'budget_entry_sheet.dart';
+import 'receipt_scanner_sheet.dart';
 
 class BudgetView extends StatefulWidget {
   const BudgetView({super.key});
@@ -20,6 +21,7 @@ class _BudgetViewState extends State<BudgetView> {
   List<TransactionItem> _transactions = [];
   List<BudgetLimitItem> _limits = [];
   String _ledgerFilter = 'all'; // 'all', 'expense', 'income'
+  DateTime _currentMonth = DateTime.now();
 
   @override
   void initState() {
@@ -27,12 +29,38 @@ class _BudgetViewState extends State<BudgetView> {
     _loadBudgetData();
   }
 
+  String _getMonthParam() {
+    final y = _currentMonth.year.toString();
+    final m = _currentMonth.month.toString().padLeft(2, '0');
+    return '$y-$m';
+  }
+
+  String _getMonthLabel() {
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    return '${months[_currentMonth.month - 1]} ${_currentMonth.year}';
+  }
+
+  void _prevMonth() {
+    setState(() {
+      _currentMonth = DateTime(_currentMonth.year, _currentMonth.month - 1, 1);
+    });
+    _loadBudgetData();
+  }
+
+  void _nextMonth() {
+    setState(() {
+      _currentMonth = DateTime(_currentMonth.year, _currentMonth.month + 1, 1);
+    });
+    _loadBudgetData();
+  }
+
   Future<void> _loadBudgetData() async {
     setState(() => _isLoading = true);
+    final monthQuery = _getMonthParam();
     try {
-      final incRes = await ApiClient.instance.get(ApiEndpoints.incomes);
-      final expRes = await ApiClient.instance.get(ApiEndpoints.expenses);
-      final budRes = await ApiClient.instance.get(ApiEndpoints.budgets);
+      final incRes = await ApiClient.instance.get('${ApiEndpoints.incomes}?month=$monthQuery');
+      final expRes = await ApiClient.instance.get('${ApiEndpoints.expenses}?month=$monthQuery');
+      final budRes = await ApiClient.instance.get('${ApiEndpoints.budgets}?month=$monthQuery');
 
       if (mounted) {
         _totalIncome = 0;
@@ -83,6 +111,10 @@ class _BudgetViewState extends State<BudgetView> {
     BudgetEntrySheet.show(context, initialTab: tab, onSaved: _loadBudgetData);
   }
 
+  void _openReceiptScanner() {
+    ReceiptScannerSheet.show(context, onSaved: _loadBudgetData);
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
@@ -100,6 +132,13 @@ class _BudgetViewState extends State<BudgetView> {
       return true;
     }).toList();
 
+    // Category breakdown map for expenses
+    final Map<String, double> categorySpendMap = {};
+    for (var t in _transactions.where((t) => !t.isIncome)) {
+      final cat = t.categoryOrSource.isNotEmpty ? t.categoryOrSource : 'Other';
+      categorySpendMap[cat] = (categorySpendMap[cat] ?? 0.0) + t.amount;
+    }
+
     return RefreshIndicator(
       color: AppColors.primaryLight,
       backgroundColor: AppColors.bgSurface,
@@ -107,7 +146,39 @@ class _BudgetViewState extends State<BudgetView> {
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // ── Cashflow Hero Balance Card (Reference 1 & 2) ───────────────────
+          // ── Month Picker Carousel Bar ─────────────────────────────────────
+          GlassCard(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            borderRadius: 16,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  onPressed: _prevMonth,
+                  icon: const Icon(Icons.chevron_left_rounded, color: AppColors.primaryLight),
+                  tooltip: 'Previous Month',
+                ),
+                Row(
+                  children: [
+                    const Icon(Icons.calendar_month_rounded, color: AppColors.primaryLight, size: 18),
+                    const SizedBox(width: 8),
+                    Text(
+                      _getMonthLabel(),
+                      style: const TextStyle(color: AppColors.textPrimary, fontSize: 15, fontWeight: FontWeight.w800),
+                    ),
+                  ],
+                ),
+                IconButton(
+                  onPressed: _nextMonth,
+                  icon: const Icon(Icons.chevron_right_rounded, color: AppColors.primaryLight),
+                  tooltip: 'Next Month',
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // ── Cashflow Hero Balance Card ─────────────────────────────────────
           GlassCard(
             padding: const EdgeInsets.all(20),
             borderRadius: 22,
@@ -121,7 +192,7 @@ class _BudgetViewState extends State<BudgetView> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      'TOTAL NET BALANCE',
+                      'MONTHLY NET BALANCE',
                       style: TextStyle(
                         color: AppColors.textMuted,
                         fontSize: 11,
@@ -139,7 +210,7 @@ class _BudgetViewState extends State<BudgetView> {
                         ),
                       ),
                       child: Text(
-                        balance >= 0 ? 'Healthy Surplus' : 'Deficit Spending',
+                        balance >= 0 ? 'Surplus' : 'Deficit',
                         style: TextStyle(
                           color: balance >= 0 ? AppColors.success : AppColors.danger,
                           fontSize: 11,
@@ -219,9 +290,9 @@ class _BudgetViewState extends State<BudgetView> {
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
-          // ── Quick Log Buttons ──────────────────────────────────────────────
+          // ── Quick Log & OCR Buttons ────────────────────────────────────────
           Row(
             children: [
               Expanded(
@@ -230,11 +301,11 @@ class _BudgetViewState extends State<BudgetView> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.danger,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 13),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
                   icon: const Icon(Icons.remove_circle_outline_rounded, size: 18),
-                  label: const Text('- Expense', style: TextStyle(fontWeight: FontWeight.w800)),
+                  label: const Text('- Expense', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12.5)),
                 ),
               ),
               const SizedBox(width: 8),
@@ -244,29 +315,70 @@ class _BudgetViewState extends State<BudgetView> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.success,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 13),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
                   icon: const Icon(Icons.add_circle_outline_rounded, size: 18),
-                  label: const Text('+ Income', style: TextStyle(fontWeight: FontWeight.w800)),
+                  label: const Text('+ Income', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12.5)),
                 ),
               ),
               const SizedBox(width: 8),
               IconButton.filled(
-                onPressed: () => _openEntry('budget'),
+                onPressed: _openReceiptScanner,
                 style: IconButton.styleFrom(
                   backgroundColor: AppColors.primary,
-                  padding: const EdgeInsets.all(13),
+                  padding: const EdgeInsets.all(12),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 ),
-                icon: const Icon(Icons.track_changes_rounded, color: Colors.white),
-                tooltip: 'Set Target Limit',
+                icon: const Icon(Icons.document_scanner_rounded, color: Colors.white, size: 20),
+                tooltip: 'Scan Receipt OCR',
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 18),
 
-          // ── Category Limits ────────────────────────────────────────────────
+          // ── Category Spending Share Breakdown ─────────────────────────────
+          if (categorySpendMap.isNotEmpty) ...[
+            const Text('CATEGORY SPENDING SHARE', style: TextStyle(color: AppColors.textMuted, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 0.8)),
+            const SizedBox(height: 8),
+            GlassCard(
+              padding: const EdgeInsets.all(16),
+              borderRadius: 18,
+              child: Column(
+                children: categorySpendMap.entries.map((e) {
+                  final sharePct = _totalExpense > 0 ? (e.value / _totalExpense) * 100 : 0.0;
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(e.key, style: const TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w700)),
+                            Text('Rp ${e.value.toStringAsFixed(0)} (${sharePct.toStringAsFixed(0)}%)', style: const TextStyle(color: AppColors.textSecondary, fontSize: 12, fontWeight: FontWeight.w700)),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(99),
+                          child: LinearProgressIndicator(
+                            value: sharePct / 100.0,
+                            minHeight: 5,
+                            backgroundColor: AppColors.bgSurfaceAlt,
+                            valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primaryLight),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+            const SizedBox(height: 18),
+          ],
+
+          // ── Category Target Limits ─────────────────────────────────────────
           if (_limits.isNotEmpty) ...[
             const Text(
               'CATEGORY SPENDING TARGETS',
@@ -361,7 +473,7 @@ class _BudgetViewState extends State<BudgetView> {
               child: Padding(
                 padding: EdgeInsets.all(24),
                 child: Center(
-                  child: Text('No transactions logged yet.', style: TextStyle(color: AppColors.textMuted, fontWeight: FontWeight.w600)),
+                  child: Text('No transactions for this month.', style: TextStyle(color: AppColors.textMuted, fontWeight: FontWeight.w600)),
                 ),
               ),
             )

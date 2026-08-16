@@ -309,7 +309,7 @@ class CourseItem {
     return CourseItem(
       id: json['id'] as int? ?? 0,
       code: json['code'] as String? ?? '',
-      name: json['name'] as String? ?? '',
+      name: (json['name'] as String?) ?? (json['title'] as String? ?? ''),
       credits: (json['credits'] as num?)?.toInt() ?? 3,
       lecturer: json['lecturer'] as String? ?? '',
       progress: (json['progress'] as num?)?.toDouble() ?? 0.0,
@@ -342,4 +342,43 @@ class LecturerItem {
       department: json['department'] as String? ?? 'Computer Science',
     );
   }
+}
+
+/// Study Session Log Item Model
+class StudyLogItem {
+  final int id;
+  final int? courseId;
+  final String courseName;
+  final double hours;
+  final String notes;
+  final String date;
+
+  StudyLogItem({
+    required this.id,
+    this.courseId,
+    this.courseName = '',
+    this.hours = 1.0,
+    this.notes = '',
+    this.date = '',
+  });
+
+  factory StudyLogItem.fromJson(Map<String, dynamic> json) {
+    return StudyLogItem(
+      id: json['id'] as int? ?? 0,
+      courseId: json['course_id'] as int?,
+      courseName: json['course_name'] as String? ?? (json['course_title'] as String? ?? ''),
+      hours: (json['hours'] as num?)?.toDouble() ?? 1.0,
+      notes: json['notes'] as String? ?? '',
+      date: json['date'] as String? ?? (json['log_date'] as String? ?? ''),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'course_id': courseId,
+    'course_name': courseName,
+    'hours': hours,
+    'notes': notes,
+    'date': date,
+  };
 }

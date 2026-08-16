@@ -79,7 +79,7 @@ class ApiEndpoints {
   static String course(int id) => '$baseUrl/courses/$id';
   static String get lecturers => '$baseUrl/lecturers';
   static String lecturer(int id) => '$baseUrl/lecturers/$id';
-  static String get studyLogs => '$baseUrl/study_logs';
+  static String get studyLogs => '$baseUrl/study-logs';
   static String get curriculumSchema => '$baseUrl/curriculum/schema';
   static String get curriculumQuery => '$baseUrl/curriculum/query';
 
@@ -95,5 +95,6 @@ class ApiEndpoints {
 
   static String get receiptScan => '$baseUrl/receipt/scan';
   static String get backupExport => '$baseUrl/backup/export';
-  static String get backupImport => '$baseUrl/backup/import';
+  static String get backupRestore => '$baseUrl/backup/restore';
+  static String get backupImport => '$baseUrl/backup/restore';
 }
