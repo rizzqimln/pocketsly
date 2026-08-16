@@ -24,6 +24,8 @@ class HealthAndCorsTest(unittest.TestCase):
     def test_public_routes_include_health(self):
         self.assertIn("/api/health", _PUBLIC_GET)
         self.assertIn("/api/health", _GET_ROUTES)
+        self.assertIn("/api", _PUBLIC_GET)
+        self.assertIn("/api", _GET_ROUTES)
 
 if __name__ == "__main__":
     unittest.main()

@@ -395,6 +395,21 @@ class AppRequestHandler(http.server.BaseHTTPRequestHandler):
     # GET HANDLERS
     # =========================================================================
 
+    def _get_api_root(self, user_id, query_params):
+        """GET /api — public API index."""
+        return self.send_json({
+            "status": "ok",
+            "service": "pocketsly-api",
+            "version": "1.0.0",
+            "timestamp": int(time.time()),
+            "endpoints": {
+                "health": "/api/health",
+                "session": "/api/session",
+                "login": "/api/login",
+                "register": "/api/register",
+            },
+        })
+
     def _get_health(self, user_id, query_params):
         """GET /api/health — public health check and network ping endpoint."""
         return self.send_json({
@@ -1258,10 +1273,12 @@ def _resolve_route(route_table, patterns, path):
 # =============================================================================
 
 # Endpoints reachable without a session cookie
-_PUBLIC_GET = {"/api/session", "/api/health"}
+_PUBLIC_GET = {"/api", "/api/", "/api/session", "/api/health"}
 _PUBLIC_POST = {"/api/register", "/api/login", "/api/request-otp", "/api/reset-password", "/api/logout"}
 
 _GET_ROUTES = {
+    "/api": AppRequestHandler._get_api_root,
+    "/api/": AppRequestHandler._get_api_root,
     "/api/health": AppRequestHandler._get_health,
     "/api/session": AppRequestHandler._get_session,
     "/api/dashboard": AppRequestHandler._get_dashboard,

@@ -33,7 +33,10 @@ function buildSecurityHeaders() {
     'X-Frame-Options': 'DENY',
     'X-XSS-Protection': '1; mode=block',
     'Referrer-Policy': 'strict-origin-when-cross-origin',
-    'Permissions-Policy': 'geolocation=(), microphone=(), camera=()'
+    'Permissions-Policy': 'geolocation=(), microphone=(), camera=()',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, Cookie, X-Requested-With, Accept'
   };
 }
 
@@ -64,9 +67,9 @@ export async function onRequest(context) {
     return new Response(null, {
       status: 204,
       headers: {
+        'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Cookie',
-        'Access-Control-Allow-Credentials': 'true',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Cookie, X-Requested-With, Accept',
         'Access-Control-Max-Age': '86400'
       }
     });
@@ -105,8 +108,20 @@ export async function onRequest(context) {
   try {
     // ── 1. PUBLIC ROUTES ────────────────────────────────────────────────────
 
-    if (method === 'GET' && path === '/api/health') {
-      return jsonResponse({ status: 'ok', service: 'cloudflare-d1-edge', version: '1.0.0', timestamp: Math.floor(Date.now() / 1000) });
+    if (method === 'GET' && (path === '/api' || path === '/api/' || path === '' || path === '/api/health')) {
+      return jsonResponse({
+        status: 'ok',
+        service: 'cloudflare-d1-edge',
+        name: 'Pocketsly Edge API',
+        version: '1.0.0',
+        timestamp: Math.floor(Date.now() / 1000),
+        endpoints: {
+          health: '/api/health',
+          session: '/api/session',
+          login: '/api/login',
+          register: '/api/register'
+        }
+      });
     }
 
     if (method === 'GET' && path === '/api/session') {
