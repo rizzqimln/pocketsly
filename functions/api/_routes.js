@@ -766,33 +766,167 @@ export async function handlePostBackupRestore(db, userId, body) {
   const data = body.data || body;
   if (!data || typeof data !== 'object') throw new Error('Invalid backup data payload.');
 
+  // Clean existing user domain data before restoring
+  await execute(db, 'DELETE FROM habits WHERE user_id = ?1', [userId]);
+  await execute(db, 'DELETE FROM tasks WHERE user_id = ?1', [userId]);
+  await execute(db, 'DELETE FROM events WHERE user_id = ?1', [userId]);
+  await execute(db, 'DELETE FROM notes WHERE user_id = ?1', [userId]);
+  await execute(db, 'DELETE FROM courses WHERE user_id = ?1', [userId]);
+  await execute(db, 'DELETE FROM lecturers WHERE user_id = ?1', [userId]);
+  await execute(db, 'DELETE FROM budgets WHERE user_id = ?1', [userId]);
+  await execute(db, 'DELETE FROM expenses WHERE user_id = ?1', [userId]);
+  await execute(db, 'DELETE FROM incomes WHERE user_id = ?1', [userId]);
+  await execute(db, 'DELETE FROM resources WHERE user_id = ?1', [userId]);
+  await execute(db, 'DELETE FROM study_logs WHERE user_id = ?1', [userId]);
+
+  // 1. Habits & Habit Logs
+  const habitIdMap = {};
   if (Array.isArray(data.habits)) {
     for (const h of data.habits) {
-      await insert(db, 'INSERT INTO habits (user_id, title, icon, color) VALUES (?1, ?2, ?3, ?4)', [userId, h.title, h.icon || '✨', h.color || '#4F6DF5']);
+      const oldId = h.id;
+      const newId = await insert(
+        db,
+        'INSERT INTO habits (user_id, title, icon, color) VALUES (?1, ?2, ?3, ?4)',
+        [userId, h.title, h.icon || '✨', h.color || '#4F6DF5']
+      );
+      if (oldId !== undefined && oldId !== null) {
+        habitIdMap[oldId] = newId;
+      }
     }
   }
 
+  if (Array.isArray(data.habit_logs)) {
+    for (const hl of data.habit_logs) {
+      const mappedHid = habitIdMap[hl.habit_id];
+      if (mappedHid) {
+        await execute(
+          db,
+          'INSERT OR IGNORE INTO habit_logs (habit_id, log_date, done) VALUES (?1, ?2, ?3)',
+          [mappedHid, hl.log_date, hl.done !== undefined ? hl.done : 1]
+        );
+      }
+    }
+  }
+
+  // 2. Tasks
   if (Array.isArray(data.tasks)) {
     for (const t of data.tasks) {
-      await insert(db, 'INSERT INTO tasks (user_id, title, details, priority, due_date, done) VALUES (?1, ?2, ?3, ?4, ?5, ?6)', [userId, t.title, t.details || '', t.priority || 'medium', t.due_date || null, t.done ? 1 : 0]);
+      await insert(
+        db,
+        'INSERT INTO tasks (user_id, title, details, priority, due_date, done) VALUES (?1, ?2, ?3, ?4, ?5, ?6)',
+        [userId, t.title, t.details || '', t.priority || 'medium', t.due_date || null, t.done ? 1 : 0]
+      );
     }
   }
 
+  // 3. Courses
+  const courseIdMap = {};
+  if (Array.isArray(data.courses)) {
+    for (const c of data.courses) {
+      const oldCid = c.id;
+      const newCid = await insert(
+        db,
+        'INSERT INTO courses (user_id, code, name, credits, semester, progress) VALUES (?1, ?2, ?3, ?4, ?5, ?6)',
+        [userId, c.code || '', c.name || '', c.credits || 3, c.semester || 1, c.progress || 0]
+      );
+      if (oldCid !== undefined && oldCid !== null) {
+        courseIdMap[oldCid] = newCid;
+      }
+    }
+  }
+
+  // 4. Lecturers
+  const lecturerIdMap = {};
+  if (Array.isArray(data.lecturers)) {
+    for (const l of data.lecturers) {
+      const oldLid = l.id;
+      const newLid = await insert(
+        db,
+        'INSERT INTO lecturers (user_id, name, email, office, phone) VALUES (?1, ?2, ?3, ?4, ?5)',
+        [userId, l.name || '', l.email || null, l.office || null, l.phone || null]
+      );
+      if (oldLid !== undefined && oldLid !== null) {
+        lecturerIdMap[oldLid] = newLid;
+      }
+    }
+  }
+
+  // 5. Events
+  if (Array.isArray(data.events)) {
+    for (const e of data.events) {
+      const mappedCid = courseIdMap[e.course_id] || null;
+      const mappedLid = lecturerIdMap[e.lecturer_id] || null;
+      await insert(
+        db,
+        'INSERT INTO events (user_id, title, day_of_week, start_time, end_time, location, color, course_id, lecturer_id) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)',
+        [userId, e.title, e.day_of_week || 0, e.start_time || '09:00', e.end_time || '10:00', e.location || null, e.color || '#4F6DF5', mappedCid, mappedLid]
+      );
+    }
+  }
+
+  // 6. Notes
   if (Array.isArray(data.notes)) {
     for (const n of data.notes) {
-      await insert(db, 'INSERT INTO notes (user_id, title, body, mood) VALUES (?1, ?2, ?3, ?4)', [userId, n.title, n.body || '', n.mood || 'neutral']);
+      await insert(
+        db,
+        'INSERT INTO notes (user_id, title, body, mood) VALUES (?1, ?2, ?3, ?4)',
+        [userId, n.title, n.body || '', n.mood || 'neutral']
+      );
     }
   }
 
+  // 7. Budgets
+  if (Array.isArray(data.budgets)) {
+    for (const b of data.budgets) {
+      await execute(
+        db,
+        'INSERT INTO budgets (user_id, category, amount, month_year) VALUES (?1, ?2, ?3, ?4) ON CONFLICT(user_id, category, month_year) DO UPDATE SET amount = excluded.amount',
+        [userId, b.category, b.amount, b.month_year]
+      );
+    }
+  }
+
+  // 8. Expenses
   if (Array.isArray(data.expenses)) {
     for (const e of data.expenses) {
-      await insert(db, 'INSERT INTO expenses (user_id, category, amount, description, expense_date, wallet) VALUES (?1, ?2, ?3, ?4, ?5, ?6)', [userId, e.category, e.amount, e.description || '', e.expense_date, e.wallet || 'Cash']);
+      await insert(
+        db,
+        'INSERT INTO expenses (user_id, category, amount, description, expense_date, wallet) VALUES (?1, ?2, ?3, ?4, ?5, ?6)',
+        [userId, e.category, e.amount, e.description || '', e.expense_date, e.wallet || 'Cash']
+      );
     }
   }
 
+  // 9. Incomes
   if (Array.isArray(data.incomes)) {
     for (const i of data.incomes) {
-      await insert(db, 'INSERT INTO incomes (user_id, source, amount, description, income_date, wallet, recurring) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)', [userId, i.source, i.amount, i.description || '', i.income_date, i.wallet || 'Cash', i.recurring || 'none']);
+      await insert(
+        db,
+        'INSERT INTO incomes (user_id, source, amount, description, income_date, wallet, recurring) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)',
+        [userId, i.source, i.amount, i.description || '', i.income_date, i.wallet || 'Cash', i.recurring || 'none']
+      );
+    }
+  }
+
+  // 10. Academic Resources
+  if (Array.isArray(data.resources)) {
+    for (const r of data.resources) {
+      await insert(
+        db,
+        'INSERT INTO resources (user_id, title, author, resource_type, category, url_or_path, status, notes, year, publisher, doi) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)',
+        [userId, r.title, r.author || '', r.resource_type || 'article', r.category || 'general', r.url_or_path || '', r.status || 'unread', r.notes || '', r.year || '', r.publisher || '', r.doi || '']
+      );
+    }
+  }
+
+  // 11. Study Logs
+  if (Array.isArray(data.study_logs)) {
+    for (const sl of data.study_logs) {
+      await insert(
+        db,
+        'INSERT INTO study_logs (user_id, course_name, hours, activity_type, log_date, notes) VALUES (?1, ?2, ?3, ?4, ?5, ?6)',
+        [userId, sl.course_name, sl.hours || 1.0, sl.activity_type || 'practice', sl.log_date, sl.notes || '']
+      );
     }
   }
 

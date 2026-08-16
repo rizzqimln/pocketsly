@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" name="viewport" />
   <title>Pocketsly — Daily Routine &amp; Student Productivity Suite</title>
-  
+
   <!-- PWA & Mobile Web App Meta -->
   <meta name="theme-color" content="#7C3AED" />
   <meta name="mobile-web-app-capable" content="yes" />
@@ -24,9 +24,13 @@
   <!-- Google Fonts is loaded async (media=print trick) so it never blocks first
        paint; after the first online visit the service worker runtime-caches it,
        keeping the PWA's offline promise intact. -->
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
-  <noscript><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" /></noscript>
-  
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet" media="print" onload="this.media='all'" />
+  <noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet" />
+  </noscript>
+
   <!-- Bundled styling: one file, zero render-blocking fan-out over HTTP/1.1.
        Sources stay modular under static/css; regenerate via scripts/build.py. -->
   <link href="/css/bundle.css?v=8.8" rel="stylesheet" />
@@ -54,8 +58,10 @@
             <span class="ld-avatar" id="landing-user-avatar">U</span>
             <span id="landing-username">User</span>
           </span>
-          <a class="ld-btn ld-btn-ghost hidden" href="#" id="landing-continue-btn" onclick="Auth.continueToApp()">Continue to Dashboard</a>
-          <button class="ld-btn ld-btn-primary" id="landing-signin-btn" onclick="App.openProfileSettings()" type="button">Sign In / Get Started</button>
+          <a class="ld-btn ld-btn-ghost hidden" href="#" id="landing-continue-btn"
+            onclick="Auth.continueToApp()">Continue to Dashboard</a>
+          <button class="ld-btn ld-btn-primary" id="landing-signin-btn" onclick="App.openProfileSettings()"
+            type="button">Sign In / Get Started</button>
         </div>
       </div>
     </header>
@@ -71,9 +77,15 @@
           explore first, sign in later.
         </p>
         <div class="ld-hero-cta">
-          <button class="ld-btn ld-btn-primary ld-btn-big" onclick="App.openProfileSettings()" type="button">Get Started — it's free</button>
+          <button class="ld-btn ld-btn-primary ld-btn-big" onclick="App.openProfileSettings()" type="button">Get Started
+            — it's free</button>
           <button class="ld-btn ld-btn-ghost ld-btn-big" onclick="App.requestInstall()" type="button">
-            <svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewBox="0 0 24 24" width="18"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+              stroke-width="2.2" viewBox="0 0 24 24" width="18">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
             Install App
           </button>
         </div>
@@ -89,10 +101,44 @@
             <span class="ld-mockup-dot"></span>
           </div>
           <div class="ld-mockup-body">
-            <div class="ld-mock-tile"><div class="tile-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div class="tile-line"></div><div class="tile-line short"></div><div class="tile-line success" style="width:80%"></div></div>
-            <div class="ld-mock-tile"><div class="tile-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div><div class="tile-line"></div><div class="tile-line warn" style="width:65%"></div></div>
-            <div class="ld-mock-tile"><div class="tile-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg></div><div class="tile-line"></div><div class="tile-line short"></div></div>
-            <div class="ld-mock-tile"><div class="tile-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></div><div class="tile-line"></div><div class="tile-line success" style="width:70%"></div></div>
+            <div class="ld-mock-tile">
+              <div class="tile-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                  stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg></div>
+              <div class="tile-line"></div>
+              <div class="tile-line short"></div>
+              <div class="tile-line success" style="width:80%"></div>
+            </div>
+            <div class="ld-mock-tile">
+              <div class="tile-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                  stroke-width="2.2">
+                  <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg></div>
+              <div class="tile-line"></div>
+              <div class="tile-line warn" style="width:65%"></div>
+            </div>
+            <div class="ld-mock-tile">
+              <div class="tile-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                  stroke-width="2.2">
+                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                </svg></div>
+              <div class="tile-line"></div>
+              <div class="tile-line short"></div>
+            </div>
+            <div class="ld-mock-tile">
+              <div class="tile-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                  stroke-width="2.2">
+                  <line x1="12" y1="1" x2="12" y2="23"></line>
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg></div>
+              <div class="tile-line"></div>
+              <div class="tile-line success" style="width:70%"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -107,43 +153,81 @@
         </div>
         <div class="ld-bento">
           <div class="ld-cell cell-2x2 ld-cell-glass">
-            <div class="cell-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg></div>
+            <div class="cell-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+                stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <circle cx="12" cy="12" r="6"></circle>
+                <circle cx="12" cy="12" r="2"></circle>
+              </svg></div>
             <h3>Habits &amp; Tasks</h3>
-            <p>Build consistent routines with daily habit tracking, priorities, and due dates. Log completion with one tap and watch streaks grow.</p>
+            <p>Build consistent routines with daily habit tracking, priorities, and due dates. Log completion with one
+              tap and watch streaks grow.</p>
             <div class="cell-stat">14<small> consecutive days</small></div>
           </div>
           <div class="ld-cell cell-w4">
-            <div class="cell-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
+            <div class="cell-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+                stroke-width="2.2">
+                <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg></div>
             <h3>Weekly Timetable</h3>
             <p>Block out classes, focus work, and personal routines in a color-coded weekly schedule.</p>
           </div>
           <div class="ld-cell cell-w4">
-            <div class="cell-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg></div>
+            <div class="cell-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+                stroke-width="2.2">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              </svg></div>
             <h3>Journal &amp; Notes</h3>
             <p>Capture daily reflections and lecture notes, tagged with mood to spot your energy patterns.</p>
           </div>
           <div class="ld-cell cell-w4">
-            <div class="cell-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"></rect><path d="M2 10h20"></path></svg></div>
+            <div class="cell-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+                stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="6" width="20" height="12" rx="2"></rect>
+                <path d="M2 10h20"></path>
+              </svg></div>
             <h3>Receipt Scanner</h3>
             <p>Snap a receipt and let OCR extract merchant, amount, and date — on-device or via server.</p>
           </div>
           <div class="ld-cell cell-w3">
-            <div class="cell-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg></div>
+            <div class="cell-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+                stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+              </svg></div>
             <h3>Curriculum Lab</h3>
             <p>Track courses, credits, lecturers, and study logs — even run live SQL practice.</p>
           </div>
           <div class="ld-cell cell-w3">
-            <div class="cell-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></div>
+            <div class="cell-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+                stroke-width="2.2">
+                <line x1="12" y1="1" x2="12" y2="23"></line>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+              </svg></div>
             <h3>Monthly Budget</h3>
             <p>Allocate category limits, log incomes and expenses, and monitor spend against budget live.</p>
           </div>
           <div class="ld-cell cell-w3">
-            <div class="cell-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"></circle><path d="M12 9v4l2 2"></path><path d="M5 3 2 6"></path><path d="m22 6-3-3"></path></svg></div>
+            <div class="cell-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+                stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="13" r="8"></circle>
+                <path d="M12 9v4l2 2"></path>
+                <path d="M5 3 2 6"></path>
+                <path d="m22 6-3-3"></path>
+              </svg></div>
             <h3>Focus Timer</h3>
             <p>Pomodoro and focus sessions wired into your study-log for honest hour tracking.</p>
           </div>
           <div class="ld-cell cell-w3">
-            <div class="cell-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></div>
+            <div class="cell-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+                stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg></div>
             <h3>Private &amp; Portable</h3>
             <p>Cookie sessions, per-account data, and one-click JSON backup &amp; restore.</p>
           </div>
@@ -183,11 +267,16 @@
       <div class="container">
         <div class="ld-section-head">
           <h2>Get Pocketsly on your phone</h2>
-          <p>Free, private, and works offline. Anyone can install it on their own device in under a minute — no app store needed.</p>
+          <p>Free, private, and works offline. Anyone can install it on their own device in under a minute — no app
+            store needed.</p>
         </div>
         <div class="ld-install-grid">
           <div class="ld-install-card">
-            <div class="cell-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg></div>
+            <div class="cell-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="5" y="2" width="14" height="20" rx="2"></rect>
+                <line x1="12" y1="18" x2="12.01" y2="18"></line>
+              </svg></div>
             <h3>Android</h3>
             <ol>
               <li>Open Pocketsly in Chrome</li>
@@ -196,7 +285,10 @@
             </ol>
           </div>
           <div class="ld-install-card">
-            <div class="cell-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c1 2-1 4-1 6s2 2 2 5-3 5-6 5-4-3-2-6c2-1 2-3 1-5s3-4 6-5z"></path></svg></div>
+            <div class="cell-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2c1 2-1 4-1 6s2 2 2 5-3 5-6 5-4-3-2-6c2-1 2-3 1-5s3-4 6-5z"></path>
+              </svg></div>
             <h3>iPhone &amp; iPad</h3>
             <ol>
               <li>Open Pocketsly in Safari</li>
@@ -205,7 +297,12 @@
             </ol>
           </div>
           <div class="ld-install-card">
-            <div class="cell-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg></div>
+            <div class="cell-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2"></rect>
+                <line x1="8" y1="21" x2="16" y2="21"></line>
+                <line x1="12" y1="17" x2="12" y2="21"></line>
+              </svg></div>
             <h3>Computer</h3>
             <ol>
               <li>Open Pocketsly in Chrome or Edge</li>
@@ -215,8 +312,10 @@
           </div>
         </div>
         <div class="ld-install-cta">
-          <button class="ld-btn ld-btn-primary ld-btn-big" id="landing-install-cta-btn" onclick="App.requestInstall()" type="button">Install Pocketsly now</button>
-          <p class="ld-install-note" id="install-ios-hint" hidden>On iPhone or iPad: use Safari &rarr; Share &rarr; Add to Home Screen.</p>
+          <button class="ld-btn ld-btn-primary ld-btn-big" id="landing-install-cta-btn" onclick="App.requestInstall()"
+            type="button">Install Pocketsly now</button>
+          <p class="ld-install-note" id="install-ios-hint" hidden>On iPhone or iPad: use Safari &rarr; Share &rarr; Add
+            to Home Screen.</p>
         </div>
       </div>
     </section>
@@ -228,8 +327,10 @@
           <h2>Your best week starts today.</h2>
           <p>Free to explore. Sign in whenever you're ready.</p>
           <div class="ld-cta-actions">
-            <button class="ld-btn ld-btn-primary ld-btn-big" onclick="App.openProfileSettings()" type="button">Get Started — it's free</button>
-            <button class="ld-btn ld-btn-ghost ld-btn-big" onclick="App.requestInstall()" type="button">Install App</button>
+            <button class="ld-btn ld-btn-primary ld-btn-big" onclick="App.openProfileSettings()" type="button">Get
+              Started — it's free</button>
+            <button class="ld-btn ld-btn-ghost ld-btn-big" onclick="App.requestInstall()" type="button">Install
+              App</button>
           </div>
         </div>
       </div>
@@ -496,7 +597,10 @@
               <div class="onboarding-modules-grid">
                 <a class="onboarding-module-tile" href="#habits">
                   <span class="tile-icon text-brand">
-                    <svg class="icon-svg" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    <svg class="icon-svg" viewBox="0 0 24 24">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
                   </span>
                   <div>
                     <div class="tile-title">Habits &amp; Tasks</div>
@@ -506,7 +610,12 @@
                 </a>
                 <a class="onboarding-module-tile" href="#schedule">
                   <span class="tile-icon text-brand">
-                    <svg class="icon-svg" viewBox="0 0 24 24"><rect height="18" rx="2" ry="2" width="18" x="3" y="4"></rect><line x1="16" x2="16" y1="2" y2="6"></line><line x1="8" x2="8" y1="2" y2="6"></line><line x1="3" x2="21" y1="10" y2="10"></line></svg>
+                    <svg class="icon-svg" viewBox="0 0 24 24">
+                      <rect height="18" rx="2" ry="2" width="18" x="3" y="4"></rect>
+                      <line x1="16" x2="16" y1="2" y2="6"></line>
+                      <line x1="8" x2="8" y1="2" y2="6"></line>
+                      <line x1="3" x2="21" y1="10" y2="10"></line>
+                    </svg>
                   </span>
                   <div>
                     <div class="tile-title">Weekly Timetable</div>
@@ -516,7 +625,12 @@
                 </a>
                 <a class="onboarding-module-tile" href="#notes">
                   <span class="tile-icon text-brand">
-                    <svg class="icon-svg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line></svg>
+                    <svg class="icon-svg" viewBox="0 0 24 24">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14 2 14 8 20 8"></polyline>
+                      <line x1="16" x2="8" y1="13" y2="13"></line>
+                      <line x1="16" x2="8" y1="17" y2="17"></line>
+                    </svg>
                   </span>
                   <div>
                     <div class="tile-title">Journal &amp; Notes</div>
@@ -526,7 +640,14 @@
                 </a>
                 <a class="onboarding-module-tile" href="#curriculum">
                   <span class="tile-icon text-brand">
-                    <svg class="icon-svg" viewBox="0 0 24 24"><line x1="8" x2="21" y1="6" y2="6"></line><line x1="8" x2="21" y1="12" y2="12"></line><line x1="8" x2="21" y1="18" y2="18"></line><line x1="3" x2="3.01" y1="6" y2="6"></line><line x1="3" x2="3.01" y1="12" y2="12"></line><line x1="3" x2="3.01" y1="18" y2="18"></line></svg>
+                    <svg class="icon-svg" viewBox="0 0 24 24">
+                      <line x1="8" x2="21" y1="6" y2="6"></line>
+                      <line x1="8" x2="21" y1="12" y2="12"></line>
+                      <line x1="8" x2="21" y1="18" y2="18"></line>
+                      <line x1="3" x2="3.01" y1="6" y2="6"></line>
+                      <line x1="3" x2="3.01" y1="12" y2="12"></line>
+                      <line x1="3" x2="3.01" y1="18" y2="18"></line>
+                    </svg>
                   </span>
                   <div>
                     <div class="tile-title">Curriculum Lab</div>
@@ -536,7 +657,10 @@
                 </a>
                 <a class="onboarding-module-tile" href="#budget">
                   <span class="tile-icon text-success">
-                    <svg class="icon-svg" viewBox="0 0 24 24"><rect height="14" rx="2" width="20" x="2" y="5"></rect><line x1="2" x2="22" y1="10" y2="10"></line></svg>
+                    <svg class="icon-svg" viewBox="0 0 24 24">
+                      <rect height="14" rx="2" width="20" x="2" y="5"></rect>
+                      <line x1="2" x2="22" y1="10" y2="10"></line>
+                    </svg>
                   </span>
                   <div>
                     <div class="tile-title">Monthly Budget</div>
@@ -838,8 +962,8 @@
                     <span class="text-muted text-xs" id="note-word-count">0 words • 0 chars</span>
                   </div>
                   <div class="d-flex gap-md items-center">
-                    <input class="note-title-input flex-1" id="note-title-input" placeholder="Untitled Reflection / Note"
-                      type="text" />
+                    <input class="note-title-input flex-1" id="note-title-input"
+                      placeholder="Untitled Reflection / Note" type="text" />
                     <select class="text-sm p-md" id="note-mood-select">
                       <option value="productive">Productive</option>
                       <option value="happy">Positive</option>
@@ -853,8 +977,7 @@
                   <div class="editor-actions d-flex justify-between items-center">
                     <button class="btn btn-danger hidden text-sm p-sm" id="delete-note-btn">Delete
                       Note</button>
-                    <button class="btn btn-primary d-flex items-center gap-sm font-bold p-xl"
-                      id="save-note-btn">
+                    <button class="btn btn-primary d-flex items-center gap-sm font-bold p-xl" id="save-note-btn">
                       <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                         stroke-width="2.5" viewBox="0 0 24 24" width="14">
                         <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
@@ -883,11 +1006,16 @@
                       </svg>
                       Library &amp; Research Journals
                     </h3>
-                    <p class="text-muted text-xs m-0 mt-xs">Catalog of research articles, online books, journals, and papers with instant citations.</p>
+                    <p class="text-muted text-xs m-0 mt-xs">Catalog of research articles, online books, journals, and
+                      papers with instant citations.</p>
                   </div>
                   <button class="btn btn-primary btn-sm d-inline-flex items-center gap-sm font-bold p-lg"
                     onclick="Notes.openAddResourceModal()" type="button">
-                    <svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="15"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                      stroke-width="2.5" viewBox="0 0 24 24" width="15">
+                      <line x1="12" y1="5" x2="12" y2="19"></line>
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
                     + Add Resource / Paper
                   </button>
                 </div>
@@ -1037,8 +1165,7 @@
                         </div>
                       </div>
                       <!-- Library Card (Navigates to Journal & Notes -> Library tab) -->
-                      <div class="card bento-tile"
-                        onclick="Notes.openLibrary()">
+                      <div class="card bento-tile" onclick="Notes.openLibrary()">
                         <div class="bento-header">
                           <span class="bento-icon-box bento-icon-indigo">
                             <svg class="icon-svg" viewBox="0 0 24 24">
@@ -1196,7 +1323,8 @@
                           </div>
                         </div>
                         <h4 class="bento-title">CSS Flexbox &amp; Grid Visualizer</h4>
-                        <p class="bento-desc">Interactive live CSS stage to tweak direction, alignment, justify-content, and copy snippets.</p>
+                        <p class="bento-desc">Interactive live CSS stage to tweak direction, alignment, justify-content,
+                          and copy snippets.</p>
                         <div class="bento-tags-row">
                           <span class="bento-tag">CSS Flexbox</span>
                           <span class="bento-tag">CSS Grid</span>
@@ -1218,7 +1346,8 @@
                           </div>
                         </div>
                         <h4 class="bento-title">JS Array &amp; Functional Lab</h4>
-                        <p class="bento-desc">Interactive pipeline for .map(), .filter(), .reduce(), and data transformations.</p>
+                        <p class="bento-desc">Interactive pipeline for .map(), .filter(), .reduce(), and data
+                          transformations.</p>
                         <div class="bento-tags-row">
                           <span class="bento-tag">Array Methods</span>
                           <span class="bento-tag">Functional JS</span>
@@ -1240,7 +1369,8 @@
                           </div>
                         </div>
                         <h4 class="bento-title">Regex Pattern Validator</h4>
-                        <p class="bento-desc">Test real-time Regular Expressions with instant match highlighting and group capture.</p>
+                        <p class="bento-desc">Test real-time Regular Expressions with instant match highlighting and
+                          group capture.</p>
                         <div class="bento-tags-row">
                           <span class="bento-tag">RegEx</span>
                           <span class="bento-tag">Input Validation</span>
@@ -1403,8 +1533,7 @@
                       <div class="font-extrabold text-brand text-2xl" id="perf-course-percentage">
                         0%
                       </div>
-                      <div class="d-flex flex-col gap-md mt-lg"
-                        id="perf-course-progress-list">
+                      <div class="d-flex flex-col gap-md mt-lg" id="perf-course-progress-list">
                         <!-- Render dynamic course progress bars here -->
                       </div>
                     </div>
@@ -1416,8 +1545,8 @@
                         <div class="font-bold text-secondary text-md">
                           Overall Productivity</div>
                       </div>
-                      <div class="font-extrabold text-success text-2xl"
-                        id="perf-productivity-hours">0 <span class="text-muted text-base">hours/week</span></div>
+                      <div class="font-extrabold text-success text-2xl" id="perf-productivity-hours">0 <span
+                          class="text-muted text-base">hours/week</span></div>
                       <p class="text-muted mt-xs text-sm" id="perf-theory-practice-breakdown">0
                         h theory • 0 h practice
                       </p>
@@ -1445,8 +1574,7 @@
                     <div class="card-body">
                       <div class="font-bold text-secondary mb-md text-md">
                         Tasks &amp; Quiz Mastery</div>
-                      <div class="font-extrabold text-brand text-2xl"
-                        id="perf-homeworks-percentage">
+                      <div class="font-extrabold text-brand text-2xl" id="perf-homeworks-percentage">
                         85%</div>
                       <div class="d-flex gap-md font-semibold mt-xs text-sm" id="perf-tasks-status-row">
                         <span class="text-warning" id="perf-pending-tasks">0 pending</span>
@@ -1484,15 +1612,15 @@
                         <div>
                           <div class="font-bold text-secondary text-md">
                             Productivity &amp; Study Logs</div>
-                          <div class="font-extrabold text-success mt-xl text-xl"
-                            id="perf-monthly-hours-total">0 <span class="text-muted">hours logged
+                          <div class="font-extrabold text-success mt-xl text-xl" id="perf-monthly-hours-total">0 <span
+                              class="text-muted">hours logged
                               total</span></div>
                         </div>
                         <button class="btn btn-outline btn-sm" onclick="window.Curriculum.openLogStudyModal()"> Add
                           Study Session</button>
                       </div>
                       <!-- Study Logs Table / List -->
-                      <div  id="perf-study-logs-container">
+                      <div id="perf-study-logs-container">
                         <p class="text-muted text-center text-md p-2xl">No
                           study sessions logged yet. Click "Add Study Session" above to track your practice &amp; theory
                           hours.</p>
@@ -1504,7 +1632,8 @@
               <!-- RELATIONAL DATABASE SANDBOX -->
               <div class="curr-panel hidden" id="curr-db">
                 <div class="panel-header">
-                  <button class="btn btn-outline btn-sm back-to-hub-btn d-inline-flex items-center gap-sm mb-md text-xs p-md"
+                  <button
+                    class="btn btn-outline btn-sm back-to-hub-btn d-inline-flex items-center gap-sm mb-md text-xs p-md"
                     onclick="window.Curriculum.switchTab('backend-sec')" type="button">
                     <svg class="icon-svg" viewBox="0 0 24 24">
                       <line x1="19" x2="5" y1="12" y2="12"></line>
@@ -1520,9 +1649,8 @@
                   <div class="card schema-card">
                     <div class="d-flex justify-between items-center mb-md p-sm">
                       <h4 class="m-0 font-bold text-primary text-base">Database Schema</h4>
-                      <button class="btn btn-outline font-bold cursor-pointer text-xs p-sm"
-                        id="schema-toggle-btn" onclick="Curriculum.toggleSchemaCollapse()"
-                        type="button">Collapse</button>
+                      <button class="btn btn-outline font-bold cursor-pointer text-xs p-sm" id="schema-toggle-btn"
+                        onclick="Curriculum.toggleSchemaCollapse()" type="button">Collapse</button>
                     </div>
                     <div class="schema-list-container" id="db-schema-viewer">
                       <p class="text-muted">Fetching schema structure...</p>
@@ -1531,8 +1659,8 @@
                   <div class="card query-card">
                     <div class="d-flex justify-between items-center mb-md">
                       <h4 class="m-0 d-flex items-center gap-sm">
-                        <svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                          stroke-width="2.2" viewBox="0 0 24 24" width="16">
+                        <svg fill="none" height="16" stroke="currentColor" stroke-linecap="round"
+                          stroke-linejoin="round" stroke-width="2.2" viewBox="0 0 24 24" width="16">
                           <polyline points="4 17 10 11 4 5"></polyline>
                           <line x1="12" x2="20" y1="19" y2="19"></line>
                         </svg>
@@ -1547,16 +1675,21 @@
                         <button class="template-btn"
                           data-sql="SELECT * FROM tasks WHERE done = 0 ORDER BY priority DESC LIMIT 10;"
                           type="button">Tasks</button>
-                        <button class="template-btn" data-sql="SELECT * FROM habits LIMIT 10;" type="button">Habits</button>
+                        <button class="template-btn" data-sql="SELECT * FROM habits LIMIT 10;"
+                          type="button">Habits</button>
                         <button class="template-btn" data-sql="SELECT * FROM notes ORDER BY updated_at DESC LIMIT 10;"
                           type="button">Notes</button>
-                        <button class="template-btn" data-sql="SELECT * FROM courses LIMIT 10;" type="button">Courses</button>
+                        <button class="template-btn" data-sql="SELECT * FROM courses LIMIT 10;"
+                          type="button">Courses</button>
                         <button class="template-btn"
-                          data-sql="SELECT * FROM incomes ORDER BY income_date DESC LIMIT 10;" type="button">Incomes</button>
+                          data-sql="SELECT * FROM incomes ORDER BY income_date DESC LIMIT 10;"
+                          type="button">Incomes</button>
                         <button class="template-btn"
-                          data-sql="SELECT * FROM expenses ORDER BY expense_date DESC LIMIT 10;" type="button">Expenses</button>
+                          data-sql="SELECT * FROM expenses ORDER BY expense_date DESC LIMIT 10;"
+                          type="button">Expenses</button>
                         <button class="template-btn"
-                          data-sql="SELECT * FROM events ORDER BY day_of_week, start_time LIMIT 10;" type="button">Timetable</button>
+                          data-sql="SELECT * FROM events ORDER BY day_of_week, start_time LIMIT 10;"
+                          type="button">Timetable</button>
                         <button class="template-btn" data-sql="SELECT name FROM sqlite_master WHERE type='table';"
                           type="button">Schema Tables</button>
                       </div>
@@ -1595,8 +1728,7 @@
                         </svg>
                         Run Query
                       </button>
-                      <button
-                        class="btn btn-outline d-inline-flex items-center justify-center gap-sm p-0"
+                      <button class="btn btn-outline d-inline-flex items-center justify-center gap-sm p-0"
                         id="reset-sql-btn" type="button">
                         <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round"
                           stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="14">
@@ -1659,7 +1791,8 @@
               <!-- BACKEND DEVELOPMENT CONCEPTS -->
               <div class="curr-panel hidden" id="curr-backend">
                 <div class="panel-header">
-                  <button class="btn btn-outline btn-sm back-to-hub-btn d-inline-flex items-center gap-sm mb-md text-xs p-md"
+                  <button
+                    class="btn btn-outline btn-sm back-to-hub-btn d-inline-flex items-center gap-sm mb-md text-xs p-md"
                     onclick="window.Curriculum.switchTab('backend-sec')" type="button">
                     <svg class="icon-svg" viewBox="0 0 24 24">
                       <line x1="19" x2="5" y1="12" y2="12"></line>
@@ -1747,7 +1880,8 @@
               <!-- ACADEMIC & FACULTY MANAGEMENT -->
               <div class="curr-panel hidden" id="curr-academic">
                 <div class="panel-header">
-                  <button class="btn btn-outline btn-sm back-to-hub-btn d-inline-flex items-center gap-sm mb-md text-xs p-md"
+                  <button
+                    class="btn btn-outline btn-sm back-to-hub-btn d-inline-flex items-center gap-sm mb-md text-xs p-md"
                     onclick="window.Curriculum.switchTab('hub')" type="button">
                     <svg class="icon-svg" viewBox="0 0 24 24">
                       <line x1="19" x2="5" y1="12" y2="12"></line>
@@ -1777,7 +1911,7 @@
                       </div>
                       <button class="btn btn-primary" type="submit">Save Course</button>
                     </form>
-                    <hr  />
+                    <hr />
                     <h4>Add Lecturer / Professor</h4>
                     <form class="auth-form d-flex flex-col gap-md" id="add-lecturer-form">
                       <div class="form-group">
@@ -1800,7 +1934,7 @@
                     <div class="list-container mt-lg" id="active-courses-list">
                       <p class="text-muted">Loading study program list...</p>
                     </div>
-                    <h4 >Lecturer Directory</h4>
+                    <h4>Lecturer Directory</h4>
                     <div class="list-container mt-lg" id="active-lecturers-list">
                       <p class="text-muted">Loading lecturer directory...</p>
                     </div>
@@ -1810,7 +1944,8 @@
               <!-- ALGORITHMS AND STRUCTURES -->
               <div class="curr-panel hidden" id="curr-algorithms">
                 <div class="panel-header">
-                  <button class="btn btn-outline btn-sm back-to-hub-btn d-inline-flex items-center gap-sm mb-md text-xs p-md"
+                  <button
+                    class="btn btn-outline btn-sm back-to-hub-btn d-inline-flex items-center gap-sm mb-md text-xs p-md"
                     onclick="window.Curriculum.switchTab('hub')" type="button">
                     <svg class="icon-svg" viewBox="0 0 24 24">
                       <line x1="19" x2="5" y1="12" y2="12"></line>
@@ -1888,7 +2023,8 @@
               <!-- ROADMAP QUIZZES / FLASHCARDS -->
               <div class="curr-panel hidden" id="curr-flashcards">
                 <div class="panel-header">
-                  <button class="btn btn-outline btn-sm back-to-hub-btn d-inline-flex items-center gap-sm mb-md text-xs p-md"
+                  <button
+                    class="btn btn-outline btn-sm back-to-hub-btn d-inline-flex items-center gap-sm mb-md text-xs p-md"
                     onclick="window.Curriculum.switchTab('hub')" type="button">
                     <svg class="icon-svg" viewBox="0 0 24 24">
                       <line x1="19" x2="5" y1="12" y2="12"></line>
@@ -1931,17 +2067,24 @@
               <div class="curr-panel hidden" id="curr-flexbox">
                 <div class="panel-header d-flex justify-between items-start flex-wrap gap-md">
                   <div>
-                    <button class="btn btn-outline btn-sm back-to-hub-btn d-inline-flex items-center gap-sm mb-sm text-xs p-md"
+                    <button
+                      class="btn btn-outline btn-sm back-to-hub-btn d-inline-flex items-center gap-sm mb-sm text-xs p-md"
                       onclick="window.Curriculum.switchTab('hub')" type="button">
-                      <svg class="icon-svg" viewBox="0 0 24 24"><line x1="19" x2="5" y1="12" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                      <svg class="icon-svg" viewBox="0 0 24 24">
+                        <line x1="19" x2="5" y1="12" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                      </svg>
                       Back to Catalog
                     </button>
                     <h3>CSS Flexbox &amp; Grid Visualizer Lab</h3>
-                    <p class="text-muted">Interactively manipulate modern CSS layout primitives and preview changes live on stage.</p>
+                    <p class="text-muted">Interactively manipulate modern CSS layout primitives and preview changes live
+                      on stage.</p>
                   </div>
                   <div class="d-flex gap-sm">
-                    <button class="btn btn-primary btn-sm" onclick="window.Curriculum.addFlexItem()" type="button">+ Add Box</button>
-                    <button class="btn btn-outline btn-sm" onclick="window.Curriculum.removeFlexItem()" type="button">- Remove Box</button>
+                    <button class="btn btn-primary btn-sm" onclick="window.Curriculum.addFlexItem()" type="button">+ Add
+                      Box</button>
+                    <button class="btn btn-outline btn-sm" onclick="window.Curriculum.removeFlexItem()" type="button">-
+                      Remove Box</button>
                   </div>
                 </div>
 
@@ -1950,7 +2093,7 @@
                   <div class="card flex-controls-card">
                     <div class="card-body">
                       <h4 class="font-bold text-sm mb-md text-primary">Container Properties</h4>
-                      
+
                       <div class="form-group mb-sm">
                         <label class="text-xs font-semibold">flex-direction</label>
                         <select class="w-full" id="flex-dir-select" onchange="window.Curriculum.updateFlexStage()">
@@ -1998,7 +2141,8 @@
                           <label class="text-xs font-semibold m-0">gap</label>
                           <span class="text-xs font-bold text-brand" id="flex-gap-val">12px</span>
                         </div>
-                        <input class="w-full" id="flex-gap-slider" max="48" min="0" oninput="window.Curriculum.updateFlexStage()" step="4" type="range" value="12" />
+                        <input class="w-full" id="flex-gap-slider" max="28" min="0"
+                          oninput="window.Curriculum.updateFlexStage()" step="2" type="range" value="12" />
                       </div>
                     </div>
                   </div>
@@ -2024,7 +2168,8 @@
                     <div class="card flex-code-card">
                       <div class="card-header d-flex justify-between items-center">
                         <span class="font-mono text-xs text-primary font-bold">Generated CSS Rules</span>
-                        <button class="btn btn-outline btn-xs" onclick="window.Curriculum.copyFlexCSS()" type="button">📋 Copy CSS</button>
+                        <button class="btn btn-outline btn-xs" onclick="window.Curriculum.copyFlexCSS()"
+                          type="button">📋 Copy CSS</button>
                       </div>
                       <div class="card-body p-md">
                         <pre class="flex-css-snippet font-mono text-xs m-0" id="flex-css-snippet"></pre>
@@ -2038,29 +2183,40 @@
               <div class="curr-panel hidden" id="curr-jslab">
                 <div class="panel-header d-flex justify-between items-start flex-wrap gap-md">
                   <div>
-                    <button class="btn btn-outline btn-sm back-to-hub-btn d-inline-flex items-center gap-sm mb-sm text-xs p-md"
+                    <button
+                      class="btn btn-outline btn-sm back-to-hub-btn d-inline-flex items-center gap-sm mb-sm text-xs p-md"
                       onclick="window.Curriculum.switchTab('hub')" type="button">
-                      <svg class="icon-svg" viewBox="0 0 24 24"><line x1="19" x2="5" y1="12" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                      <svg class="icon-svg" viewBox="0 0 24 24">
+                        <line x1="19" x2="5" y1="12" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                      </svg>
                       Back to Catalog
                     </button>
                     <h3>JavaScript Functional &amp; Array Lab</h3>
-                    <p class="text-muted">Master .map(), .filter(), .reduce(), and data pipelines with live code execution and visual data flow.</p>
+                    <p class="text-muted">Master .map(), .filter(), .reduce(), and data pipelines with live code
+                      execution and visual data flow.</p>
                   </div>
                 </div>
 
                 <div class="card mb-md">
                   <div class="card-body p-lg">
                     <div class="d-flex gap-xs flex-wrap mb-md" id="js-method-pills">
-                      <button class="day-pill-btn active" onclick="window.Curriculum.selectJSMethod('map')" type="button">.map()</button>
-                      <button class="day-pill-btn" onclick="window.Curriculum.selectJSMethod('filter')" type="button">.filter()</button>
-                      <button class="day-pill-btn" onclick="window.Curriculum.selectJSMethod('reduce')" type="button">.reduce()</button>
-                      <button class="day-pill-btn" onclick="window.Curriculum.selectJSMethod('find')" type="button">.find()</button>
-                      <button class="day-pill-btn" onclick="window.Curriculum.selectJSMethod('sort')" type="button">.sort()</button>
+                      <button class="day-pill-btn active" onclick="window.Curriculum.selectJSMethod('map')"
+                        type="button">.map()</button>
+                      <button class="day-pill-btn" onclick="window.Curriculum.selectJSMethod('filter')"
+                        type="button">.filter()</button>
+                      <button class="day-pill-btn" onclick="window.Curriculum.selectJSMethod('reduce')"
+                        type="button">.reduce()</button>
+                      <button class="day-pill-btn" onclick="window.Curriculum.selectJSMethod('find')"
+                        type="button">.find()</button>
+                      <button class="day-pill-btn" onclick="window.Curriculum.selectJSMethod('sort')"
+                        type="button">.sort()</button>
                     </div>
 
                     <div class="form-group mb-sm">
                       <label class="text-xs font-semibold">Initial Array (JSON format)</label>
-                      <input class="font-mono text-sm w-full" id="js-input-array" type="text" value="[12, 45, 68, 23, 89, 34, 90]" />
+                      <input class="font-mono text-sm w-full" id="js-input-array" type="text"
+                        value="[12, 45, 68, 23, 89, 34, 90]" />
                     </div>
 
                     <div class="form-group mb-md">
@@ -2068,8 +2224,12 @@
                       <input class="font-mono text-sm w-full" id="js-callback-expr" type="text" value="x => x * 2" />
                     </div>
 
-                    <button class="btn btn-primary btn-sm d-inline-flex items-center gap-xs font-bold" onclick="window.Curriculum.runJSLab()" type="button">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                    <button class="btn btn-primary btn-sm d-inline-flex items-center gap-xs font-bold"
+                      onclick="window.Curriculum.runJSLab()" type="button">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                      </svg>
                       Execute Transformation
                     </button>
                   </div>
@@ -2090,13 +2250,18 @@
               <div class="curr-panel hidden" id="curr-regexlab">
                 <div class="panel-header d-flex justify-between items-start flex-wrap gap-md">
                   <div>
-                    <button class="btn btn-outline btn-sm back-to-hub-btn d-inline-flex items-center gap-sm mb-sm text-xs p-md"
+                    <button
+                      class="btn btn-outline btn-sm back-to-hub-btn d-inline-flex items-center gap-sm mb-sm text-xs p-md"
                       onclick="window.Curriculum.switchTab('hub')" type="button">
-                      <svg class="icon-svg" viewBox="0 0 24 24"><line x1="19" x2="5" y1="12" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                      <svg class="icon-svg" viewBox="0 0 24 24">
+                        <line x1="19" x2="5" y1="12" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                      </svg>
                       Back to Catalog
                     </button>
                     <h3>Interactive Regex Pattern Validator</h3>
-                    <p class="text-muted">Test regular expressions against dynamic strings with real-time match highlighting and capture analysis.</p>
+                    <p class="text-muted">Test regular expressions against dynamic strings with real-time match
+                      highlighting and capture analysis.</p>
                   </div>
                 </div>
 
@@ -2104,27 +2269,37 @@
                   <div class="card-body p-lg">
                     <div class="d-flex gap-xs flex-wrap mb-md">
                       <span class="text-xs font-bold text-muted self-center mr-xs">Presets:</span>
-                      <button class="preset-chip" onclick="window.Curriculum.setRegexPreset('email')" type="button">Email</button>
-                      <button class="preset-chip" onclick="window.Curriculum.setRegexPreset('date')" type="button">Date (YYYY-MM-DD)</button>
-                      <button class="preset-chip" onclick="window.Curriculum.setRegexPreset('phone')" type="button">Phone / Mobile</button>
-                      <button class="preset-chip" onclick="window.Curriculum.setRegexPreset('hex')" type="button">Hex Color</button>
-                      <button class="preset-chip" onclick="window.Curriculum.setRegexPreset('nim')" type="button">NIM / Student ID</button>
+                      <button class="preset-chip" onclick="window.Curriculum.setRegexPreset('email')"
+                        type="button">Email</button>
+                      <button class="preset-chip" onclick="window.Curriculum.setRegexPreset('date')" type="button">Date
+                        (YYYY-MM-DD)</button>
+                      <button class="preset-chip" onclick="window.Curriculum.setRegexPreset('phone')"
+                        type="button">Phone / Mobile</button>
+                      <button class="preset-chip" onclick="window.Curriculum.setRegexPreset('hex')" type="button">Hex
+                        Color</button>
+                      <button class="preset-chip" onclick="window.Curriculum.setRegexPreset('nim')" type="button">NIM /
+                        Student ID</button>
                     </div>
 
                     <div class="d-flex gap-sm mb-sm">
                       <div class="flex-1">
                         <label class="text-xs font-semibold">Regular Expression Pattern</label>
-                        <input class="font-mono text-sm w-full" id="regex-pattern-input" oninput="window.Curriculum.testRegex()" type="text" value="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" />
+                        <input class="font-mono text-sm w-full" id="regex-pattern-input"
+                          oninput="window.Curriculum.testRegex()" type="text"
+                          value="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" />
                       </div>
                       <div style="width: 90px;">
                         <label class="text-xs font-semibold">Flags</label>
-                        <input class="font-mono text-sm w-full" id="regex-flags-input" oninput="window.Curriculum.testRegex()" type="text" value="gi" />
+                        <input class="font-mono text-sm w-full" id="regex-flags-input"
+                          oninput="window.Curriculum.testRegex()" type="text" value="gi" />
                       </div>
                     </div>
 
                     <div class="form-group mb-sm">
                       <label class="text-xs font-semibold">Test Input Text</label>
-                      <textarea class="font-mono text-sm w-full" id="regex-test-text" oninput="window.Curriculum.testRegex()" rows="4">Contact our student admin at support@pocketsly.edu or alex.turner@campus.ac.id for assistance with semester enrollment.</textarea>
+                      <textarea class="font-mono text-sm w-full" id="regex-test-text"
+                        oninput="window.Curriculum.testRegex()"
+                        rows="4">Contact our student admin at support@pocketsly.edu or alex.turner@campus.ac.id for assistance with semester enrollment.</textarea>
                     </div>
                   </div>
                 </div>
@@ -2132,7 +2307,8 @@
                 <div class="card">
                   <div class="card-header d-flex justify-between items-center">
                     <span class="font-bold text-xs text-secondary">MATCH ANALYSIS &amp; HIGHLIGHTS</span>
-                    <span class="priority-badge" id="regex-match-badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">0 Matches</span>
+                    <span class="priority-badge" id="regex-match-badge"
+                      style="background: rgba(16, 185, 129, 0.15); color: #10B981;">0 Matches</span>
                   </div>
                   <div class="card-body p-lg">
                     <div class="regex-highlight-box p-md mb-md" id="regex-highlight-output"></div>
@@ -2150,7 +2326,8 @@
                       GPA requirements.</p>
                   </div>
                   <div class="d-flex gap-sm">
-                    <button class="btn btn-outline btn-sm d-flex items-center gap-xs" onclick="Curriculum.loadCoursesIntoGPA()">
+                    <button class="btn btn-outline btn-sm d-flex items-center gap-xs"
+                      onclick="Curriculum.loadCoursesIntoGPA()">
                       <svg fill="none" height="13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                         stroke-width="2.2" viewBox="0 0 24 24" width="13">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -2169,7 +2346,7 @@
                   <div class="card">
                     <div class="card-body">
                       <h4 class="text-base">Course Grades &amp; SKS Credits</h4>
-                      <div >
+                      <div>
                         <table class="w-full text-md">
                           <thead>
                             <tr class="text-muted">
@@ -2192,7 +2369,8 @@
                     <div class="card">
                       <div class="card-body">
                         <h4 class="text-base">Target GPA Simulator</h4>
-                        <p class="text-muted mb-lg text-base">Find what GPA you need on future semesters to graduate with your
+                        <p class="text-muted mb-lg text-base">Find what GPA you need on future semesters to graduate
+                          with your
                           target honors.</p>
                         <div class="gap-md">
                           <div>
@@ -2212,8 +2390,8 @@
                           </div>
                           <div>
                             <label class="font-semibold text-brand text-xs">Remaining SKS</label>
-                    <input class="w-full font-bold p-md" id="target-future-credits"
-                              min="1" oninput="Curriculum.calculateTargetGPA()" type="number" value="40" />
+                            <input class="w-full font-bold p-md" id="target-future-credits" min="1"
+                              oninput="Curriculum.calculateTargetGPA()" type="number" value="40" />
                           </div>
                         </div>
                         <div class="mt-md" id="target-gpa-result">
@@ -2243,203 +2421,131 @@
         </section>
         <!-- 7. MONTHLY BUDGET & CASH FLOW VIEW -->
         <section class="view-panel hidden" id="view-budget">
-          <!-- Budget Header Controls: Scan Receipt, Export, Print -->
-          <div class="budget-top-bar d-flex justify-between items-center flex-wrap gap-md mb-lg">
+          <!-- Top Bar: Title & Quick Header Actions -->
+          <div class="budget-top-bar d-flex justify-between items-center flex-wrap gap-sm mb-md">
             <div>
-              <h2 class="font-extrabold text-primary m-0 d-flex items-center gap-sm text-2xl">
-                <svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                  stroke-width="2.2" viewBox="0 0 24 24" width="24">
+              <h2 class="font-extrabold text-primary m-0 d-flex items-center gap-xs text-xl">
+                <svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                  stroke-width="2.2" viewBox="0 0 24 24" width="20">
                   <rect height="16" rx="2" width="22" x="1" y="4"></rect>
                   <line x1="1" x2="23" y1="10" y2="10"></line>
                 </svg>
-                Monthly Budget &amp; Cash Flow
+                Monthly Budget
               </h2>
-              <p class="text-muted text-sm">Track income, expenses, scan receipts, and manage category limits.</p>
+              <span class="text-muted text-xs font-semibold" id="budget-period-text">Current Month</span>
             </div>
-            <div class="d-flex items-center gap-sm flex-wrap">
-              <!-- Scan Receipt Action Button -->
-              <button class="btn btn-primary btn-sm d-inline-flex items-center gap-sm font-bold p-sm"
+            <div class="d-flex items-center gap-xs">
+              <button class="btn btn-outline btn-sm d-inline-flex items-center gap-xs font-bold text-xs p-md"
                 onclick="Budget.openReceiptScanner()" type="button">
-                <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                  stroke-width="2.5" viewBox="0 0 24 24" width="14">
+                <svg fill="none" height="13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                  stroke-width="2.2" viewBox="0 0 24 24" width="13">
                   <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
                   <circle cx="12" cy="13" r="4"></circle>
                 </svg>
                 Scan Receipt
               </button>
-              <!-- CSV & Print Buttons -->
-              <button class="btn btn-outline btn-sm d-flex items-center gap-xs text-xs p-md" onclick="Budget.exportCSV()"
-                title="Download CSV Spreadsheet" type="button">
-                <svg fill="none" height="13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                  stroke-width="2.2" viewBox="0 0 24 24" width="13">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                  <polyline points="7 10 12 15 17 10"></polyline>
-                  <line x1="12" x2="12" y1="15" y2="3"></line>
-                </svg>
-                CSV
-              </button>
-              <button class="btn btn-outline btn-sm d-flex items-center gap-xs text-xs p-md" onclick="Budget.printReport()"
-                title="Print Financial Report" type="button">
-                <svg fill="none" height="13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                  stroke-width="2.2" viewBox="0 0 24 24" width="13">
-                  <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                  <rect height="8" width="12" x="6" y="14"></rect>
-                </svg>
-                Print
-              </button>
+              <button class="btn btn-outline btn-sm text-xs p-md" onclick="Budget.exportCSV()" title="Download CSV"
+                type="button">CSV</button>
+              <button class="btn btn-outline btn-sm text-xs p-md" onclick="Budget.printReport()" title="Print Report"
+                type="button">Print</button>
             </div>
           </div>
-          <!-- Unified KPI Card: Net Balance top + Income & Expense side-by-side below -->
-          <div class="card budget-unified-card">
-            <!-- Decorative background glow -->
-            <div class="budget-kpi-glow"></div>
-            <div class="card-body p-xl">
-              <!-- TOP SECTION: Net Balance -->
-              <div class="budget-balance-header">
-                <div class="font-extrabold text-brand d-flex items-center justify-center gap-sm">
-                  <svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                    stroke-width="2.5" viewBox="0 0 24 24" width="16">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" x2="12" y1="8" y2="12"></line>
-                    <line x1="12" x2="12.01" y1="16" y2="16"></line>
+
+          <!-- Hero Balance Card (Clean, Minimal, High-Impact) -->
+          <div class="card budget-hero-card mb-md">
+            <div class="card-body p-lg">
+              <div class="d-flex justify-between items-start flex-wrap gap-sm mb-md">
+                <div>
+                  <div class="text-muted font-bold text-xs">NET CASH FLOW</div>
+                  <div class="text-primary text-3xl font-extrabold" id="kpi-total-balance"
+                    style="letter-spacing: -0.02em; margin: 0.15rem 0;">0</div>
+                  <div class="d-inline-flex items-center gap-xs">
+                    <span class="priority-badge priority-low font-bold text-xs" id="kpi-balance-status">Healthy
+                      Surplus</span>
+                    <span class="text-muted text-xs font-mono" id="donut-percent-text">0%</span>
+                  </div>
+                </div>
+                <div class="donut-chart-wrapper-mini" style="display:none;">
+                  <svg class="donut" viewBox="0 0 36 36" style="width:40px; height:40px;">
+                    <circle class="donut-ring" cx="18" cy="18" fill="transparent" r="15.915"
+                      stroke="var(--border-color)" stroke-width="3"></circle>
+                    <circle class="donut-segment" cx="18" cy="18" fill="transparent" id="donut-usage-segment" r="15.915"
+                      stroke="url(#donut-gradient)" stroke-dasharray="0 100" stroke-dashoffset="25"
+                      stroke-linecap="round" stroke-width="3"></circle>
                   </svg>
-                  Current Net Balance
-                </div>
-                <div class="text-primary text-2xl font-extrabold" id="kpi-total-balance">
-                  0</div>
-                <div class="text-secondary text-sm">
-                  Income − Expense</div>
-                <div class="d-inline-flex items-center gap-xs mt-xs">
-                  <span class="font-semibold text-muted text-xs">Status:</span>
-                  <span class="priority-badge priority-low font-bold text-xs"
-                    id="kpi-balance-status">Healthy Surplus</span>
                 </div>
               </div>
-              <!-- BOTTOM SECTION: Income & Expense side-by-side -->
-              <div class="grid-2col gap-lg">
-                <!-- Left: Total Income -->
-                <div class="budget-income-box">
-                  <div class="d-flex justify-between items-center mb-xs">
-                    <div class="font-bold text-success d-flex items-center gap-xs">
-                      <svg fill="none" height="13" stroke="currentColor" stroke-linecap="round"
-                        stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="13">
-                        <line x1="12" x2="12" y1="19" y2="5"></line>
-                        <polyline points="5 12 12 5 19 12"></polyline>
-                      </svg>
-                      Income
-                    </div>
-                    <span class="priority-badge priority-low text-xs" id="kpi-incomes-count">0
-                      logs</span>
+
+              <!-- 2-Column Inflow vs Outflow Mini Bar -->
+              <div class="grid-2col gap-md p-sm"
+                style="background: var(--bg-surface-alt); border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                <div class="d-flex justify-between items-center">
+                  <div class="d-flex items-center gap-xs">
+                    <span style="color:#10B981; font-weight:800;">↑</span>
+                    <span class="text-muted text-xs font-semibold">Income:</span>
                   </div>
-                  <div class="font-extrabold text-success text-xl" id="kpi-total-income">0</div>
-                  <div class="text-muted text-xs">Total earnings &amp; allowance</div>
-                  <div class="budget-micro-bars" id="income-micro-chart"></div>
+                  <span class="font-extrabold text-success text-sm font-mono" id="kpi-total-income">0</span>
+                  <span class="hidden" id="kpi-incomes-count">0 logs</span>
+                  <span class="hidden" id="donut-kpi-inflow">0</span>
                 </div>
-                <!-- Right: Total Expense -->
-                <div class="budget-expense-box">
-                  <div class="d-flex justify-between items-center mb-xs">
-                    <div class="font-bold text-danger d-flex items-center gap-xs">
-                      <svg fill="none" height="13" stroke="currentColor" stroke-linecap="round"
-                        stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="13">
-                        <line x1="12" x2="12" y1="5" y2="19"></line>
-                        <polyline points="19 12 12 19 5 12"></polyline>
-                      </svg>
-                      Expense
-                    </div>
-                    <span class="priority-badge priority-high text-xs" id="kpi-expenses-count">0
-                      logs</span>
+                <div class="d-flex justify-between items-center">
+                  <div class="d-flex items-center gap-xs">
+                    <span style="color:#EF4444; font-weight:800;">↓</span>
+                    <span class="text-muted text-xs font-semibold">Expense:</span>
                   </div>
-                  <div class="font-extrabold text-danger text-xl" id="kpi-total-spent">
-                    0</div>
-                  <div class="text-muted text-xs">Total monthly outflows</div>
-                  <div class="budget-micro-bars" id="spent-micro-chart"></div>
+                  <span class="font-extrabold text-danger text-sm font-mono" id="kpi-total-spent">0</span>
+                  <span class="hidden" id="kpi-expenses-count">0 logs</span>
+                  <span class="hidden" id="donut-kpi-outflow">0</span>
+                  <span class="hidden" id="donut-kpi-savings">0%</span>
+                  <span class="hidden" id="income-micro-chart"></span>
+                  <span class="hidden" id="spent-micro-chart"></span>
                 </div>
               </div>
+
+              <div class="text-muted text-xs mt-sm" id="donut-feedback-text" style="font-size: 0.76rem;">Ready to track:
+                Log daily expenses or income.</div>
             </div>
           </div>
-          <!-- Quick Action Buttons Bar (Mobile-First) -->
+
+          <!-- 3 Quick Action Buttons (Big, Prominent, Clear) -->
           <div class="budget-quick-action-bar mb-lg">
-            <button class="btn btn-action-expense font-bold text-sm" onclick="Budget.openEntryModal('expense')" type="button">
-              <svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="15"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+            <button class="btn btn-action-expense font-bold text-sm" onclick="Budget.openEntryModal('expense')"
+              type="button">
+              <svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                stroke-width="2.5" viewBox="0 0 24 24" width="15">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <polyline points="19 12 12 19 5 12"></polyline>
+              </svg>
               <span>- Log Expense</span>
             </button>
-            <button class="btn btn-action-income font-bold text-sm" onclick="Budget.openEntryModal('income')" type="button">
-              <svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="15"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+            <button class="btn btn-action-income font-bold text-sm" onclick="Budget.openEntryModal('income')"
+              type="button">
+              <svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                stroke-width="2.5" viewBox="0 0 24 24" width="15">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <polyline points="5 12 12 5 19 12"></polyline>
+              </svg>
               <span>+ Log Income</span>
             </button>
-            <button class="btn btn-action-budget font-bold text-sm" onclick="Budget.openEntryModal('budget')" type="button">
-              <svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="15"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" x2="16" y1="12" y2="12"></line></svg>
+            <button class="btn btn-action-budget font-bold text-sm" onclick="Budget.openEntryModal('budget')"
+              type="button">
+              <svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                stroke-width="2.5" viewBox="0 0 24 24" width="15">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="16"></line>
+                <line x1="8" x2="16" y1="12" y2="12"></line>
+              </svg>
               <span>🎯 Set Target</span>
             </button>
           </div>
 
-          <!-- Main Dashboard: Cash Flow Ratio & Recent Transactions -->
+          <!-- Main Content Grid (Recent Cash Flow + Category Targets) -->
           <div class="budget-dashboard-grid mb-lg">
-            <!-- 1. Monthly Cash Flow Donut Card -->
+            <!-- 1. Recent Cash Flow Ledger Card -->
             <div class="card">
-              <div class="card-body">
-                <div class="d-flex justify-between items-center mb-lg">
-                  <h4>Monthly Cash Flow Ratio</h4>
-                  <div class="budget-period" id="budget-period-text">Current Month</div>
-                </div>
-                <!-- Donut Chart Widget & KPI Stack -->
-                <div class="donut-chart-container">
-                  <!-- Left: Donut Chart -->
-                  <div class="d-flex flex-col items-center gap-xs text-center">
-                    <div class="donut-chart-wrapper">
-                      <svg class="donut" viewBox="0 0 36 36">
-                        <defs>
-                          <linearGradient id="donut-gradient" x1="0%" x2="100%" y1="0%" y2="100%">
-                            <stop offset="0%" stop-color="#34D399"></stop>
-                            <stop offset="50%" stop-color="#2DD4BF"></stop>
-                            <stop offset="100%" stop-color="#06B6D4"></stop>
-                          </linearGradient>
-                        </defs>
-                        <circle class="donut-ring" cx="18" cy="18" fill="transparent" r="15.915"
-                          stroke="var(--border-color)" stroke-width="3"></circle>
-                        <circle class="donut-segment" cx="18" cy="18" fill="transparent"
-                          id="donut-usage-segment" r="15.915" stroke="url(#donut-gradient)" stroke-dasharray="0 100"
-                          stroke-dashoffset="25" stroke-linecap="round" stroke-width="3"></circle>
-                      </svg>
-                      <div class="donut-percent font-extrabold text-primary"
-                        id="donut-percent-text">0%</div>
-                    </div>
-                    <div class="text-muted text-xs" id="donut-feedback-text">Ready to Track</div>
-                  </div>
-                  <!-- Right: Adjacent KPI Metrics Stack -->
-                  <div class="donut-kpi-stack">
-                    <div class="donut-kpi-item donut-kpi-item-green">
-                      <div class="d-flex items-center gap-xs">
-                        <span class="trend-badge trend-up">↑ Inflow</span>
-                      </div>
-                      <span class="font-extrabold text-success text-md" id="donut-kpi-inflow">0</span>
-                    </div>
-                    <div class="donut-kpi-item donut-kpi-item-red">
-                      <div class="d-flex items-center gap-xs">
-                        <span class="trend-badge trend-down">↓ Outflow</span>
-                      </div>
-                      <span class="font-extrabold text-danger text-md" id="donut-kpi-outflow">0</span>
-                    </div>
-                    <div class="donut-kpi-item donut-kpi-item-purple">
-                      <div class="d-flex items-center gap-xs">
-                        <span class="trend-badge trend-savings">Savings</span>
-                      </div>
-                      <span class="font-extrabold text-purple text-md" id="donut-kpi-savings">0%</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- 2. Recent Cash Flow Ledger Card -->
-            <div class="card">
-              <div class="card-body">
-                <!-- Transaction List Header & Filter Tabs -->
-                <div class="d-flex flex-wrap justify-between items-center gap-sm mb-md">
-                  <div class="d-flex items-center gap-sm">
-                    <h4 class="m-0 text-base font-bold">Recent Cash Flow</h4>
-                  </div>
+              <div class="card-body p-lg">
+                <div class="d-flex flex-wrap justify-between items-center gap-xs mb-md">
+                  <h4 class="m-0 text-base font-bold">Recent Transactions</h4>
                   <div class="transaction-filter-tabs d-flex gap-xs">
                     <button class="btn-sm day-pill-btn active text-xs p-md" id="tx-filter-all"
                       onclick="Budget.filterTransactions('all')" type="button">All</button>
@@ -2450,56 +2556,24 @@
                   </div>
                 </div>
                 <div class="list-container" id="recent-transactions-list">
-                  <!-- Empty state shown initially -->
-                  <div class="empty-state">
-                    <div class="empty-state-icon">
-                      <svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                        stroke-width="2" viewBox="0 0 24 24" width="24">
-                        <rect height="14" rx="2" ry="2" width="20" x="2" y="3"></rect>
-                        <line x1="8" x2="16" y1="21" y2="21"></line>
-                        <line x1="12" x2="12" y1="17" y2="21"></line>
-                      </svg>
-                    </div>
-                    <div class="empty-state-title">No transactions yet</div>
-                    <div class="empty-state-desc">Log your first income or expense using the buttons above.</div>
-                  </div>
+                  <!-- Injected by JS -->
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. Category Targets Card -->
+            <div class="card">
+              <div class="card-body p-lg">
+                <div class="d-flex justify-between items-center gap-sm mb-md">
+                  <h4 class="m-0 text-base font-bold">Category Targets</h4>
+                  <span class="priority-badge priority-low text-xs" id="category-targets-summary">0 categories</span>
+                </div>
+                <div class="budget-category-grid" id="budget-category-cards">
+                  <!-- Injected by JS -->
                 </div>
               </div>
             </div>
           </div>
-          <!-- Bottom Category highlight cards -->
-          <div >
-            <div class="d-flex flex-wrap justify-between items-center gap-sm mb-lg">
-              <div>
-                <h4 class="m-0 text-base">Category Targets</h4>
-                <p class="text-muted text-xs">Monthly spending limits
-                  &amp; progress</p>
-              </div>
-              <span class="priority-badge priority-low text-xs" id="category-targets-summary">0
-                categories</span>
-            </div>
-            <div class="budget-category-grid" id="budget-category-cards">
-              <!-- Empty state for categories -->
-              <div class="empty-state col-span-full">
-                <div class="empty-state-icon">
-                  <svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                    stroke-width="2" viewBox="0 0 24 24" width="24">
-                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
-                  </svg>
-                </div>
-                <div class="empty-state-title">No category targets set</div>
-                <div class="empty-state-desc">Use the "Target" tab to set monthly spending limits per category.</div>
-              </div>
-            </div>
-          </div>
-          <!-- Budget Quick Actions FAB (mobile only) -->
-          <button aria-label="Budget quick actions" class="mobile-fab budget-fab" id="budget-fab"
-            onclick="Budget.openQuickActions()" title="Quick actions: Income, Expense, Scan, Target">
-            <svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="24">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-          </button>
         </section>
       </div>
     </main>
@@ -2514,18 +2588,26 @@
       </div>
       <div class="modal-header">
         <h3 class="m-0 font-extrabold d-flex items-center gap-xs text-base">
-          <svg class="icon-svg text-brand" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+          <svg class="icon-svg text-brand" viewBox="0 0 24 24">
+            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+            <line x1="12" y1="18" x2="12.01" y2="18"></line>
+          </svg>
           More Sections &amp; Settings
         </h3>
-        <button aria-label="Close" class="btn-icon drawer-close-btn"
-          onclick="App.closeMoreDrawer()" type="button">
-          <svg class="icon-svg" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        <button aria-label="Close" class="btn-icon drawer-close-btn" onclick="App.closeMoreDrawer()" type="button">
+          <svg class="icon-svg" viewBox="0 0 24 24">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
         </button>
       </div>
       <div class="more-sheet-grid">
         <button class="more-menu-tile" onclick="App.closeMoreDrawer(); CommandPalette.open();" type="button">
           <span class="tile-icon text-brand">
-            <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
           </span>
           <div>
             <div class="tile-title">Quick Search</div>
@@ -2534,7 +2616,12 @@
         </button>
         <button class="more-menu-tile" onclick="App.closeMoreDrawer(); App.navigateTo('schedule');" type="button">
           <span class="tile-icon text-brand">
-            <svg class="icon-svg" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
           </span>
           <div>
             <div class="tile-title">Timetable</div>
@@ -2543,7 +2630,10 @@
         </button>
         <button class="more-menu-tile" onclick="App.closeMoreDrawer(); App.navigateTo('budget');" type="button">
           <span class="tile-icon text-success">
-            <svg class="icon-svg" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+              <line x1="1" y1="10" x2="23" y2="10"></line>
+            </svg>
           </span>
           <div>
             <div class="tile-title">Budget</div>
@@ -2553,7 +2643,10 @@
         <button class="more-menu-tile" data-view="profile" onclick="App.closeMoreDrawer(); App.openProfileSettings();"
           type="button">
           <span class="tile-icon text-warning">
-            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
           </span>
           <div>
             <div class="tile-title">Profile</div>
@@ -2562,7 +2655,9 @@
         </button>
         <button class="more-menu-tile" onclick="UI.toggleTheme(); App.syncThemeState();" type="button">
           <span class="tile-icon text-purple" id="more-theme-icon">
-            <svg class="icon-svg" viewBox="0 0 24 24" id="more-theme-svg"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            <svg class="icon-svg" viewBox="0 0 24 24" id="more-theme-svg">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
           </span>
           <div>
             <div class="tile-title" id="more-theme-label">Dark Mode</div>
@@ -2571,10 +2666,12 @@
         </button>
       </div>
       <div>
-        <button
-          class="signout-btn-left"
-          onclick="App.closeMoreDrawer(); Auth.logout();" type="button">
-          <svg class="icon-svg" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        <button class="signout-btn-left" onclick="App.closeMoreDrawer(); Auth.logout();" type="button">
+          <svg class="icon-svg" viewBox="0 0 24 24">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
           <span>Sign Out</span>
         </button>
       </div>
@@ -2591,26 +2688,39 @@
       </div>
       <div class="modal-header">
         <h3 class="m-0 font-extrabold d-flex items-center gap-xs text-base">
-          <svg class="icon-svg text-success" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+          <svg class="icon-svg text-success" viewBox="0 0 24 24">
+            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+            <line x1="1" y1="10" x2="23" y2="10"></line>
+          </svg>
           Monthly Budget Quick Actions
         </h3>
         <button aria-label="Close" class="btn-icon drawer-close-btn" onclick="Budget.closeQuickActions()" type="button">
-          <svg class="icon-svg" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          <svg class="icon-svg" viewBox="0 0 24 24">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
         </button>
       </div>
       <div class="more-sheet-grid">
         <button class="more-menu-tile" data-quick-action="income" onclick="Budget.quickAction('income')" type="button">
           <span class="tile-icon text-success">
-            <svg class="icon-svg" viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <line x1="12" y1="19" x2="12" y2="5"></line>
+              <polyline points="5 12 12 5 19 12"></polyline>
+            </svg>
           </span>
           <div>
             <div class="tile-title">Log Income</div>
             <div class="tile-desc">Salary, allowance, scholarships</div>
           </div>
         </button>
-        <button class="more-menu-tile" data-quick-action="expense" onclick="Budget.quickAction('expense')" type="button">
+        <button class="more-menu-tile" data-quick-action="expense" onclick="Budget.quickAction('expense')"
+          type="button">
           <span class="tile-icon text-danger">
-            <svg class="icon-svg" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <polyline points="19 12 12 19 5 12"></polyline>
+            </svg>
           </span>
           <div>
             <div class="tile-title">Log Expense</div>
@@ -2619,7 +2729,10 @@
         </button>
         <button class="more-menu-tile" data-quick-action="scan" onclick="Budget.quickAction('scan')" type="button">
           <span class="tile-icon text-brand">
-            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+              <circle cx="12" cy="13" r="4"></circle>
+            </svg>
           </span>
           <div>
             <div class="tile-title">Scan Receipt</div>
@@ -2628,7 +2741,11 @@
         </button>
         <button class="more-menu-tile" data-quick-action="budget" onclick="Budget.quickAction('budget')" type="button">
           <span class="tile-icon text-warning">
-            <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+            <svg class="icon-svg" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="16"></line>
+              <line x1="8" y1="12" x2="16" y2="12"></line>
+            </svg>
           </span>
           <div>
             <div class="tile-title">Set Target</div>
@@ -2656,8 +2773,7 @@
           </svg>
           <h3 class="m-0 text-lg">Profile Settings</h3>
         </div>
-        <button aria-label="Close profile"
-          class="btn-icon d-flex items-center justify-center cursor-pointer text-xl"
+        <button aria-label="Close profile" class="btn-icon d-flex items-center justify-center cursor-pointer text-xl"
           onclick="App.closeProfileSettings()">×</button>
       </div>
       <!-- Guest mode: sign in / register (shown when not authenticated) -->
@@ -2671,7 +2787,8 @@
         <form class="auth-form d-flex flex-col gap-md" id="login-form">
           <div class="form-group">
             <label for="login-username">Username</label>
-            <input autocomplete="username" id="login-username" placeholder="e.g. alex_student" required="" type="text" />
+            <input autocomplete="username" id="login-username" placeholder="e.g. alex_student" required=""
+              type="text" />
           </div>
           <div class="form-group">
             <div class="d-flex justify-between items-center mb-xs">
@@ -2702,7 +2819,8 @@
             <input autocomplete="new-password" id="reg-password" minlength="6" placeholder="••••••••" required=""
               type="password" />
           </div>
-          <button class="btn btn-primary btn-block font-bold" type="submit" style="min-height: 44px;">Create Account</button>
+          <button class="btn btn-primary btn-block font-bold" type="submit" style="min-height: 44px;">Create
+            Account</button>
           <p class="auth-switch m-0">Already have an account? <a href="#" id="show-login-link">Sign In</a></p>
         </form>
         <form class="auth-form d-flex flex-col gap-md hidden" id="forgot-form">
@@ -2730,15 +2848,18 @@
             <input autocomplete="new-password" id="forgot-confirm-password" minlength="6" placeholder="••••••••"
               required="" type="password" />
           </div>
-          <button class="btn btn-primary btn-block font-bold" type="submit" style="min-height: 44px;">Verify OTP &amp; Reset Password</button>
-          <p class="auth-switch m-0">Remember your password? <a href="#" id="forgot-back-login-link">Back to Sign In</a></p>
+          <button class="btn btn-primary btn-block font-bold" type="submit" style="min-height: 44px;">Verify OTP &amp;
+            Reset Password</button>
+          <p class="auth-switch m-0">Remember your password? <a href="#" id="forgot-back-login-link">Back to Sign In</a>
+          </p>
         </form>
       </div>
       <!-- Signed-in mode: account settings -->
       <div class="modal-body d-flex flex-col gap-md" id="profile-signedin">
         <form class="auth-form d-flex flex-col gap-md" id="profile-settings-form">
           <!-- Current Info Display -->
-          <div class="d-flex items-center gap-lg p-sm" style="background: var(--bg-surface-alt); border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+          <div class="d-flex items-center gap-lg p-sm"
+            style="background: var(--bg-surface-alt); border-radius: var(--radius-md); border: 1px solid var(--border-color);">
             <div class="avatar text-base" id="profile-avatar">U</div>
             <div>
               <div class="font-bold text-primary text-base" id="profile-display-name">
@@ -2765,8 +2886,8 @@
               <div class="d-flex gap-sm">
                 <input autocomplete="new-password" id="profile-password" minlength="6" placeholder="••••••••"
                   type="password" />
-                <button class="btn btn-secondary text-nowrap text-sm" id="profile-btn-send-otp"
-                  type="button" style="min-height: 42px; padding: 0 1rem; font-weight: 700;">Get OTP</button>
+                <button class="btn btn-secondary text-nowrap text-sm" id="profile-btn-send-otp" type="button"
+                  style="min-height: 42px; padding: 0 1rem; font-weight: 700;">Get OTP</button>
               </div>
             </div>
             <div class="form-group" id="profile-otp-group">
@@ -2776,11 +2897,13 @@
                 type="text" />
             </div>
           </div>
-          <button class="btn btn-primary btn-block font-bold mt-xs" type="submit" style="min-height: 44px;">Save Account Changes</button>
+          <button class="btn btn-primary btn-block font-bold mt-xs" type="submit" style="min-height: 44px;">Save Account
+            Changes</button>
         </form>
 
         <!-- Theme Preference Option -->
-        <div class="profile-section-card" style="padding: 1.15rem; border: 1px solid var(--border-color); border-radius: var(--radius-lg); background: var(--bg-surface-alt);">
+        <div class="profile-section-card"
+          style="padding: 1.15rem; border: 1px solid var(--border-color); border-radius: var(--radius-lg); background: var(--bg-surface-alt);">
           <div class="font-bold text-primary d-flex items-center gap-sm mb-xs">
             <svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
               stroke-width="2.2" viewBox="0 0 24 24" width="15">
@@ -2789,8 +2912,7 @@
             Theme Preference
           </div>
           <p class="text-muted mb-md text-xs">Switch between light and dark visual aesthetics.</p>
-          <button
-            class="theme-switch-btn w-full d-flex items-center justify-between cursor-pointer"
+          <button class="theme-switch-btn w-full d-flex items-center justify-between cursor-pointer"
             id="theme-toggle-btn" onclick="UI.toggleTheme()" title="Toggle Light / Dark Mode" type="button"
             style="padding: 0.75rem 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); background: var(--bg-surface);">
             <span class="d-flex items-center gap-sm font-semibold text-primary text-sm">
@@ -2804,7 +2926,8 @@
         </div>
 
         <!-- Data Backup & Restore Zone -->
-        <div class="profile-section-card" style="padding: 1.15rem; border: 1px solid var(--border-color); border-radius: var(--radius-lg); background: var(--bg-surface-alt);">
+        <div class="profile-section-card"
+          style="padding: 1.15rem; border: 1px solid var(--border-color); border-radius: var(--radius-lg); background: var(--bg-surface-alt);">
           <div class="font-bold text-primary d-flex items-center gap-sm mb-xs">
             <svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
               stroke-width="2.2" viewBox="0 0 24 24" width="15">
@@ -2814,7 +2937,8 @@
             </svg>
             Data Backup &amp; Portability
           </div>
-          <p class="text-muted mb-md text-xs">Export your full routines, notes, budget logs, and courses as JSON or restore anytime.</p>
+          <p class="text-muted mb-md text-xs">Export your full routines, notes, budget logs, and courses as JSON or
+            restore anytime.</p>
           <div class="d-grid grid-2col gap-sm">
             <button class="btn btn-outline btn-sm d-flex items-center justify-center gap-sm font-bold"
               onclick="App.exportBackup()" type="button" style="padding: 0.65rem 1rem; min-height: 42px;">
@@ -2826,8 +2950,7 @@
               </svg>
               Backup JSON
             </button>
-            <label
-              class="btn btn-outline btn-sm d-flex items-center justify-center gap-sm font-bold cursor-pointer m-0"
+            <label class="btn btn-outline btn-sm d-flex items-center justify-center gap-sm font-bold cursor-pointer m-0"
               style="padding: 0.65rem 1rem; min-height: 42px;">
               <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                 stroke-width="2.2" viewBox="0 0 24 24" width="14">
@@ -2844,8 +2967,7 @@
 
         <!-- Danger Zone -->
         <div class="mt-xs">
-          <button
-            class="btn btn-danger btn-block d-flex items-center justify-center gap-sm font-bold"
+          <button class="btn btn-danger btn-block d-flex items-center justify-center gap-sm font-bold"
             id="profile-logout-btn" style="min-height: 44px;">
             <svg class="icon-svg" viewBox="0 0 24 24">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
@@ -2856,8 +2978,8 @@
           </button>
         </div>
       </div>
-      </div>
     </div>
+  </div>
   </div>
   <!-- ===================================================================== -->
   <!-- COMMAND PALETTE MODAL (⌘K / Ctrl+K Spotlight)                          -->
@@ -2866,27 +2988,35 @@
     onclick="if(event.target === this) CommandPalette.close()">
     <div class="command-palette-card">
       <div class="palette-input-wrapper">
-        <svg class="icon-svg text-brand" viewBox="0 0 24 24" style="width: 18px; height: 18px; flex-shrink: 0; color: var(--primary);">
+        <svg class="icon-svg text-brand" viewBox="0 0 24 24"
+          style="width: 18px; height: 18px; flex-shrink: 0; color: var(--primary);">
           <circle cx="11" cy="11" r="8"></circle>
           <line x1="21" x2="16.65" y1="21" y2="16.65"></line>
         </svg>
         <input autocomplete="off" class="flex-1 text-primary text-base" id="command-palette-input"
           oninput="CommandPalette.onInputDebounced(this.value)" onkeydown="CommandPalette.handleKey(event)"
           placeholder="Search pages, notes, tasks, actions..." type="text" />
-        <button aria-label="Close command palette" class="palette-close-btn" onclick="CommandPalette.close()" type="button">×</button>
+        <button aria-label="Close command palette" class="palette-close-btn" onclick="CommandPalette.close()"
+          type="button">×</button>
       </div>
       <div class="palette-filter-bar d-flex gap-xs" id="palette-filter-bar">
-        <button type="button" class="palette-filter-pill active" data-cat="all" onclick="CommandPalette.setCategory('all')">All</button>
-        <button type="button" class="palette-filter-pill" data-cat="Navigation" onclick="CommandPalette.setCategory('Navigation')">Pages</button>
-        <button type="button" class="palette-filter-pill" data-cat="Actions" onclick="CommandPalette.setCategory('Actions')">Actions</button>
-        <button type="button" class="palette-filter-pill" data-cat="Finance" onclick="CommandPalette.setCategory('Finance')">Finance</button>
-        <button type="button" class="palette-filter-pill" data-cat="System" onclick="CommandPalette.setCategory('System')">System</button>
+        <button type="button" class="palette-filter-pill active" data-cat="all"
+          onclick="CommandPalette.setCategory('all')">All</button>
+        <button type="button" class="palette-filter-pill" data-cat="Navigation"
+          onclick="CommandPalette.setCategory('Navigation')">Pages</button>
+        <button type="button" class="palette-filter-pill" data-cat="Actions"
+          onclick="CommandPalette.setCategory('Actions')">Actions</button>
+        <button type="button" class="palette-filter-pill" data-cat="Finance"
+          onclick="CommandPalette.setCategory('Finance')">Finance</button>
+        <button type="button" class="palette-filter-pill" data-cat="System"
+          onclick="CommandPalette.setCategory('System')">System</button>
       </div>
       <div class="palette-results p-sm" id="command-palette-results">
         <!-- Results injected by JS -->
       </div>
       <div class="palette-footer text-muted d-flex justify-between">
-        <span class="palette-desktop-hint">Navigate: <kbd>↑</kbd> <kbd>↓</kbd> • Select: <kbd>↵ Enter</kbd> • Close: <kbd>Esc</kbd></span>
+        <span class="palette-desktop-hint">Navigate: <kbd>↑</kbd> <kbd>↓</kbd> • Select: <kbd>↵ Enter</kbd> • Close:
+          <kbd>Esc</kbd></span>
         <span class="palette-mobile-hint">Tap any item or action to execute</span>
       </div>
     </div>
@@ -2917,12 +3047,12 @@
             type="button">Long (15m)</button>
         </div>
         <!-- Timer Circular Ring -->
-        <div >
-          <svg  height="180" viewBox="0 0 36 36" width="180">
+        <div>
+          <svg height="180" viewBox="0 0 36 36" width="180">
             <circle cx="18" cy="18" fill="transparent" r="15.915" stroke="var(--border-color)" stroke-width="2.5">
             </circle>
-            <circle  cx="18" cy="18" fill="transparent" id="pomo-progress-ring"
-              r="15.915" stroke="var(--primary)" stroke-dasharray="0 100" stroke-linecap="round" stroke-width="2.5">
+            <circle cx="18" cy="18" fill="transparent" id="pomo-progress-ring" r="15.915" stroke="var(--primary)"
+              stroke-dasharray="0 100" stroke-linecap="round" stroke-width="2.5">
             </circle>
           </svg>
           <div class="pomo-timer-inner">
@@ -2968,12 +3098,12 @@
             onclick="Budget.switchModalTab('expense')" type="button">
             - Expense
           </button>
-          <button class="budget-modal-tab-btn" id="modal-tab-income"
-            onclick="Budget.switchModalTab('income')" type="button">
+          <button class="budget-modal-tab-btn" id="modal-tab-income" onclick="Budget.switchModalTab('income')"
+            type="button">
             + Income
           </button>
-          <button class="budget-modal-tab-btn" id="modal-tab-budget"
-            onclick="Budget.switchModalTab('budget')" type="button">
+          <button class="budget-modal-tab-btn" id="modal-tab-budget" onclick="Budget.switchModalTab('budget')"
+            type="button">
             🎯 Target
           </button>
         </div>
@@ -2981,7 +3111,8 @@
         <!-- 1. Log Expense Form -->
         <form class="auth-form budget-form-container d-flex flex-col" id="add-expense-form">
           <!-- Quick Scan Helper -->
-          <button class="btn btn-outline btn-sm receipt-autofill-btn text-brand d-flex items-center justify-center gap-xs font-bold text-xs p-sm mb-sm"
+          <button
+            class="btn btn-outline btn-sm receipt-autofill-btn text-brand d-flex items-center justify-center gap-xs font-bold text-xs p-sm mb-sm"
             onclick="Budget.openReceiptScanner()" type="button">
             <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
               stroke-width="2.2" viewBox="0 0 24 24" width="14">
@@ -2993,11 +3124,11 @@
             </svg>
             Auto-fill from Receipt (Camera / Gallery OCR)
           </button>
-          
+
           <div class="form-group mb-sm">
             <label for="expense-amount">Amount Spent</label>
-            <input class="currency-formatted-input font-bold text-lg w-full" id="expense-amount"
-              inputmode="numeric" placeholder="e.g. 35,000" required="" type="text" />
+            <input class="currency-formatted-input font-bold text-lg w-full" id="expense-amount" inputmode="numeric"
+              placeholder="e.g. 35,000" required="" type="text" />
           </div>
 
           <div class="form-group mb-sm">
@@ -3048,8 +3179,8 @@
         <form class="auth-form budget-form-container hidden d-flex flex-col" id="add-income-form">
           <div class="form-group mb-sm">
             <label for="income-amount">Income Amount</label>
-            <input class="currency-formatted-input font-bold text-lg w-full" id="income-amount"
-              inputmode="numeric" placeholder="e.g. 1,500,000" required="" type="text" />
+            <input class="currency-formatted-input font-bold text-lg w-full" id="income-amount" inputmode="numeric"
+              placeholder="e.g. 1,500,000" required="" type="text" />
           </div>
 
           <div class="form-group mb-sm">
@@ -3107,13 +3238,13 @@
         <form class="auth-form budget-form-container hidden d-flex flex-col" id="add-budget-form">
           <div class="form-group mb-sm">
             <label for="budget-category">Category / Allocation</label>
-            <input class="w-full" id="budget-category" list="expense-categories-list" placeholder="e.g. Food &amp; Dining, Transport, Books"
-              required="" type="text" />
+            <input class="w-full" id="budget-category" list="expense-categories-list"
+              placeholder="e.g. Food &amp; Dining, Transport, Books" required="" type="text" />
           </div>
           <div class="form-group mb-md">
             <label for="budget-amount">Monthly Limit Amount</label>
-            <input class="currency-formatted-input font-bold text-lg w-full" id="budget-amount"
-              inputmode="numeric" placeholder="e.g. 500,000" required="" type="text" />
+            <input class="currency-formatted-input font-bold text-lg w-full" id="budget-amount" inputmode="numeric"
+              placeholder="e.g. 500,000" required="" type="text" />
           </div>
           <button class="btn btn-action-budget font-bold w-full p-md" type="submit">
             🎯 Allocate Limit Target
@@ -3151,12 +3282,21 @@
         <!-- Scan Mode & Input Source Toggles -->
         <div class="receipt-scan-mode-row">
           <div class="receipt-source-seg" role="group" aria-label="Input source">
-            <button class="receipt-source-btn active" id="btn-src-upload" onclick="Budget.switchScannerSource('upload')" type="button">
-              <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewBox="0 0 24 24" width="14"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+            <button class="receipt-source-btn active" id="btn-src-upload" onclick="Budget.switchScannerSource('upload')"
+              type="button">
+              <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                stroke-width="2.2" viewBox="0 0 24 24" width="14">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+              </svg>
               Upload / Drop
             </button>
-            <button class="receipt-source-btn" id="btn-src-camera" onclick="Budget.switchScannerSource('camera')" type="button">
-              <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewBox="0 0 24 24" width="14"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+            <button class="receipt-source-btn" id="btn-src-camera" onclick="Budget.switchScannerSource('camera')"
+              type="button">
+              <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                stroke-width="2.2" viewBox="0 0 24 24" width="14">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                <circle cx="12" cy="13" r="4"></circle>
+              </svg>
               Live Camera
             </button>
           </div>
@@ -3183,12 +3323,21 @@
             </div>
           </div>
           <div class="receipt-camera-controls d-flex gap-sm justify-center items-center p-sm">
-            <button class="btn btn-primary btn-lg d-flex items-center gap-xs font-bold" onclick="Budget.captureCameraSnapshot()" type="button">
-              <svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewBox="0 0 24 24" width="18"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle></svg>
+            <button class="btn btn-primary btn-lg d-flex items-center gap-xs font-bold"
+              onclick="Budget.captureCameraSnapshot()" type="button">
+              <svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                stroke-width="2.2" viewBox="0 0 24 24" width="18">
+                <circle cx="12" cy="12" r="10"></circle>
+                <circle cx="12" cy="12" r="4"></circle>
+              </svg>
               Capture &amp; Scan
             </button>
-            <button class="btn btn-outline btn-sm d-flex items-center gap-xs" onclick="Budget.toggleCameraFacing()" type="button" title="Flip Camera">
-              <svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="15"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+            <button class="btn btn-outline btn-sm d-flex items-center gap-xs" onclick="Budget.toggleCameraFacing()"
+              type="button" title="Flip Camera">
+              <svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                stroke-width="2" viewBox="0 0 24 24" width="15">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+              </svg>
               Flip
             </button>
           </div>
@@ -3203,7 +3352,7 @@
           <!-- Input 2: Direct mobile device camera snapshot -->
           <input accept="image/*" capture="environment" class="hidden" id="receipt-camera-input"
             onchange="Budget.handleReceiptUpload(event)" type="file" />
-          
+
           <div class="receipt-dropzone-inner">
             <div class="receipt-dropzone-icon">
               <svg fill="none" height="36" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
@@ -3217,7 +3366,8 @@
                 class="receipt-dropzone-kbd">Ctrl+V</kbd> to paste</p>
             <div class="d-flex gap-sm justify-center flex-wrap">
               <button class="btn btn-primary btn-sm d-flex items-center gap-xs"
-                onclick="event.stopPropagation(); document.getElementById('receipt-upload-input').click()" type="button">
+                onclick="event.stopPropagation(); document.getElementById('receipt-upload-input').click()"
+                type="button">
                 <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                   stroke-width="2.2" viewBox="0 0 24 24" width="14">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -3236,11 +3386,14 @@
                 Live Camera
               </button>
               <button class="btn btn-ghost btn-sm d-flex items-center gap-xs"
-                onclick="event.stopPropagation(); document.getElementById('receipt-camera-input').click()" type="button">
+                onclick="event.stopPropagation(); document.getElementById('receipt-camera-input').click()"
+                type="button">
                 <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                   stroke-width="2" viewBox="0 0 24 24" width="14">
                   <circle cx="12" cy="12" r="3"></circle>
-                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                  <path
+                    d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                  </path>
                 </svg>
                 Device Camera
               </button>
@@ -3266,7 +3419,8 @@
             <!-- Receipt Thumbnail Preview -->
             <div class="receipt-preview-box">
               <img alt="Receipt Preview" class="receipt-preview-img" id="receipt-preview-img" src="" />
-              <button class="receipt-change-btn" onclick="Budget.resetReceiptScanner()" type="button">Change Photo</button>
+              <button class="receipt-change-btn" onclick="Budget.resetReceiptScanner()" type="button">Change
+                Photo</button>
             </div>
             <!-- Detected Form Fields -->
             <div class="receipt-fields-form">
@@ -3274,7 +3428,9 @@
                 <span class="receipt-ocr-badge d-flex items-center gap-xs">
                   <svg fill="none" height="12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                     stroke-width="2.2" viewBox="0 0 24 24" width="12">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    <polygon
+                      points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+                    </polygon>
                   </svg>
                   OCR Fields Extracted
                 </span>
@@ -3314,7 +3470,8 @@
           <!-- Apply Action Button -->
           <div class="receipt-actions-footer">
             <button class="btn btn-outline flex-1" onclick="Budget.closeReceiptScanner()" type="button">Cancel</button>
-            <button class="btn btn-primary d-flex items-center gap-xs" onclick="Budget.applyReceiptToExpense()" type="button">
+            <button class="btn btn-primary d-flex items-center gap-xs" onclick="Budget.applyReceiptToExpense()"
+              type="button">
               <svg fill="none" height="13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                 stroke-width="2.5" viewBox="0 0 24 24" width="13">
                 <polyline points="20 6 9 17 4 12"></polyline>
@@ -3344,16 +3501,17 @@
           </svg>
           <h3>Add Academic Resource</h3>
         </div>
-        <button aria-label="Close modal" class="btn-icon" onclick="Notes.closeAddResourceModal()" type="button">×</button>
+        <button aria-label="Close modal" class="btn-icon" onclick="Notes.closeAddResourceModal()"
+          type="button">×</button>
       </div>
       <div class="modal-body">
-        <p class="text-muted mb-md text-xs">Catalog links to books, research journals, PDF papers, documentation, or lecture readings.</p>
+        <p class="text-muted mb-md text-xs">Catalog links to books, research journals, PDF papers, documentation, or
+          lecture readings.</p>
         <form class="auth-form d-flex flex-col gap-md" id="notes-add-resource-form">
           <div class="form-group mb-xs">
             <label>Resource Title</label>
-            <input id="notes-resource-title"
-              placeholder="e.g. Clean Code: Agile Software Craftsmanship / IEEE Paper" required=""
-              type="text" />
+            <input id="notes-resource-title" placeholder="e.g. Clean Code: Agile Software Craftsmanship / IEEE Paper"
+              required="" type="text" />
           </div>
           <div class="grid-2col gap-sm mb-xs">
             <div class="form-group m-0">
@@ -3368,8 +3526,7 @@
           <div class="grid-2col gap-sm mb-xs">
             <div class="form-group m-0">
               <label>Publisher / Journal</label>
-              <input id="notes-resource-publisher" placeholder="e.g. MIT Press / IEEE Transactions"
-                type="text" />
+              <input id="notes-resource-publisher" placeholder="e.g. MIT Press / IEEE Transactions" type="text" />
             </div>
             <div class="form-group m-0">
               <label>DOI / ISBN / Ref ID</label>
@@ -3402,7 +3559,8 @@
           </div>
           <div class="form-group mb-sm">
             <label>Notes / Key Insights Summary</label>
-            <textarea id="notes-resource-notes" rows="2" placeholder="Key insights, study highlights, or summary..."></textarea>
+            <textarea id="notes-resource-notes" rows="2"
+              placeholder="Key insights, study highlights, or summary..."></textarea>
           </div>
           <button class="btn btn-primary font-bold justify-center p-md" type="submit">+ Save to Library</button>
         </form>
@@ -3460,7 +3618,8 @@
         </div>
         <!-- Action Buttons -->
         <div class="citation-actions-grid">
-          <button class="btn btn-primary btn-sm d-flex items-center justify-center gap-xs" onclick="Notes.copyCitation()" type="button">
+          <button class="btn btn-primary btn-sm d-flex items-center justify-center gap-xs"
+            onclick="Notes.copyCitation()" type="button">
             <svg fill="none" height="13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
               stroke-width="2.2" viewBox="0 0 24 24" width="13">
               <rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect>
@@ -3468,7 +3627,8 @@
             </svg>
             Copy Citation
           </button>
-          <button class="btn btn-outline btn-sm d-flex items-center justify-center gap-xs" onclick="Notes.insertCitationToNote()" type="button">
+          <button class="btn btn-outline btn-sm d-flex items-center justify-center gap-xs"
+            onclick="Notes.insertCitationToNote()" type="button">
             <svg fill="none" height="13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
               stroke-width="2.2" viewBox="0 0 24 24" width="13">
               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
@@ -3476,8 +3636,8 @@
             </svg>
             Insert to Note
           </button>
-          <button class="btn btn-outline btn-sm d-flex items-center justify-center gap-xs" id="citation-bib-download-btn" onclick="Notes.downloadBibtex()"
-            type="button">
+          <button class="btn btn-outline btn-sm d-flex items-center justify-center gap-xs"
+            id="citation-bib-download-btn" onclick="Notes.downloadBibtex()" type="button">
             <svg fill="none" height="13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
               stroke-width="2.2" viewBox="0 0 24 24" width="13">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
