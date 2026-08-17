@@ -221,7 +221,7 @@ function parseSender(from) {
 async function sendOtpEmail(env, to, otpCode) {
   const apiKey = env?.BREVO_API_KEY;
   const from = env?.MAIL_FROM;
-  if (!apiKey || !from || !to) return false;
+  if (!apiKey || !from || !to) return { ok: false, reason: 'not-configured' };
 
   const res = await fetch('https://api.brevo.com/v3/smtp/email', {
     method: 'POST',
@@ -236,7 +236,8 @@ async function sendOtpEmail(env, to, otpCode) {
       textContent: `Your Pocketsly verification code is ${otpCode}. It expires in 15 minutes.`
     })
   });
-  return res.ok;
+  if (res.ok) return { ok: true, status: res.status };
+  return { ok: false, reason: `brevo-rejected:${res.status}` };
 }
 
 /**
@@ -274,10 +275,11 @@ export async function requestPasswordOtp(db, usernameOrEmail, env = {}) {
   }
 
   const sent = await sendOtpEmail(env, user.email, otpCode);
-  if (!sent) {
-    throw new Error(
-      'Email delivery is not configured. Set BREVO_API_KEY and MAIL_FROM in the Pages project to enable password recovery.'
-    );
+  if (!sent.ok) {
+    const detail = sent.reason === 'not-configured'
+      ? 'Set BREVO_API_KEY and MAIL_FROM in the Pages project to enable password recovery.'
+      : `Brevo rejected the send (${sent.reason}). Verify the key, sender, and recipient.`;
+    throw new Error(`Email delivery is not configured. ${detail}`);
   }
 
   return {
