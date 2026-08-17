@@ -167,6 +167,7 @@ export async function loginUser(db, username, password) {
 
 /**
  * Retrieves the authenticated user from a session cookie token.
+ * Expired sessions are deleted on read so the sessions table stays tidy.
  */
 export async function getUserFromSession(db, token) {
   if (!token) return null;
@@ -174,19 +175,29 @@ export async function getUserFromSession(db, token) {
 
   const session = await queryOne(
     db,
-    'SELECT s.user_id, u.id, u.username, u.email, u.phone, u.currency, u.security_pin FROM sessions s JOIN users u ON s.user_id = u.id WHERE s.token = ?1 AND s.expires_at > ?2',
-    [token, nowStr]
+    'SELECT s.expires_at, u.id, u.username, u.email, u.phone, u.currency FROM sessions s JOIN users u ON s.user_id = u.id WHERE s.token = ?1',
+    [token]
   );
 
   if (!session) return null;
+  if (session.expires_at <= nowStr) {
+    await execute(db, 'DELETE FROM sessions WHERE token = ?1', [token]);
+    return null;
+  }
   return {
     id: session.id,
     username: session.username,
     email: session.email,
     phone: session.phone,
-    currency: session.currency || 'IDR',
-    security_pin: session.security_pin
+    currency: session.currency || 'IDR'
   };
+}
+
+/**
+ * Invalidates every session belonging to a user (used after a password change).
+ */
+export async function purgeUserSessions(db, userId) {
+  await execute(db, 'DELETE FROM sessions WHERE user_id = ?1', [userId]);
 }
 
 /**
@@ -198,9 +209,35 @@ export async function logoutUser(db, token) {
 }
 
 /**
- * Requests an OTP code for password recovery.
+ * Sends the OTP by email via the Resend API when a provider is configured.
+ * Returns true when the email was delivered.
  */
-export async function requestPasswordOtp(db, usernameOrEmail) {
+async function sendOtpEmail(env, to, otpCode) {
+  const apiKey = env?.RESEND_API_KEY;
+  const from = env?.MAIL_FROM;
+  if (!apiKey || !from || !to) return false;
+
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      from,
+      to,
+      subject: 'Pocketsly password reset code',
+      text: `Your Pocketsly verification code is ${otpCode}. It expires in 15 minutes.`
+    })
+  });
+  return res.ok;
+}
+
+/**
+ * Requests an OTP code for password recovery.
+ * The code is sent to the user's email — it is NEVER returned in the response.
+ */
+export async function requestPasswordOtp(db, usernameOrEmail, env = {}) {
   const query = (usernameOrEmail || '').trim().toLowerCase();
   const user = await queryOne(
     db,
@@ -226,11 +263,20 @@ export async function requestPasswordOtp(db, usernameOrEmail) {
     [otpCode, expiresAt, user.id]
   );
 
+  if (!user.email) {
+    throw new Error('This account has no email on file, so a recovery code cannot be sent.');
+  }
+
+  const sent = await sendOtpEmail(env, user.email, otpCode);
+  if (!sent) {
+    throw new Error(
+      'Email delivery is not configured. Set RESEND_API_KEY and MAIL_FROM in the Pages project to enable password recovery.'
+    );
+  }
+
   return {
     success: true,
-    message: 'OTP sent successfully (valid for 15 minutes).',
-    otp_code: otpCode, // Demo convenience
-    email: user.email || 'Registered Email'
+    message: 'A recovery code was sent to your registered email (valid for 15 minutes).'
   };
 }
 
@@ -275,7 +321,7 @@ export async function resetPasswordWithOtp(db, { username, otp_code, new_passwor
   );
 
   // Invalidate all existing sessions on password reset
-  await execute(db, 'DELETE FROM sessions WHERE user_id = ?1', [user.id]);
+  await purgeUserSessions(db, user.id);
 
   return {
     success: true,

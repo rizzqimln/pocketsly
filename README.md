@@ -1,13 +1,11 @@
 # Pocketsly — Daily Routine & Student Productivity Suite
 
-A high-performance full-stack productivity suite built with **Pure HTML5, Vanilla CSS3, Modern JavaScript (ES6+), and Python 3** — with **zero frontend frameworks** and exactly one backend dependency (the PostgreSQL driver `psycopg`).
+A high-performance full-stack productivity suite built with **Pure HTML5, Vanilla CSS3, Modern JavaScript (ES6+)** — with **zero frontend frameworks**. The canonical production backend is **Cloudflare Pages Functions + D1** (the `functions/` directory); the original **Python 3** backend (`server.py`) is kept for local development and legacy deployments only.
 
 Designed as a modern daily routine planner, weekly timetable, notes & academic library manager, curriculum GPA simulator, monthly budget tracker, and offline-capable installable PWA.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![CI](https://github.com/<YOUR-USERNAME>/pocketsly/actions/workflows/ci.yml/badge.svg)](https://github.com/<YOUR-USERNAME>/pocketsly/actions/workflows/ci.yml)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-3776AB.svg)](https://www.python.org/)
-[![Dependencies: psycopg](https://img.shields.io/badge/dependencies-psycopg-blue.svg)](requirements.txt)
 
 > Replace `<YOUR-USERNAME>` in the CI badge URL after your first push — it links
 > to your fork's Actions page.
@@ -24,19 +22,31 @@ Designed as a modern daily routine planner, weekly timetable, notes & academic l
 - **Focus Timer** — built-in Pomodoro-style timer
 - **Command Palette** — global ⌘K / Ctrl+K spotlight for navigation and actions
 - **PWA & Offline** — installable, offline-capable via service worker caching
-- **Security-first** — PBKDF2 password hashing, HttpOnly session cookies, IP rate limiting, CSP, and XSS escaping
-- **Minimal dependencies** — Python 3 stdlib backend + one driver (`psycopg` for PostgreSQL) + vanilla JS/CSS frontend
+- **Security-first** — PBKDF2 password hashing, HttpOnly session cookies, D1-backed IP rate limiting, OTP recovery by email (never echoed to clients), isolated SQL playground, CSP, and XSS escaping
+- **Minimal dependencies** — production backend runs on the Cloudflare edge (no servers to run); the local Python backend needs one driver (`psycopg`)
 
 ## 🧰 Tech Stack
 
 | Layer | Technology |
 |---|---|
-| Backend | Python 3.10+ Standard Library (`http.server`, `hashlib`) + `psycopg` driver |
-| Database | PostgreSQL 14+ — Supabase managed Postgres in production, local Postgres for dev |
+| Backend | **Cloudflare Pages Functions (edge JS) + D1 SQLite** — canonical; Python 3 (`server.py`) kept for local dev / legacy deploys |
+| Database | Cloudflare D1 (production), PostgreSQL 14+ (local dev + legacy deploys) |
 | Frontend | Pure HTML5, CSS3, Vanilla JavaScript (ES6+) |
 | PWA | Web App Manifest, Service Worker, offline caching |
-| Deploy | Netlify (static) or Render / Railway / Fly / VPS (full app) |
-| CI | GitHub Actions (API, security, and E2E suites) |
+| Deploy | Cloudflare Pages (canonical) or Netlify / Render / VPS (legacy) |
+| CI | GitHub Actions (edge API, Python API, security, and E2E suites) |
+
+## 🧭 Which backend am I using?
+
+| Use case | Backend |
+|---|---|
+| **Production deployment** | [`functions/`](functions/) — Cloudflare Pages Functions + D1. See [`docs/DEPLOY_CLOUDFLARE_PAGES_D1.md`](docs/DEPLOY_CLOUDFLARE_PAGES_D1.md) |
+| **Local development** | `python3 server.py` (Postgres required) |
+| **Legacy deployments** | Netlify Functions adapter (`netlify/functions/api.py`) or a Python host |
+
+> Password recovery requires an email provider. On Cloudflare, set `RESEND_API_KEY`
+> and `MAIL_FROM` in the Pages project — the OTP is delivered by email and is
+> **never** returned by the API. See [`SECURITY.md`](SECURITY.md).
 
 ---
 

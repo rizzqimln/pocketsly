@@ -1,7 +1,24 @@
 import time
+import os
 from playwright.sync_api import sync_playwright
+import db
 
 test_user = f"e2e_user_{int(time.time())}"
+
+db.DATABASE_URL = os.environ.get(
+    "DATABASE_URL",
+    "postgresql://postgres:postgres@localhost:5432/pocketsly_test",
+)
+
+
+def fetch_otp(username):
+    """The API no longer returns the OTP; read it straight from the DB."""
+    with db.get_db() as conn:
+        row = conn.execute(
+            "SELECT otp_code FROM users WHERE LOWER(username) = LOWER(%s)",
+            (username,),
+        ).fetchone()
+        return row[0] if row else None
 
 with sync_playwright() as p:
     browser = p.chromium.launch(headless=True)
@@ -39,6 +56,14 @@ with sync_playwright() as p:
     print('4. Requested OTP successfully')
 
     # 5. Reset password with OTP
+    otp = None
+    for _ in range(10):
+        otp = fetch_otp(test_user)
+        if otp:
+            break
+        time.sleep(0.5)
+    assert otp, "OTP never persisted to the database"
+    page.fill('#forgot-otp-code', otp)
     page.fill('#forgot-new-password', 'brand_new_secret123')
     page.fill('#forgot-confirm-password', 'brand_new_secret123')
     page.click('#forgot-form button[type="submit"]')

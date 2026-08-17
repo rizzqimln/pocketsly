@@ -29,14 +29,14 @@ function parseCookies(cookieHeader) {
 function buildSecurityHeaders() {
   return {
     'Content-Type': 'application/json; charset=utf-8',
+    'Cache-Control': 'no-store',
     'X-Content-Type-Options': 'nosniff',
     'X-Frame-Options': 'DENY',
     'X-XSS-Protection': '1; mode=block',
     'Referrer-Policy': 'strict-origin-when-cross-origin',
     'Permissions-Policy': 'geolocation=(), microphone=(), camera=()',
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization, Cookie, X-Requested-With, Accept'
+    'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+    'Content-Security-Policy': "default-src 'none'; frame-ancestors 'none'"
   };
 }
 
@@ -54,6 +54,40 @@ function errorResponse(message, status = 400) {
   return jsonResponse({ error: message }, status);
 }
 
+// ── Rate Limiting (D1-backed, keyed by the edge's trusted cf-connecting-ip) ───
+
+const RATE_LIMIT_PATHS = ['/api/login', '/api/register', '/api/request-otp', '/api/reset-password'];
+const RATE_LIMIT_MAX = 20; // requests per 60s window
+const RATE_LIMIT_WINDOW_SECS = 60;
+
+export async function isRateLimited(db, ip, path) {
+  if (!RATE_LIMIT_PATHS.some(r => path.startsWith(r))) return false;
+  if (!ip) ip = 'unknown';
+
+  const now = Math.floor(Date.now() / 1000);
+  const windowStart = Math.floor(now / RATE_LIMIT_WINDOW_SECS) * RATE_LIMIT_WINDOW_SECS;
+
+  // Prune windows older than 2 minutes so the table stays small.
+  await db.prepare('DELETE FROM rate_limits WHERE window_start < ?1').bind(windowStart - 120).run();
+
+  const row = await db
+    .prepare('SELECT count FROM rate_limits WHERE ip = ?1 AND window_start = ?2')
+    .bind(ip, windowStart)
+    .first();
+
+  if (row && row.count >= RATE_LIMIT_MAX) return true;
+
+  await db
+    .prepare(
+      'INSERT INTO rate_limits (ip, window_start, count) VALUES (?1, ?2, 1) ' +
+      'ON CONFLICT(ip, window_start) DO UPDATE SET count = count + 1'
+    )
+    .bind(ip, windowStart)
+    .run();
+
+  return false;
+}
+
 // ── Main Request Handler ──────────────────────────────────────────────────────
 
 export async function onRequest(context) {
@@ -64,15 +98,7 @@ export async function onRequest(context) {
 
   // Handle CORS Preflight OPTIONS
   if (method === 'OPTIONS') {
-    return new Response(null, {
-      status: 204,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Cookie, X-Requested-With, Accept',
-        'Access-Control-Max-Age': '86400'
-      }
-    });
+    return new Response(null, { status: 204, headers: { 'Access-Control-Max-Age': '86400' } });
   }
 
   // Ensure D1 database binding is present
@@ -83,6 +109,12 @@ export async function onRequest(context) {
 
   // Idempotently initialize schema on request
   await initDb(db);
+
+  // Throttle brute-force / OTP abuse on sensitive endpoints before anything else.
+  const clientIp = request.headers.get('cf-connecting-ip') || request.headers.get('x-forwarded-for')?.split(',')[0].trim() || null;
+  if (await isRateLimited(db, clientIp, path)) {
+    return errorResponse('Too many requests. Please wait a moment before trying again.', 429);
+  }
 
   // Extract Session Cookie and Authenticated User
   const cookies = parseCookies(request.headers.get('Cookie'));
@@ -148,7 +180,7 @@ export async function onRequest(context) {
     }
 
     if (method === 'POST' && path === '/api/request-otp') {
-      const res = await routes.handleRequestOtp(db, body);
+      const res = await routes.handleRequestOtp(db, body, env);
       return jsonResponse(res);
     }
 
@@ -202,7 +234,7 @@ export async function onRequest(context) {
       if (path === '/api/courses') return jsonResponse(await routes.handlePostCourse(db, userId, body));
       if (path === '/api/lecturers') return jsonResponse(await routes.handlePostLecturer(db, userId, body));
       if (path === '/api/study-logs') return jsonResponse(await routes.handlePostStudyLog(db, userId, body));
-      if (path === '/api/curriculum/playground') return jsonResponse(await routes.handlePostCurriculumPlayground(db, userId, body));
+      if (path === '/api/curriculum/playground') return jsonResponse(await routes.handlePostCurriculumPlayground(env.PLAYGROUND_DB, body));
       if (path === '/api/budgets') return jsonResponse(await routes.handlePostBudget(db, userId, body));
       if (path === '/api/expenses') return jsonResponse(await routes.handlePostExpense(db, userId, body));
       if (path === '/api/incomes') return jsonResponse(await routes.handlePostIncome(db, userId, body));

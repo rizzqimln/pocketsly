@@ -1,5 +1,20 @@
 # Cloudflare Pages headers (the Cloudflare equivalent of netlify.toml).
 # Versioned assets (?v= in index.html/sw.js) are safe to cache immutably.
+
+# Security headers + CSP for every static response.
+# Ceiling: script-src keeps 'unsafe-inline' (the app's legacy inline onclick
+# handlers) and 'unsafe-eval' (the curriculum JS Lab uses new Function).
+# Upgrade path: migrate onclick handlers to data-action + a single delegated
+# listener, then tighten to script-src 'self' 'unsafe-eval'; sandbox the JS
+# Lab in an iframe (no allow-same-origin) to drop 'unsafe-eval' too.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https:; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; worker-src 'self' blob:
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=()
+
 /css/*
   Cache-Control: public, max-age=31536000, immutable
 

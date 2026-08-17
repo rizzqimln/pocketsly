@@ -326,12 +326,9 @@ window.App = {
         try {
           const res = await API.post('/api/request-otp', { email, username: email });
           if (res.success) {
-            UI.toast(`OTP code sent! (Demo OTP: ${res.otp_code})`, 'success');
+            UI.toast(res.message || 'Recovery code sent to your email.', 'success');
             const otpInput = document.getElementById('profile-otp-code');
-            if (otpInput) {
-              otpInput.focus();
-              otpInput.value = res.otp_code;
-            }
+            if (otpInput) otpInput.focus();
           }
         } catch (err) {
           UI.toast(err.message || 'Failed to send OTP.', 'danger');
@@ -533,8 +530,8 @@ window.App = {
         if (res.success) {
           UI.toast('Data restored successfully! Refreshing...', 'success');
           App.closeProfileSettings();
-          // Re-load view
-          App.route();
+          // Re-load current view so it refetches the restored data
+          App.navigateTo(App.currentView);
         } else {
           UI.toast(res.error || 'Restore failed.', 'danger');
         }

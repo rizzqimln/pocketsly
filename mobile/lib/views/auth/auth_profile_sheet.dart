@@ -225,9 +225,9 @@ class _AuthProfileSheetState extends State<AuthProfileSheet> {
     if (mounted) {
       setState(() => _isLoading = false);
       if (res['success'] == true) {
-        final otp = res['otp_code'] ?? '';
-        _forgotOtpController.text = otp;
-        setState(() => _successMessage = 'OTP generated! Code: $otp');
+        // The OTP is sent to the user's email — never displayed in the UI.
+        _forgotOtpController.clear();
+        setState(() => _successMessage = res['message'] ?? 'Recovery code sent to your email.');
       } else {
         setState(() => _errorMessage = res['error'] ?? 'No account found with provided info.');
       }

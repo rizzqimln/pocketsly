@@ -1,8 +1,8 @@
 # Cloudflare Pages + Netlify-compatible routing.
 #
-# /api/* is intentionally NOT listed here. On Cloudflare Pages it is handled by
-# the proxy function at functions/api/[[path]].js, which forwards every request
-# to your Python backend (configure BACKEND_URL in the Pages dashboard).
+# /api/* is intentionally NOT listed here. On Cloudflare Pages it is handled
+# directly by the edge functions at functions/api/[[path]].js (D1-backed,
+# canonical production backend) — no external backend is proxied.
 #
 # Netlify alternative (only if you ever deploy the API there again): uncomment
 # this line ABOVE the SPA fallback and point it at your backend:

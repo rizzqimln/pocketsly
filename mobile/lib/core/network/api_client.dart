@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../models/models.dart';
 import 'api_endpoints.dart';
 
@@ -10,6 +11,11 @@ import 'api_endpoints.dart';
 class ApiClient {
   ApiClient._();
   static final ApiClient instance = ApiClient._();
+
+  // Session token lives in platform secure storage (Keychain/Keystore), never
+  // in plaintext SharedPreferences, so a local attacker can't read it.
+  static const _secureStorage = FlutterSecureStorage();
+  static const _tokenKey = 'pocketsly_session_token';
 
   String? _sessionToken;
   UserModel? _currentUser;
@@ -20,7 +26,7 @@ class ApiClient {
 
   Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
-    _sessionToken = prefs.getString('pocketsly_session_token');
+    _sessionToken = await _secureStorage.read(key: _tokenKey);
 
     // Restore custom base URL if previously saved
     final customBaseUrl = prefs.getString('pocketsly_base_url');
@@ -65,8 +71,7 @@ class ApiClient {
           final val = trimmed.split('=').sublist(1).join('=');
           if (val.isNotEmpty) {
             _sessionToken = val;
-            final prefs = await SharedPreferences.getInstance();
-            await prefs.setString('pocketsly_session_token', val);
+            await _secureStorage.write(key: _tokenKey, value: val);
           }
           break;
         }
@@ -289,8 +294,8 @@ class ApiClient {
     _sessionToken = null;
     _currentUser = null;
     currentUserNotifier.value = null;
+    await _secureStorage.delete(key: _tokenKey);
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('pocketsly_session_token');
     await prefs.remove('pocketsly_user_data');
   }
 

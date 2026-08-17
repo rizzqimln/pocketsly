@@ -4,13 +4,14 @@
  * Complete endpoint handlers matching all functionality in server.py.
  */
 
-import { queryAll, queryOne, execute, insert } from './_db.js';
+import { queryAll, queryOne, execute, insert, initPlaygroundDb } from './_db.js';
 import {
   registerUser,
   loginUser,
   logoutUser,
   requestPasswordOtp,
   resetPasswordWithOtp,
+  purgeUserSessions,
   hashPassword,
   formatUtcDateTime
 } from './_auth.js';
@@ -95,9 +96,9 @@ export async function handleLogout(db, token) {
   return { success: true, message: 'Logged out successfully.' };
 }
 
-export async function handleRequestOtp(db, body) {
+export async function handleRequestOtp(db, body, env = {}) {
   const { username, email } = body;
-  return await requestPasswordOtp(db, username || email);
+  return await requestPasswordOtp(db, username || email, env);
 }
 
 export async function handleResetPassword(db, body) {
@@ -109,6 +110,7 @@ export async function handlePatchProfile(db, userId, body) {
   const updates = [];
   const params = [];
   let paramIdx = 1;
+  let passwordChanged = false;
 
   if (username !== undefined) {
     const cleanUser = username.trim().toLowerCase();
@@ -144,6 +146,7 @@ export async function handlePatchProfile(db, userId, body) {
     params.push(hash);
     updates.push(`salt = ?${paramIdx++}`);
     params.push(salt);
+    passwordChanged = true;
   }
 
   if (updates.length === 0) {
@@ -153,7 +156,12 @@ export async function handlePatchProfile(db, userId, body) {
   params.push(userId);
   await execute(db, `UPDATE users SET ${updates.join(', ')} WHERE id = ?${paramIdx}`, params);
 
-  const updatedUser = await queryOne(db, 'SELECT id, username, email, phone, currency, security_pin FROM users WHERE id = ?1', [userId]);
+  // A changed password invalidates every existing session (parity with OTP reset).
+  if (passwordChanged) {
+    await purgeUserSessions(db, userId);
+  }
+
+  const updatedUser = await queryOne(db, 'SELECT id, username, email, phone, currency FROM users WHERE id = ?1', [userId]);
   return { success: true, user: updatedUser };
 }
 
@@ -576,7 +584,14 @@ export async function handleGetCurriculumSchema() {
   };
 }
 
-export async function handlePostCurriculumPlayground(db, userId, body) {
+export async function handlePostCurriculumPlayground(playgroundDb, body) {
+  // The playground only runs against its own scratch D1 database
+  // (PLAYGROUND_DB binding) — it can never touch production data.
+  if (!playgroundDb) {
+    throw new Error('PLAYGROUND_DB D1 binding is not configured. Add a second D1 database named PLAYGROUND_DB to the Pages project.');
+  }
+  await initPlaygroundDb(playgroundDb);
+
   const { query } = body;
   if (!query || !query.trim()) throw new Error('Query string is required.');
   const clean = query.trim().replace(/;+$/, '');
@@ -589,7 +604,7 @@ export async function handlePostCurriculumPlayground(db, userId, body) {
   }
 
   try {
-    const results = await queryAll(db, clean);
+    const results = await queryAll(playgroundDb, clean);
     const columns = results.length > 0 ? Object.keys(results[0]) : [];
     return {
       success: true,

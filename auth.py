@@ -100,7 +100,8 @@ def login_user(username: str, password: str) -> str:
 def request_password_otp(username_or_email: str) -> dict:
     """
     Generates a 6-digit OTP code for password reset and saves it to the user's record.
-    Returns user details and the generated OTP code (for demo/notification).
+    The code is written to the server log (dev-only backend) and is NEVER returned
+    in the API response.
     """
     query = username_or_email.strip().lower()
     if not query:
@@ -113,7 +114,7 @@ def request_password_otp(username_or_email: str) -> dict:
     # Generate 6-digit numeric OTP code
     otp_code = str(secrets.randbelow(900000) + 100000)
     now_utc = datetime.now(timezone.utc).replace(tzinfo=None)
-    expires_at = (now_utc + timedelta(minutes=10)).strftime("%Y-%m-%d %H:%M:%S")
+    expires_at = (now_utc + timedelta(minutes=15)).strftime("%Y-%m-%d %H:%M:%S")
 
     db.execute(
         "UPDATE users SET otp_code = %s, otp_expires_at = %s WHERE id = %s",
@@ -121,19 +122,22 @@ def request_password_otp(username_or_email: str) -> dict:
     )
 
     user_email = user["email"] or f"{user['username']}@app.local"
+    # Dev-only delivery: log the code. Do NOT echo it back to the client.
+    print(f"[request-password-otp] recovery code for {user['username']}: {otp_code} (valid 15 min)")
     return {
         "success": True,
         "username": user["username"],
         "email": user_email,
-        "otp_code": otp_code,
         "message": f"OTP code sent to {user_email}"
     }
 
 
 def reset_password(username: str, recovery_contact: str, new_password: str, otp_code: str = None) -> bool:
     """
-    Resets user password after verifying OTP code (or recovery Email/Phone/PIN fallback).
-    Generates a fresh cryptographic salt, re-hashes with PBKDF2, and purges all active sessions.
+    Resets user password after verifying the OTP code. OTP is mandatory; there is
+    no recovery_contact / security_pin fallback (that path was removed — see
+    remediation plan). Generates a fresh cryptographic salt, re-hashes with
+    PBKDF2, and purges all active sessions.
     Raises ValueError on invalid OTP or weak new password.
     """
     username = username.strip().lower()
@@ -145,31 +149,19 @@ def reset_password(username: str, recovery_contact: str, new_password: str, otp_
         raise ValueError("Invalid account or recovery credentials.")
 
     provided_otp = str(otp_code).strip() if otp_code else ""
-    if provided_otp:
-        stored_otp = (user["otp_code"] or "").strip()
-        expires_str = user["otp_expires_at"]
+    stored_otp = (user["otp_code"] or "").strip()
+    expires_str = user["otp_expires_at"]
 
-        if not stored_otp or not secrets.compare_digest(provided_otp, stored_otp):
-            raise ValueError("Invalid OTP code. Please check your email or request a new code.")
+    if not stored_otp or not expires_str:
+        raise ValueError("No active OTP request found. Please request a new OTP.")
 
-        if expires_str:
-            expires = datetime.strptime(expires_str, "%Y-%m-%d %H:%M:%S")
-            now_utc = datetime.now(timezone.utc).replace(tzinfo=None)
-            if now_utc > expires:
-                raise ValueError("OTP code has expired. Please request a new code.")
-    else:
-        # Fallback to recovery contact check (email, phone, pin)
-        contact = str(recovery_contact).strip().lower() if recovery_contact else ""
-        stored_email = (user["email"] or "").strip().lower()
-        stored_phone = (user["phone"] or "").strip().lower()
-        stored_pin = (user["security_pin"] or "").strip().lower()
+    expires = datetime.strptime(expires_str, "%Y-%m-%d %H:%M:%S")
+    now_utc = datetime.now(timezone.utc).replace(tzinfo=None)
+    if now_utc > expires:
+        raise ValueError("OTP code has expired. Please request a new code.")
 
-        matches_email = stored_email and secrets.compare_digest(contact, stored_email)
-        matches_phone = stored_phone and secrets.compare_digest(contact, stored_phone)
-        matches_pin = stored_pin and secrets.compare_digest(contact, stored_pin)
-
-        if not (matches_email or matches_phone or matches_pin):
-            raise ValueError("Invalid OTP code or recovery credentials.")
+    if not provided_otp or not secrets.compare_digest(provided_otp, stored_otp):
+        raise ValueError("Invalid OTP code. Please check your email or request a new code.")
 
     new_password = str(new_password).strip()
     if not new_password or len(new_password) < 6:

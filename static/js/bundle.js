@@ -46,6 +46,25 @@ const UI = {
   },
 
   /**
+   * Returns a safe href for a user-supplied URL, or null when the scheme
+   * is not allowed (blocks javascript:, data:, etc.).
+   * @param {string} url  raw user-supplied URL
+   * @returns {string|null}  safe URL for href attributes, or null
+   */
+  safeUrl(url) {
+    if (!url) return null;
+    try {
+      const parsed = new URL(url, window.location.origin);
+      if (parsed.protocol === 'http:' || parsed.protocol === 'https:' || parsed.protocol === 'mailto:') {
+        return parsed.href;
+      }
+    } catch (e) {
+      return null;
+    }
+    return null;
+  },
+
+  /**
    * Shows a self-dismissing toast notification at the bottom of the screen.
    *
    * LEARN: setTimeout(() => el.remove(), ms) is the standard way to
@@ -429,7 +448,7 @@ async checkSession() {
 
     const SUBTITLES = {
       [FORM.REGISTER]: 'Join Daily Rhythm to build consistent routines.',
-      [FORM.FORGOT]:   'Enter your username, recovery PIN, and a new password.',
+      [FORM.FORGOT]:   'Enter your username, the recovery code emailed to you, and a new password.',
       [FORM.LOGIN]:    'Welcome back! Please sign in to access your routine.',
     };
 
@@ -535,12 +554,9 @@ async checkSession() {
         try {
           const res = await API.post('/api/request-otp', { email: username, username: username });
           if (res.success) {
-            UI.toast(`OTP Code sent to email! (Demo OTP: ${res.otp_code})`, 'success');
+            UI.toast(res.message || 'Recovery code sent to your email.', 'success');
             const otpInput = document.getElementById('forgot-otp-code');
-            if (otpInput) {
-              otpInput.focus();
-              otpInput.value = res.otp_code; // Autofill for convenience
-            }
+            if (otpInput) otpInput.focus();
           }
         } catch (err) {
           UI.toast(err.message, 'danger');
@@ -1999,11 +2015,11 @@ window.Notes = {
               <button type="button" class="btn btn-outline btn-sm" onclick="Notes.openCitationModal(${r.id})" style="display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 700; padding: 0.4rem 0.75rem; font-size: 0.8rem; border-color: var(--primary); color: var(--primary); background: var(--primary-light); min-height: 36px;">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> Cite
               </button>
-              ${r.url_or_path ? `
-                <a href="${UI.esc(r.url_or_path)}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm" style="display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 700; padding: 0.4rem 0.75rem; font-size: 0.8rem; min-height: 36px;">
+              ${r.url_or_path ? (() => { const safeUrl = UI.safeUrl(r.url_or_path); return safeUrl ? `
+                <a href="${UI.esc(safeUrl)}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm" style="display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 700; padding: 0.4rem 0.75rem; font-size: 0.8rem; min-height: 36px;">
                   Open ↗
                 </a>
-              ` : ''}
+              ` : ''; })() : ''}
               <button class="btn-icon text-muted" onclick="Notes.deleteResource(${r.id})" title="Delete resource" style="padding: 6px; min-height: 36px; min-width: 36px; display: inline-flex; align-items: center; justify-content: center;">
                 <svg class="icon-svg" viewBox="0 0 24 24" style="width: 16px; height: 16px; color: var(--accent-danger);"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
               </button>
@@ -6028,12 +6044,9 @@ window.App = {
         try {
           const res = await API.post('/api/request-otp', { email, username: email });
           if (res.success) {
-            UI.toast(`OTP code sent! (Demo OTP: ${res.otp_code})`, 'success');
+            UI.toast(res.message || 'Recovery code sent to your email.', 'success');
             const otpInput = document.getElementById('profile-otp-code');
-            if (otpInput) {
-              otpInput.focus();
-              otpInput.value = res.otp_code;
-            }
+            if (otpInput) otpInput.focus();
           }
         } catch (err) {
           UI.toast(err.message || 'Failed to send OTP.', 'danger');
@@ -6235,8 +6248,8 @@ window.App = {
         if (res.success) {
           UI.toast('Data restored successfully! Refreshing...', 'success');
           App.closeProfileSettings();
-          // Re-load view
-          App.route();
+          // Re-load current view so it refetches the restored data
+          App.navigateTo(App.currentView);
         } else {
           UI.toast(res.error || 'Restore failed.', 'danger');
         }

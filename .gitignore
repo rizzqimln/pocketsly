@@ -20,3 +20,9 @@ opencode.json
 .env
 .env.*
 .DS_Store
+
+# ── Node (Cloudflare functions test tooling) ─────────────────────────────────
+functions/node_modules/
+
+# ── Editor-local config ──────────────────────────────────────────────────────
+.vscode/

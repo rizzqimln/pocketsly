@@ -1,0 +1,12 @@
+{
+  "name": "pocketsly-functions",
+  "private": true,
+  "type": "module",
+  "description": "Cloudflare Pages Functions (edge API) — unit tests for the security-critical paths.",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "^3.2.4"
+  }
+}

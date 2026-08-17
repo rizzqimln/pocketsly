@@ -108,7 +108,7 @@ async checkSession() {
 
     const SUBTITLES = {
       [FORM.REGISTER]: 'Join Daily Rhythm to build consistent routines.',
-      [FORM.FORGOT]:   'Enter your username, recovery PIN, and a new password.',
+      [FORM.FORGOT]:   'Enter your username, the recovery code emailed to you, and a new password.',
       [FORM.LOGIN]:    'Welcome back! Please sign in to access your routine.',
     };
 
@@ -214,12 +214,9 @@ async checkSession() {
         try {
           const res = await API.post('/api/request-otp', { email: username, username: username });
           if (res.success) {
-            UI.toast(`OTP Code sent to email! (Demo OTP: ${res.otp_code})`, 'success');
+            UI.toast(res.message || 'Recovery code sent to your email.', 'success');
             const otpInput = document.getElementById('forgot-otp-code');
-            if (otpInput) {
-              otpInput.focus();
-              otpInput.value = res.otp_code; // Autofill for convenience
-            }
+            if (otpInput) otpInput.focus();
           }
         } catch (err) {
           UI.toast(err.message, 'danger');

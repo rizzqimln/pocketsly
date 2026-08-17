@@ -45,6 +45,25 @@ const UI = {
   },
 
   /**
+   * Returns a safe href for a user-supplied URL, or null when the scheme
+   * is not allowed (blocks javascript:, data:, etc.).
+   * @param {string} url  raw user-supplied URL
+   * @returns {string|null}  safe URL for href attributes, or null
+   */
+  safeUrl(url) {
+    if (!url) return null;
+    try {
+      const parsed = new URL(url, window.location.origin);
+      if (parsed.protocol === 'http:' || parsed.protocol === 'https:' || parsed.protocol === 'mailto:') {
+        return parsed.href;
+      }
+    } catch (e) {
+      return null;
+    }
+    return null;
+  },
+
+  /**
    * Shows a self-dismissing toast notification at the bottom of the screen.
    *
    * LEARN: setTimeout(() => el.remove(), ms) is the standard way to

@@ -27,7 +27,7 @@
   </noscript>
 
   <!-- Bundled styling: one file, zero render-blocking fan-out over HTTP/1.1. -->
-  <link href="/css/bundle.css?v=8.8" rel="stylesheet" />
+  <link href="/css/bundle.css?v=8.9" rel="stylesheet" />
 </head>
 <body>
 
@@ -3063,259 +3063,356 @@
   </div>
 
 <!-- ===================================================================== -->
-  <!-- BUDGET CASH FLOW & TARGET ENTRY MODAL (Mobile-First Bottom Sheet)    -->
-  <!-- ===================================================================== -->
-  <div class="modal-overlay hidden" id="budget-entry-modal"
-    onclick="if(event.target === this) Budget.closeEntryModal()">
-    <div class="modal-card budget-modal-card">
-      <div class="modal-drag-indicator-bar" onclick="Budget.closeEntryModal()" title="Click or pull down to close">
-        <span class="modal-drag-pill"></span>
-      </div>
-      <div class="modal-header">
-        <div class="d-flex items-center gap-sm">
-          <svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-            stroke-width="2.2" viewBox="0 0 24 24" width="18">
-            <rect height="16" rx="2" width="22" x="1" y="4"></rect>
-            <line x1="1" x2="23" y1="10" y2="10"></line>
-          </svg>
-          <h3 id="budget-modal-title">Log Outgoing Expense</h3>
-        </div>
-        <button aria-label="Close modal" class="btn-icon" onclick="Budget.closeEntryModal()" type="button">×</button>
-      </div>
-      <div class="modal-body">
-        <!-- Action Tab Switchers inside Modal -->
-        <div class="budget-modal-tabs mb-md">
-          <button class="budget-modal-tab-btn active-expense" id="modal-tab-expense"
-            onclick="Budget.switchModalTab('expense')" type="button">
-            - Expense
-          </button>
-          <button class="budget-modal-tab-btn" id="modal-tab-income" onclick="Budget.switchModalTab('income')"
-            type="button">
-            + Income
-          </button>
-          <button class="budget-modal-tab-btn" id="modal-tab-budget" onclick="Budget.switchModalTab('budget')"
-            type="button">
-            🎯 Target
-          </button>
-        </div>
-
-        <!-- 1. Log Expense Form -->
-        <form class="auth-form budget-form-container d-flex flex-col gap-sm" id="add-expense-form">
-          <!-- Quick Scan Helper -->
-          <button
-            class="btn btn-outline btn-sm receipt-autofill-btn text-brand d-flex items-center justify-center gap-xs font-bold text-xs p-sm"
-            onclick="Budget.openReceiptScanner()" type="button">
-            <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-              stroke-width="2.2" viewBox="0 0 24 24" width="14">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-              <line x1="16" x2="8" y1="13" y2="13"></line>
-              <line x1="16" x2="8" y1="17" y2="17"></line>
-              <polyline points="10 9 9 9 8 9"></polyline>
-            </svg>
-            Auto-fill from Receipt (Camera / OCR)
-          </button>
-
-          <div class="form-group m-0">
-            <label for="expense-amount">Amount Spent</label>
-            <div class="input-currency-wrapper">
-              <span class="input-currency-prefix">Rp</span>
-              <input class="currency-formatted-input font-bold text-lg w-full" id="expense-amount" inputmode="numeric"
-                placeholder="0" required="" type="text" />
-            </div>
-            <!-- Quick Increment Chips -->
-            <div class="quick-amount-chips mt-xs d-flex gap-xs flex-wrap">
-              <button type="button" class="preset-chip" onclick="Budget.addQuickAmount('expense-amount', 10000)">+10k</button>
-              <button type="button" class="preset-chip" onclick="Budget.addQuickAmount('expense-amount', 25000)">+25k</button>
-              <button type="button" class="preset-chip" onclick="Budget.addQuickAmount('expense-amount', 50000)">+50k</button>
-              <button type="button" class="preset-chip" onclick="Budget.addQuickAmount('expense-amount', 100000)">+100k</button>
-              <button type="button" class="preset-chip text-danger" onclick="Budget.clearAmount('expense-amount')">Clear</button>
-            </div>
-          </div>
-
-          <div class="form-group m-0">
-            <label for="expense-category">Category</label>
-            <input class="w-full" id="expense-category" list="expense-categories-list"
-              placeholder="Select or search category" required="" type="text"
-              value="Food &amp; Dining" />
-            <datalist id="expense-categories-list">
-              <option value="Food &amp; Dining"></option>
-              <option value="Transportation"></option>
-              <option value="Books &amp; Study"></option>
-              <option value="Bills &amp; Wifi"></option>
-              <option value="Coffee &amp; Snacks"></option>
-              <option value="Housing / Rent"></option>
-              <option value="Health &amp; Medical"></option>
-              <option value="Entertainment"></option>
-              <option value="Shopping"></option>
-            </datalist>
-          </div>
-
-          <div class="budget-form-row-grid grid-2col gap-sm">
-            <div class="form-group m-0">
-              <label for="expense-date">Date</label>
-              <input class="w-full" id="expense-date" required="" type="date" />
-            </div>
-            <div class="form-group m-0">
-              <label for="expense-wallet">Account / Wallet</label>
-              <select class="w-full" id="expense-wallet">
-                <option selected="" value="Cash">Cash in Hand</option>
-                <option value="Bank Transfer">Bank Account</option>
-                <option value="E-Wallet">E-Wallet (GoPay/OVO/Dana)</option>
-                <option value="Card">Debit / Credit Card</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-group m-0">
-            <label for="expense-desc">Description / Notes (Optional)</label>
-            <input class="w-full" id="expense-desc" placeholder="e.g. Lunch with classmates" type="text" />
-          </div>
-
-          <button class="btn btn-action-expense font-bold w-full p-md mt-xs" type="submit">
-            <span>-</span> Log Expense
-          </button>
-        </form>
-
-        <!-- 2. Log Income Form -->
-        <form class="auth-form budget-form-container hidden d-flex flex-col gap-sm" id="add-income-form">
-          <div class="form-group m-0">
-            <label for="income-amount">Income Amount</label>
-            <div class="input-currency-wrapper">
-              <span class="input-currency-prefix">Rp</span>
-              <input class="currency-formatted-input font-bold text-lg w-full" id="income-amount" inputmode="numeric"
-                placeholder="0" required="" type="text" />
-            </div>
-            <!-- Quick Increment Chips -->
-            <div class="quick-amount-chips mt-xs d-flex gap-xs flex-wrap">
-              <button type="button" class="preset-chip" onclick="Budget.addQuickAmount('income-amount', 100000)">+100k</button>
-              <button type="button" class="preset-chip" onclick="Budget.addQuickAmount('income-amount', 500000)">+500k</button>
-              <button type="button" class="preset-chip" onclick="Budget.addQuickAmount('income-amount', 1000000)">+1M</button>
-              <button type="button" class="preset-chip" onclick="Budget.addQuickAmount('income-amount', 2500000)">+2.5M</button>
-              <button type="button" class="preset-chip text-danger" onclick="Budget.clearAmount('income-amount')">Clear</button>
-            </div>
-          </div>
-
-          <div class="form-group m-0">
-            <label for="income-source">Category / Source</label>
-            <input class="w-full" id="income-source" list="income-categories-list"
-              placeholder="Select or search category" required="" type="text"
-              value="Allowance" />
-            <datalist id="income-categories-list">
-              <option value="Salary"></option>
-              <option value="Allowance"></option>
-              <option value="Freelance"></option>
-              <option value="Scholarship"></option>
-              <option value="Investment"></option>
-              <option value="Part-time Job"></option>
-              <option value="Gift / Bonus"></option>
-            </datalist>
-          </div>
-
-          <div class="budget-form-row-grid grid-2col gap-sm">
-            <div class="form-group m-0">
-              <label for="income-date">Date Received</label>
-              <input class="w-full" id="income-date" required="" type="date" />
-            </div>
-            <div class="form-group m-0">
-              <label for="income-wallet">Account / Wallet</label>
-              <select class="w-full" id="income-wallet">
-                <option selected="" value="Cash">Cash in Hand</option>
-                <option value="Bank Transfer">Bank Account</option>
-                <option value="E-Wallet">E-Wallet (GoPay/OVO/Dana)</option>
-                <option value="Card">Debit / Credit Card</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-group m-0">
-            <label for="income-recurring">Recurrence</label>
-            <select class="w-full" id="income-recurring">
-              <option selected="" value="none">One-time</option>
-              <option value="weekly">Weekly</option>
-              <option value="monthly">Monthly</option>
-            </select>
-          </div>
-
-          <div class="form-group m-0">
-            <label for="income-desc">Notes (Optional)</label>
-            <input class="w-full" id="income-desc" placeholder="e.g. Monthly allowance" type="text" />
-          </div>
-
-          <button class="btn btn-action-income font-bold w-full p-md mt-xs" type="submit">
-            <span>+</span> Log Income
-          </button>
-        </form>
-
-        <!-- 3. Setup Budget Limit Target Form -->
-        <form class="auth-form budget-form-container hidden d-flex flex-col gap-sm" id="add-budget-form">
-          <div class="form-group m-0">
-            <label for="budget-category">Category / Allocation</label>
-            <input class="w-full" id="budget-category" list="expense-categories-list"
-              placeholder="e.g. Food &amp; Dining, Transport, Books" required="" type="text" />
-          </div>
-          <div class="form-group m-0">
-            <label for="budget-amount">Monthly Limit Amount</label>
-            <div class="input-currency-wrapper">
-              <span class="input-currency-prefix">Rp</span>
-              <input class="currency-formatted-input font-bold text-lg w-full" id="budget-amount" inputmode="numeric"
-                placeholder="0" required="" type="text" />
-            </div>
-            <!-- Quick Increment Chips -->
-            <div class="quick-amount-chips mt-xs d-flex gap-xs flex-wrap">
-              <button type="button" class="preset-chip" onclick="Budget.addQuickAmount('budget-amount', 250000)">+250k</button>
-              <button type="button" class="preset-chip" onclick="Budget.addQuickAmount('budget-amount', 500000)">+500k</button>
-              <button type="button" class="preset-chip" onclick="Budget.addQuickAmount('budget-amount', 1000000)">+1M</button>
-              <button type="button" class="preset-chip" onclick="Budget.addQuickAmount('budget-amount', 2000000)">+2M</button>
-              <button type="button" class="preset-chip text-danger" onclick="Budget.clearAmount('budget-amount')">Clear</button>
-            </div>
-          </div>
-          <button class="btn btn-action-budget font-bold w-full p-md mt-sm" type="submit">
-            🎯 Allocate Limit Target
-          </button>
-        </form>
-      </div>
+<!-- BUDGET CASH FLOW & TARGET ENTRY MODAL (Mobile-First Bottom Sheet)    -->
+<!-- ===================================================================== -->
+<div class="modal-overlay hidden" id="budget-entry-modal" onclick="if(event.target === this) Budget.closeEntryModal()">
+  <div class="modal-card budget-modal-card">
+    <div class="modal-drag-indicator-bar" onclick="Budget.closeEntryModal()" title="Click or pull down to close">
+      <span class="modal-drag-pill"></span>
     </div>
-  </div>
-
-  <!-- ===================================================================== -->
-  <!-- SMART RECEIPT SCANNER MODAL (OCR / Auto-Fill)                         -->
-  <!-- ===================================================================== -->
-  <div class="modal-overlay hidden" id="receipt-scanner-modal"
-    onclick="if(event.target === this) Budget.closeReceiptScanner()">
-    <div class="modal-card receipt-modal-card">
-      <div class="modal-drag-indicator-bar" onclick="Budget.closeReceiptScanner()" title="Click or pull down to close">
-        <span class="modal-drag-pill"></span>
+    <div class="modal-header">
+      <div class="d-flex items-center gap-sm">
+        <svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+          stroke-width="2.2" viewBox="0 0 24 24" width="18">
+          <rect height="16" rx="2" width="22" x="1" y="4"></rect>
+          <line x1="1" x2="23" y1="10" y2="10"></line>
+        </svg>
+        <h3 id="budget-modal-title">Log Outgoing Expense</h3>
       </div>
-      <div class="modal-header">
-        <div class="d-flex items-center gap-sm">
-          <svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-            stroke-width="2.2" viewBox="0 0 24 24" width="18">
+      <button aria-label="Close modal" class="btn-icon" onclick="Budget.closeEntryModal()" type="button">×</button>
+    </div>
+    <div class="modal-body">
+      <!-- Action Tab Switchers inside Modal -->
+      <div class="budget-modal-tabs mb-md">
+        <button class="budget-modal-tab-btn active-expense" id="modal-tab-expense"
+          onclick="Budget.switchModalTab('expense')" type="button">
+          - Expense
+        </button>
+        <button class="budget-modal-tab-btn" id="modal-tab-income" onclick="Budget.switchModalTab('income')"
+          type="button">
+          + Income
+        </button>
+        <button class="budget-modal-tab-btn" id="modal-tab-budget" onclick="Budget.switchModalTab('budget')"
+          type="button">
+          🎯 Target
+        </button>
+      </div>
+
+      <!-- 1. Log Expense Form -->
+      <form class="auth-form budget-form-container d-flex flex-col gap-sm" id="add-expense-form">
+        <!-- Quick Scan Helper -->
+        <button
+          class="btn btn-outline btn-sm receipt-autofill-btn text-brand d-flex items-center justify-center gap-xs font-bold text-xs p-sm"
+          onclick="Budget.openReceiptScanner()" type="button">
+          <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+            stroke-width="2.2" viewBox="0 0 24 24" width="14">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
             <polyline points="14 2 14 8 20 8"></polyline>
             <line x1="16" x2="8" y1="13" y2="13"></line>
             <line x1="16" x2="8" y1="17" y2="17"></line>
             <polyline points="10 9 9 9 8 9"></polyline>
           </svg>
-          <h3>Smart Receipt Scanner</h3>
+          Auto-fill from Receipt (Camera / OCR)
+        </button>
+
+        <div class="form-group m-0">
+          <label for="expense-amount">Amount Spent</label>
+          <div class="input-currency-wrapper">
+            <span class="input-currency-prefix">Rp</span>
+            <input class="currency-formatted-input font-bold text-lg w-full" id="expense-amount" inputmode="numeric"
+              placeholder="0" required="" type="text" />
+          </div>
+          <!-- Quick Increment Chips -->
+          <div class="quick-amount-chips mt-xs d-flex gap-xs flex-wrap">
+            <button type="button" class="preset-chip"
+              onclick="Budget.addQuickAmount('expense-amount', 10000)">+10k</button>
+            <button type="button" class="preset-chip"
+              onclick="Budget.addQuickAmount('expense-amount', 25000)">+25k</button>
+            <button type="button" class="preset-chip"
+              onclick="Budget.addQuickAmount('expense-amount', 50000)">+50k</button>
+            <button type="button" class="preset-chip"
+              onclick="Budget.addQuickAmount('expense-amount', 100000)">+100k</button>
+            <button type="button" class="preset-chip text-danger"
+              onclick="Budget.clearAmount('expense-amount')">Clear</button>
+          </div>
         </div>
-        <button aria-label="Close scanner" class="btn-icon" onclick="Budget.closeReceiptScanner()"
-          type="button">×</button>
+
+        <div class="form-group m-0">
+          <label for="expense-category">Category</label>
+          <input class="w-full" id="expense-category" list="expense-categories-list"
+            placeholder="Select or search category" required="" type="text" value="Food &amp; Dining" />
+          <datalist id="expense-categories-list">
+            <option value="Food &amp; Dining"></option>
+            <option value="Transportation"></option>
+            <option value="Books &amp; Study"></option>
+            <option value="Bills &amp; Wifi"></option>
+            <option value="Coffee &amp; Snacks"></option>
+            <option value="Housing / Rent"></option>
+            <option value="Health &amp; Medical"></option>
+            <option value="Entertainment"></option>
+            <option value="Shopping"></option>
+          </datalist>
+        </div>
+
+        <div class="budget-form-row-grid grid-2col gap-sm">
+          <div class="form-group m-0">
+            <label for="expense-date">Date</label>
+            <input class="w-full" id="expense-date" required="" type="date" />
+          </div>
+          <div class="form-group m-0">
+            <label for="expense-wallet">Account / Wallet</label>
+            <select class="w-full" id="expense-wallet">
+              <option selected="" value="Cash">Cash in Hand</option>
+              <option value="Bank Transfer">Bank Account</option>
+              <option value="E-Wallet">E-Wallet (GoPay/OVO/Dana)</option>
+              <option value="Card">Debit / Credit Card</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group m-0">
+          <label for="expense-desc">Description / Notes (Optional)</label>
+          <input class="w-full" id="expense-desc" placeholder="e.g. Lunch with classmates" type="text" />
+        </div>
+
+        <button class="btn btn-action-expense font-bold w-full p-md mt-xs" type="submit">
+          <span>-</span> Log Expense
+        </button>
+      </form>
+
+      <!-- 2. Log Income Form -->
+      <form class="auth-form budget-form-container hidden d-flex flex-col gap-sm" id="add-income-form">
+        <div class="form-group m-0">
+          <label for="income-amount">Income Amount</label>
+          <div class="input-currency-wrapper">
+            <span class="input-currency-prefix">Rp</span>
+            <input class="currency-formatted-input font-bold text-lg w-full" id="income-amount" inputmode="numeric"
+              placeholder="0" required="" type="text" />
+          </div>
+          <!-- Quick Increment Chips -->
+          <div class="quick-amount-chips mt-xs d-flex gap-xs flex-wrap">
+            <button type="button" class="preset-chip"
+              onclick="Budget.addQuickAmount('income-amount', 100000)">+100k</button>
+            <button type="button" class="preset-chip"
+              onclick="Budget.addQuickAmount('income-amount', 500000)">+500k</button>
+            <button type="button" class="preset-chip"
+              onclick="Budget.addQuickAmount('income-amount', 1000000)">+1M</button>
+            <button type="button" class="preset-chip"
+              onclick="Budget.addQuickAmount('income-amount', 2500000)">+2.5M</button>
+            <button type="button" class="preset-chip text-danger"
+              onclick="Budget.clearAmount('income-amount')">Clear</button>
+          </div>
+        </div>
+
+        <div class="form-group m-0">
+          <label for="income-source">Category / Source</label>
+          <input class="w-full" id="income-source" list="income-categories-list" placeholder="Select or search category"
+            required="" type="text" value="Allowance" />
+          <datalist id="income-categories-list">
+            <option value="Salary"></option>
+            <option value="Allowance"></option>
+            <option value="Freelance"></option>
+            <option value="Scholarship"></option>
+            <option value="Investment"></option>
+            <option value="Part-time Job"></option>
+            <option value="Gift / Bonus"></option>
+          </datalist>
+        </div>
+
+        <div class="budget-form-row-grid grid-2col gap-sm">
+          <div class="form-group m-0">
+            <label for="income-date">Date Received</label>
+            <input class="w-full" id="income-date" required="" type="date" />
+          </div>
+          <div class="form-group m-0">
+            <label for="income-wallet">Account / Wallet</label>
+            <select class="w-full" id="income-wallet">
+              <option selected="" value="Cash">Cash in Hand</option>
+              <option value="Bank Transfer">Bank Account</option>
+              <option value="E-Wallet">E-Wallet (GoPay/OVO/Dana)</option>
+              <option value="Card">Debit / Credit Card</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group m-0">
+          <label for="income-recurring">Recurrence</label>
+          <select class="w-full" id="income-recurring">
+            <option selected="" value="none">One-time</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+          </select>
+        </div>
+
+        <div class="form-group m-0">
+          <label for="income-desc">Notes (Optional)</label>
+          <input class="w-full" id="income-desc" placeholder="e.g. Monthly allowance" type="text" />
+        </div>
+
+        <button class="btn btn-action-income font-bold w-full p-md mt-xs" type="submit">
+          <span>+</span> Log Income
+        </button>
+      </form>
+
+      <!-- 3. Setup Budget Limit Target Form -->
+      <form class="auth-form budget-form-container hidden d-flex flex-col gap-sm" id="add-budget-form">
+        <div class="form-group m-0">
+          <label for="budget-category">Category / Allocation</label>
+          <input class="w-full" id="budget-category" list="expense-categories-list"
+            placeholder="e.g. Food &amp; Dining, Transport, Books" required="" type="text" />
+        </div>
+        <div class="form-group m-0">
+          <label for="budget-amount">Monthly Limit Amount</label>
+          <div class="input-currency-wrapper">
+            <span class="input-currency-prefix">Rp</span>
+            <input class="currency-formatted-input font-bold text-lg w-full" id="budget-amount" inputmode="numeric"
+              placeholder="0" required="" type="text" />
+          </div>
+          <!-- Quick Increment Chips -->
+          <div class="quick-amount-chips mt-xs d-flex gap-xs flex-wrap">
+            <button type="button" class="preset-chip"
+              onclick="Budget.addQuickAmount('budget-amount', 250000)">+250k</button>
+            <button type="button" class="preset-chip"
+              onclick="Budget.addQuickAmount('budget-amount', 500000)">+500k</button>
+            <button type="button" class="preset-chip"
+              onclick="Budget.addQuickAmount('budget-amount', 1000000)">+1M</button>
+            <button type="button" class="preset-chip"
+              onclick="Budget.addQuickAmount('budget-amount', 2000000)">+2M</button>
+            <button type="button" class="preset-chip text-danger"
+              onclick="Budget.clearAmount('budget-amount')">Clear</button>
+          </div>
+        </div>
+        <button class="btn btn-action-budget font-bold w-full p-md mt-sm" type="submit">
+          🎯 Allocate Limit Target
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ===================================================================== -->
+<!-- SMART RECEIPT SCANNER MODAL (OCR / Auto-Fill)                         -->
+<!-- ===================================================================== -->
+<div class="modal-overlay hidden" id="receipt-scanner-modal"
+  onclick="if(event.target === this) Budget.closeReceiptScanner()">
+  <div class="modal-card receipt-modal-card">
+    <div class="modal-drag-indicator-bar" onclick="Budget.closeReceiptScanner()" title="Click or pull down to close">
+      <span class="modal-drag-pill"></span>
+    </div>
+    <div class="modal-header">
+      <div class="d-flex items-center gap-sm">
+        <svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+          stroke-width="2.2" viewBox="0 0 24 24" width="18">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" x2="8" y1="13" y2="13"></line>
+          <line x1="16" x2="8" y1="17" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        <h3>Smart Receipt Scanner</h3>
       </div>
-      <div class="modal-body">
-        <!-- Scan Mode & Input Source Toggles -->
-        <div class="receipt-scan-mode-row">
-          <div class="receipt-source-seg" role="group" aria-label="Input source">
-            <button class="receipt-source-btn active" id="btn-src-upload" onclick="Budget.switchScannerSource('upload')"
-              type="button">
+      <button aria-label="Close scanner" class="btn-icon" onclick="Budget.closeReceiptScanner()"
+        type="button">×</button>
+    </div>
+    <div class="modal-body">
+      <!-- Scan Mode & Input Source Toggles -->
+      <div class="receipt-scan-mode-row">
+        <div class="receipt-source-seg" role="group" aria-label="Input source">
+          <button class="receipt-source-btn active" id="btn-src-upload" onclick="Budget.switchScannerSource('upload')"
+            type="button">
+            <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+              stroke-width="2.2" viewBox="0 0 24 24" width="14">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+            </svg>
+            Upload / Drop
+          </button>
+          <button class="receipt-source-btn" id="btn-src-camera" onclick="Budget.switchScannerSource('camera')"
+            type="button">
+            <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+              stroke-width="2.2" viewBox="0 0 24 24" width="14">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+              <circle cx="12" cy="13" r="4"></circle>
+            </svg>
+            Live Camera
+          </button>
+        </div>
+        <div class="receipt-scan-mode-seg" role="group" aria-label="Receipt scan mode">
+          <button class="receipt-scan-mode-btn active" data-mode="server" type="button">Server scan</button>
+          <button class="receipt-scan-mode-btn" data-mode="on-device" type="button">On-device</button>
+        </div>
+      </div>
+      <input class="hidden" id="receipt-scan-mode" value="server" />
+
+      <!-- 1. LIVE CAMERA VIEWFINDER -->
+      <div class="receipt-camera-container hidden" id="receipt-camera-container">
+        <div class="receipt-camera-viewfinder">
+          <video autoplay playsinline muted class="receipt-camera-video" id="receipt-camera-video"></video>
+          <div class="receipt-camera-overlay">
+            <div class="receipt-viewfinder-box">
+              <span class="viewfinder-corner top-left"></span>
+              <span class="viewfinder-corner top-right"></span>
+              <span class="viewfinder-corner bottom-left"></span>
+              <span class="viewfinder-corner bottom-right"></span>
+              <div class="viewfinder-laser-line"></div>
+            </div>
+            <p class="viewfinder-hint">Align receipt within the frame</p>
+          </div>
+        </div>
+        <div class="receipt-camera-controls d-flex gap-sm justify-center items-center p-sm">
+          <button class="btn btn-primary btn-lg d-flex items-center gap-xs font-bold"
+            onclick="Budget.captureCameraSnapshot()" type="button">
+            <svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+              stroke-width="2.2" viewBox="0 0 24 24" width="18">
+              <circle cx="12" cy="12" r="10"></circle>
+              <circle cx="12" cy="12" r="4"></circle>
+            </svg>
+            Capture &amp; Scan
+          </button>
+          <button class="btn btn-outline btn-sm d-flex items-center gap-xs" onclick="Budget.toggleCameraFacing()"
+            type="button" title="Flip Camera">
+            <svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+              stroke-width="2" viewBox="0 0 24 24" width="15">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+            </svg>
+            Flip
+          </button>
+        </div>
+      </div>
+
+      <!-- 2. DROPZONE & SEPARATE FILE / CAMERA INPUTS -->
+      <div class="receipt-dropzone" id="receipt-dropzone"
+        onclick="document.getElementById('receipt-upload-input').click()">
+        <!-- Input 1: Pure file upload / photo gallery (NO capture constraint) -->
+        <input accept="image/*,application/pdf" class="hidden" id="receipt-upload-input"
+          onchange="Budget.handleReceiptUpload(event)" type="file" />
+        <!-- Input 2: Direct mobile device camera snapshot -->
+        <input accept="image/*" capture="environment" class="hidden" id="receipt-camera-input"
+          onchange="Budget.handleReceiptUpload(event)" type="file" />
+
+        <div class="receipt-dropzone-inner">
+          <div class="receipt-dropzone-icon">
+            <svg fill="none" height="36" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+              stroke-width="1.8" viewBox="0 0 24 24" width="36">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+              <circle cx="12" cy="13" r="4"></circle>
+            </svg>
+          </div>
+          <div class="receipt-dropzone-title">Upload File or Scan Receipt</div>
+          <p class="receipt-dropzone-desc">Choose an image from files/gallery, take a live photo, or press <kbd
+              class="receipt-dropzone-kbd">Ctrl+V</kbd> to paste</p>
+          <div class="d-flex gap-sm justify-center flex-wrap">
+            <button class="btn btn-primary btn-sm d-flex items-center gap-xs"
+              onclick="event.stopPropagation(); document.getElementById('receipt-upload-input').click()" type="button">
               <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                 stroke-width="2.2" viewBox="0 0 24 24" width="14">
-                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
               </svg>
-              Upload / Drop
+              Upload File / Gallery
             </button>
-            <button class="receipt-source-btn" id="btn-src-camera" onclick="Budget.switchScannerSource('camera')"
-              type="button">
+            <button class="btn btn-outline btn-sm d-flex items-center gap-xs"
+              onclick="event.stopPropagation(); Budget.switchScannerSource('camera')" type="button">
               <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                 stroke-width="2.2" viewBox="0 0 24 24" width="14">
                 <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
@@ -3323,390 +3420,302 @@
               </svg>
               Live Camera
             </button>
-          </div>
-          <div class="receipt-scan-mode-seg" role="group" aria-label="Receipt scan mode">
-            <button class="receipt-scan-mode-btn active" data-mode="server" type="button">Server scan</button>
-            <button class="receipt-scan-mode-btn" data-mode="on-device" type="button">On-device</button>
-          </div>
-        </div>
-        <input class="hidden" id="receipt-scan-mode" value="server" />
-
-        <!-- 1. LIVE CAMERA VIEWFINDER -->
-        <div class="receipt-camera-container hidden" id="receipt-camera-container">
-          <div class="receipt-camera-viewfinder">
-            <video autoplay playsinline muted class="receipt-camera-video" id="receipt-camera-video"></video>
-            <div class="receipt-camera-overlay">
-              <div class="receipt-viewfinder-box">
-                <span class="viewfinder-corner top-left"></span>
-                <span class="viewfinder-corner top-right"></span>
-                <span class="viewfinder-corner bottom-left"></span>
-                <span class="viewfinder-corner bottom-right"></span>
-                <div class="viewfinder-laser-line"></div>
-              </div>
-              <p class="viewfinder-hint">Align receipt within the frame</p>
-            </div>
-          </div>
-          <div class="receipt-camera-controls d-flex gap-sm justify-center items-center p-sm">
-            <button class="btn btn-primary btn-lg d-flex items-center gap-xs font-bold"
-              onclick="Budget.captureCameraSnapshot()" type="button">
-              <svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                stroke-width="2.2" viewBox="0 0 24 24" width="18">
-                <circle cx="12" cy="12" r="10"></circle>
-                <circle cx="12" cy="12" r="4"></circle>
+            <button class="btn btn-ghost btn-sm d-flex items-center gap-xs"
+              onclick="event.stopPropagation(); document.getElementById('receipt-camera-input').click()" type="button">
+              <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                stroke-width="2" viewBox="0 0 24 24" width="14">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path
+                  d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                </path>
               </svg>
-              Capture &amp; Scan
-            </button>
-            <button class="btn btn-outline btn-sm d-flex items-center gap-xs" onclick="Budget.toggleCameraFacing()"
-              type="button" title="Flip Camera">
-              <svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                stroke-width="2" viewBox="0 0 24 24" width="15">
-                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
-              </svg>
-              Flip
-            </button>
-          </div>
-        </div>
-
-        <!-- 2. DROPZONE & SEPARATE FILE / CAMERA INPUTS -->
-        <div class="receipt-dropzone" id="receipt-dropzone"
-          onclick="document.getElementById('receipt-upload-input').click()">
-          <!-- Input 1: Pure file upload / photo gallery (NO capture constraint) -->
-          <input accept="image/*,application/pdf" class="hidden" id="receipt-upload-input"
-            onchange="Budget.handleReceiptUpload(event)" type="file" />
-          <!-- Input 2: Direct mobile device camera snapshot -->
-          <input accept="image/*" capture="environment" class="hidden" id="receipt-camera-input"
-            onchange="Budget.handleReceiptUpload(event)" type="file" />
-
-          <div class="receipt-dropzone-inner">
-            <div class="receipt-dropzone-icon">
-              <svg fill="none" height="36" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                stroke-width="1.8" viewBox="0 0 24 24" width="36">
-                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                <circle cx="12" cy="13" r="4"></circle>
-              </svg>
-            </div>
-            <div class="receipt-dropzone-title">Upload File or Scan Receipt</div>
-            <p class="receipt-dropzone-desc">Choose an image from files/gallery, take a live photo, or press <kbd
-                class="receipt-dropzone-kbd">Ctrl+V</kbd> to paste</p>
-            <div class="d-flex gap-sm justify-center flex-wrap">
-              <button class="btn btn-primary btn-sm d-flex items-center gap-xs"
-                onclick="event.stopPropagation(); document.getElementById('receipt-upload-input').click()"
-                type="button">
-                <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                  stroke-width="2.2" viewBox="0 0 24 24" width="14">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                  <polyline points="17 8 12 3 7 8"></polyline>
-                  <line x1="12" y1="3" x2="12" y2="15"></line>
-                </svg>
-                Upload File / Gallery
-              </button>
-              <button class="btn btn-outline btn-sm d-flex items-center gap-xs"
-                onclick="event.stopPropagation(); Budget.switchScannerSource('camera')" type="button">
-                <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                  stroke-width="2.2" viewBox="0 0 24 24" width="14">
-                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                  <circle cx="12" cy="13" r="4"></circle>
-                </svg>
-                Live Camera
-              </button>
-              <button class="btn btn-ghost btn-sm d-flex items-center gap-xs"
-                onclick="event.stopPropagation(); document.getElementById('receipt-camera-input').click()"
-                type="button">
-                <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                  stroke-width="2" viewBox="0 0 24 24" width="14">
-                  <circle cx="12" cy="12" r="3"></circle>
-                  <path
-                    d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
-                  </path>
-                </svg>
-                Device Camera
-              </button>
-            </div>
-          </div>
-        </div>
-        <!-- Scanning Animation Indicator -->
-        <div class="receipt-scanning-state hidden" id="receipt-scanning-state">
-          <div class="scanner-laser-box">
-            <div class="scanner-laser-line"></div>
-            <svg fill="none" height="28" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-              stroke-width="2" viewBox="0 0 24 24" width="28" class="receipt-ocr-primary-icon">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-            </svg>
-          </div>
-          <div class="receipt-scanning-title">Analyzing Receipt...</div>
-          <p class="receipt-scanning-desc">Extracting merchant name, total price, date, and category</p>
-        </div>
-        <!-- Extraction Results Review -->
-        <div class="receipt-results-view hidden" id="receipt-results-view">
-          <div class="receipt-results-grid">
-            <!-- Receipt Thumbnail Preview -->
-            <div class="receipt-preview-box">
-              <img alt="Receipt Preview" class="receipt-preview-img" id="receipt-preview-img" src="" />
-              <button class="receipt-change-btn" onclick="Budget.resetReceiptScanner()" type="button">Change
-                Photo</button>
-            </div>
-            <!-- Detected Form Fields -->
-            <div class="receipt-fields-form">
-              <div class="d-flex justify-between items-center">
-                <span class="receipt-ocr-badge d-flex items-center gap-xs">
-                  <svg fill="none" height="12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                    stroke-width="2.2" viewBox="0 0 24 24" width="12">
-                    <polygon
-                      points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
-                    </polygon>
-                  </svg>
-                  OCR Fields Extracted
-                </span>
-                <span class="priority-badge priority-low" id="receipt-confidence-badge">High Match</span>
-              </div>
-              <div>
-                <label class="receipt-field-label">Merchant / Store</label>
-                <input class="receipt-field-input" id="receipt-parsed-merchant" placeholder="Merchant or Store Name"
-                  type="text" />
-              </div>
-              <div class="d-flex gap-sm">
-                <div class="flex-1">
-                  <label class="receipt-field-label">Total Amount</label>
-                  <input class="currency-formatted-input receipt-amount-input" id="receipt-parsed-amount"
-                    placeholder="0" type="text" />
-                </div>
-                <div class="flex-1">
-                  <label class="receipt-field-label">Receipt Date</label>
-                  <input class="receipt-field-input" id="receipt-parsed-date" type="date" />
-                </div>
-              </div>
-              <div>
-                <label class="receipt-field-label">Auto-Detected Category</label>
-                <select class="receipt-field-input" id="receipt-parsed-category">
-                  <option value="Food &amp; Dining">Food &amp; Dining</option>
-                  <option value="Transportation">Transportation</option>
-                  <option value="Books &amp; Study">Books &amp; Study</option>
-                  <option value="Bills &amp; Wifi">Bills &amp; Wifi</option>
-                  <option value="Coffee &amp; Snacks">Coffee &amp; Snacks</option>
-                  <option value="Housing / Rent">Housing / Rent</option>
-                  <option value="Health &amp; Medical">Health &amp; Medical</option>
-                  <option value="Entertainment">Entertainment</option>
-                </select>
-              </div>
-            </div>
-          </div>
-          <!-- Apply Action Button -->
-          <div class="receipt-actions-footer">
-            <button class="btn btn-outline flex-1" onclick="Budget.closeReceiptScanner()" type="button">Cancel</button>
-            <button class="btn btn-primary d-flex items-center gap-xs" onclick="Budget.applyReceiptToExpense()"
-              type="button">
-              <svg fill="none" height="13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                stroke-width="2.5" viewBox="0 0 24 24" width="13">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-              Apply to Expense Form
+              Device Camera
             </button>
           </div>
         </div>
       </div>
-    </div>
-  </div>
-
-  <!-- ===================================================================== -->
-  <!-- ADD ACADEMIC RESOURCE MODAL (Mobile-First Bottom Sheet)                 -->
-  <!-- ===================================================================== -->
-  <div class="modal-overlay hidden" id="academic-resource-modal"
-    onclick="if(event.target === this) Notes.closeAddResourceModal()">
-    <div class="modal-card academic-resource-modal-card">
-      <div class="modal-drag-indicator-bar" onclick="Notes.closeAddResourceModal()" title="Click or pull down to close">
-        <span class="modal-drag-pill"></span>
-      </div>
-      <div class="modal-header">
-        <div class="d-flex items-center gap-sm">
-          <svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-            stroke-width="2.2" viewBox="0 0 24 24" width="18">
-            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-          </svg>
-          <h3>Add Academic Resource</h3>
-        </div>
-        <button aria-label="Close modal" class="btn-icon" onclick="Notes.closeAddResourceModal()"
-          type="button">×</button>
-      </div>
-      <div class="modal-body">
-        <p class="text-muted mb-md text-xs">Catalog links to books, research journals, PDF papers, documentation, or
-          lecture readings.</p>
-        <form class="auth-form d-flex flex-col gap-md" id="notes-add-resource-form">
-          <div class="form-group mb-xs">
-            <label>Resource Title</label>
-            <input id="notes-resource-title" placeholder="e.g. Clean Code: Agile Software Craftsmanship / IEEE Paper"
-              required="" type="text" />
-          </div>
-          <div class="grid-2col gap-sm mb-xs">
-            <div class="form-group m-0">
-              <label>Author</label>
-              <input id="notes-resource-author" placeholder="e.g. Robert C. Martin" type="text" />
-            </div>
-            <div class="form-group m-0">
-              <label>Year Published</label>
-              <input id="notes-resource-year" maxlength="4" placeholder="e.g. 2024" type="text" />
-            </div>
-          </div>
-          <div class="grid-2col gap-sm mb-xs">
-            <div class="form-group m-0">
-              <label>Publisher / Journal</label>
-              <input id="notes-resource-publisher" placeholder="e.g. MIT Press / IEEE Transactions" type="text" />
-            </div>
-            <div class="form-group m-0">
-              <label>DOI / ISBN / Ref ID</label>
-              <input id="notes-resource-doi" placeholder="e.g. 10.1109/TSE.2023.123" type="text" />
-            </div>
-          </div>
-          <div class="grid-2col gap-sm mb-xs">
-            <div class="form-group m-0">
-              <label>Resource Type</label>
-              <select id="notes-resource-type">
-                <option value="book">Online Book</option>
-                <option value="journal">Research Journal</option>
-                <option value="pdf">PDF Document</option>
-                <option value="docx">DOCX File</option>
-                <option value="article">Web Article / Guide</option>
-              </select>
-            </div>
-            <div class="form-group m-0">
-              <label>Category</label>
-              <select id="notes-resource-category">
-                <option selected="" value="general">General Reference</option>
-                <option value="frontend">Frontend Dev</option>
-                <option value="backend">Backend &amp; Database</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-group mb-xs">
-            <label>URL Link / File Reference Path</label>
-            <input id="notes-resource-url" placeholder="https://example.com/paper.pdf" type="url" />
-          </div>
-          <div class="form-group mb-sm">
-            <label>Notes / Key Insights Summary</label>
-            <textarea id="notes-resource-notes" rows="2"
-              placeholder="Key insights, study highlights, or summary..."></textarea>
-          </div>
-          <button class="btn btn-primary font-bold justify-center p-md" type="submit">+ Save to Library</button>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===================================================================== -->
-  <!-- ACADEMIC CITATION GENERATOR MODAL (APA, IEEE, MLA, BibTeX, Chicago)     -->
-  <!-- ===================================================================== -->
-  <div class="modal-overlay hidden" id="citation-modal" onclick="if(event.target === this) Notes.closeCitationModal()">
-    <div class="modal-card citation-modal-card">
-      <div class="modal-drag-indicator-bar" onclick="Notes.closeCitationModal()" title="Click or pull down to close">
-        <span class="modal-drag-pill"></span>
-      </div>
-      <div class="modal-header">
-        <div class="d-flex items-center gap-sm">
-          <svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-            stroke-width="2.2" viewBox="0 0 24 24" width="18">
+      <!-- Scanning Animation Indicator -->
+      <div class="receipt-scanning-state hidden" id="receipt-scanning-state">
+        <div class="scanner-laser-box">
+          <div class="scanner-laser-line"></div>
+          <svg fill="none" height="28" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+            stroke-width="2" viewBox="0 0 24 24" width="28" class="receipt-ocr-primary-icon">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
             <polyline points="14 2 14 8 20 8"></polyline>
-            <line x1="16" x2="8" y1="13" y2="13"></line>
-            <line x1="16" x2="8" y1="17" y2="17"></line>
           </svg>
-          <h3>Academic Citation Generator</h3>
         </div>
-        <button aria-label="Close citation modal" class="btn-icon" onclick="Notes.closeCitationModal()"
-          type="button">×</button>
+        <div class="receipt-scanning-title">Analyzing Receipt...</div>
+        <p class="receipt-scanning-desc">Extracting merchant name, total price, date, and category</p>
       </div>
-      <div class="modal-body">
-        <!-- Resource Meta Summary Header -->
-        <div class="citation-resource-summary">
-          <div class="citation-resource-title" id="citation-resource-title">Title</div>
-          <div class="citation-resource-meta" id="citation-resource-meta">By Author • Year</div>
-        </div>
-        <!-- Citation Style Tabs -->
-        <div class="citation-style-tabs">
-          <button class="day-pill-btn citation-tab-btn active" data-style="apa"
-            onclick="Notes.switchCitationStyle('apa')" type="button">APA 7th</button>
-          <button class="day-pill-btn citation-tab-btn" data-style="ieee" onclick="Notes.switchCitationStyle('ieee')"
-            type="button">IEEE</button>
-          <button class="day-pill-btn citation-tab-btn" data-style="mla" onclick="Notes.switchCitationStyle('mla')"
-            type="button">MLA 9th</button>
-          <button class="day-pill-btn citation-tab-btn" data-style="bibtex"
-            onclick="Notes.switchCitationStyle('bibtex')" type="button">BibTeX</button>
-          <button class="day-pill-btn citation-tab-btn" data-style="chicago"
-            onclick="Notes.switchCitationStyle('chicago')" type="button">Chicago</button>
-          <button class="day-pill-btn citation-tab-btn" data-style="harvard"
-            onclick="Notes.switchCitationStyle('harvard')" type="button">Harvard</button>
-        </div>
-        <!-- Citation Preview Box -->
-        <div class="citation-preview-container">
-          <div id="citation-preview-box">
-            <!-- Formatted Citation HTML injected by JS -->
+      <!-- Extraction Results Review -->
+      <div class="receipt-results-view hidden" id="receipt-results-view">
+        <div class="receipt-results-grid">
+          <!-- Receipt Thumbnail Preview -->
+          <div class="receipt-preview-box">
+            <img alt="Receipt Preview" class="receipt-preview-img" id="receipt-preview-img" src="" />
+            <button class="receipt-change-btn" onclick="Budget.resetReceiptScanner()" type="button">Change
+              Photo</button>
+          </div>
+          <!-- Detected Form Fields -->
+          <div class="receipt-fields-form">
+            <div class="d-flex justify-between items-center">
+              <span class="receipt-ocr-badge d-flex items-center gap-xs">
+                <svg fill="none" height="12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                  stroke-width="2.2" viewBox="0 0 24 24" width="12">
+                  <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+                  </polygon>
+                </svg>
+                OCR Fields Extracted
+              </span>
+              <span class="priority-badge priority-low" id="receipt-confidence-badge">High Match</span>
+            </div>
+            <div>
+              <label class="receipt-field-label">Merchant / Store</label>
+              <input class="receipt-field-input" id="receipt-parsed-merchant" placeholder="Merchant or Store Name"
+                type="text" />
+            </div>
+            <div class="d-flex gap-sm">
+              <div class="flex-1">
+                <label class="receipt-field-label">Total Amount</label>
+                <input class="currency-formatted-input receipt-amount-input" id="receipt-parsed-amount" placeholder="0"
+                  type="text" />
+              </div>
+              <div class="flex-1">
+                <label class="receipt-field-label">Receipt Date</label>
+                <input class="receipt-field-input" id="receipt-parsed-date" type="date" />
+              </div>
+            </div>
+            <div>
+              <label class="receipt-field-label">Auto-Detected Category</label>
+              <select class="receipt-field-input" id="receipt-parsed-category">
+                <option value="Food &amp; Dining">Food &amp; Dining</option>
+                <option value="Transportation">Transportation</option>
+                <option value="Books &amp; Study">Books &amp; Study</option>
+                <option value="Bills &amp; Wifi">Bills &amp; Wifi</option>
+                <option value="Coffee &amp; Snacks">Coffee &amp; Snacks</option>
+                <option value="Housing / Rent">Housing / Rent</option>
+                <option value="Health &amp; Medical">Health &amp; Medical</option>
+                <option value="Entertainment">Entertainment</option>
+              </select>
+            </div>
           </div>
         </div>
-        <!-- Action Buttons -->
-        <div class="citation-actions-grid">
-          <button class="btn btn-primary btn-sm d-flex items-center justify-center gap-xs"
-            onclick="Notes.copyCitation()" type="button">
+        <!-- Apply Action Button -->
+        <div class="receipt-actions-footer">
+          <button class="btn btn-outline flex-1" onclick="Budget.closeReceiptScanner()" type="button">Cancel</button>
+          <button class="btn btn-primary d-flex items-center gap-xs" onclick="Budget.applyReceiptToExpense()"
+            type="button">
             <svg fill="none" height="13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-              stroke-width="2.2" viewBox="0 0 24 24" width="13">
-              <rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect>
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              stroke-width="2.5" viewBox="0 0 24 24" width="13">
+              <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
-            Copy Citation
-          </button>
-          <button class="btn btn-outline btn-sm d-flex items-center justify-center gap-xs"
-            onclick="Notes.insertCitationToNote()" type="button">
-            <svg fill="none" height="13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-              stroke-width="2.2" viewBox="0 0 24 24" width="13">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"></path>
-              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-            </svg>
-            Insert to Note
-          </button>
-          <button class="btn btn-outline btn-sm d-flex items-center justify-center gap-xs"
-            id="citation-bib-download-btn" onclick="Notes.downloadBibtex()" type="button">
-            <svg fill="none" height="13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-              stroke-width="2.2" viewBox="0 0 24 24" width="13">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="7 10 12 15 17 10"></polyline>
-              <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
-            Download .bib
+            Apply to Expense Form
           </button>
         </div>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- ===================================================================== -->
-  <!-- MODALS (Dialog Overlay Windows)                                       -->
-  <!-- ===================================================================== -->
-  <div class="modal-overlay hidden" id="modal-overlay">
-    <div class="modal-card">
-      <div class="modal-drag-indicator-bar" onclick="UI.closeModal()" title="Click or pull down to close">
-        <span class="modal-drag-pill"></span>
+<!-- ===================================================================== -->
+<!-- ADD ACADEMIC RESOURCE MODAL (Mobile-First Bottom Sheet)                 -->
+<!-- ===================================================================== -->
+<div class="modal-overlay hidden" id="academic-resource-modal"
+  onclick="if(event.target === this) Notes.closeAddResourceModal()">
+  <div class="modal-card academic-resource-modal-card">
+    <div class="modal-drag-indicator-bar" onclick="Notes.closeAddResourceModal()" title="Click or pull down to close">
+      <span class="modal-drag-pill"></span>
+    </div>
+    <div class="modal-header">
+      <div class="d-flex items-center gap-sm">
+        <svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+          stroke-width="2.2" viewBox="0 0 24 24" width="18">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+        </svg>
+        <h3>Add Academic Resource</h3>
       </div>
-      <div class="modal-header">
-        <h3 id="modal-title">Create Item</h3>
-        <button aria-label="Close modal" class="btn-icon" id="modal-close-btn" type="button">×</button>
+      <button aria-label="Close modal" class="btn-icon" onclick="Notes.closeAddResourceModal()" type="button">×</button>
+    </div>
+    <div class="modal-body">
+      <p class="text-muted mb-md text-xs">Catalog links to books, research journals, PDF papers, documentation, or
+        lecture readings.</p>
+      <form class="auth-form d-flex flex-col gap-md" id="notes-add-resource-form">
+        <div class="form-group mb-xs">
+          <label>Resource Title</label>
+          <input id="notes-resource-title" placeholder="e.g. Clean Code: Agile Software Craftsmanship / IEEE Paper"
+            required="" type="text" />
+        </div>
+        <div class="grid-2col gap-sm mb-xs">
+          <div class="form-group m-0">
+            <label>Author</label>
+            <input id="notes-resource-author" placeholder="e.g. Robert C. Martin" type="text" />
+          </div>
+          <div class="form-group m-0">
+            <label>Year Published</label>
+            <input id="notes-resource-year" maxlength="4" placeholder="e.g. 2024" type="text" />
+          </div>
+        </div>
+        <div class="grid-2col gap-sm mb-xs">
+          <div class="form-group m-0">
+            <label>Publisher / Journal</label>
+            <input id="notes-resource-publisher" placeholder="e.g. MIT Press / IEEE Transactions" type="text" />
+          </div>
+          <div class="form-group m-0">
+            <label>DOI / ISBN / Ref ID</label>
+            <input id="notes-resource-doi" placeholder="e.g. 10.1109/TSE.2023.123" type="text" />
+          </div>
+        </div>
+        <div class="grid-2col gap-sm mb-xs">
+          <div class="form-group m-0">
+            <label>Resource Type</label>
+            <select id="notes-resource-type">
+              <option value="book">Online Book</option>
+              <option value="journal">Research Journal</option>
+              <option value="pdf">PDF Document</option>
+              <option value="docx">DOCX File</option>
+              <option value="article">Web Article / Guide</option>
+            </select>
+          </div>
+          <div class="form-group m-0">
+            <label>Category</label>
+            <select id="notes-resource-category">
+              <option selected="" value="general">General Reference</option>
+              <option value="frontend">Frontend Dev</option>
+              <option value="backend">Backend &amp; Database</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group mb-xs">
+          <label>URL Link / File Reference Path</label>
+          <input id="notes-resource-url" placeholder="https://example.com/paper.pdf" type="url" />
+        </div>
+        <div class="form-group mb-sm">
+          <label>Notes / Key Insights Summary</label>
+          <textarea id="notes-resource-notes" rows="2"
+            placeholder="Key insights, study highlights, or summary..."></textarea>
+        </div>
+        <button class="btn btn-primary font-bold justify-center p-md" type="submit">+ Save to Library</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ===================================================================== -->
+<!-- ACADEMIC CITATION GENERATOR MODAL (APA, IEEE, MLA, BibTeX, Chicago)     -->
+<!-- ===================================================================== -->
+<div class="modal-overlay hidden" id="citation-modal" onclick="if(event.target === this) Notes.closeCitationModal()">
+  <div class="modal-card citation-modal-card">
+    <div class="modal-drag-indicator-bar" onclick="Notes.closeCitationModal()" title="Click or pull down to close">
+      <span class="modal-drag-pill"></span>
+    </div>
+    <div class="modal-header">
+      <div class="d-flex items-center gap-sm">
+        <svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+          stroke-width="2.2" viewBox="0 0 24 24" width="18">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" x2="8" y1="13" y2="13"></line>
+          <line x1="16" x2="8" y1="17" y2="17"></line>
+        </svg>
+        <h3>Academic Citation Generator</h3>
       </div>
-      <div class="modal-body" id="modal-body">
-        <!-- Dynamic Form Content Injected by JS -->
+      <button aria-label="Close citation modal" class="btn-icon" onclick="Notes.closeCitationModal()"
+        type="button">×</button>
+    </div>
+    <div class="modal-body">
+      <!-- Resource Meta Summary Header -->
+      <div class="citation-resource-summary">
+        <div class="citation-resource-title" id="citation-resource-title">Title</div>
+        <div class="citation-resource-meta" id="citation-resource-meta">By Author • Year</div>
+      </div>
+      <!-- Citation Style Tabs -->
+      <div class="citation-style-tabs">
+        <button class="day-pill-btn citation-tab-btn active" data-style="apa" onclick="Notes.switchCitationStyle('apa')"
+          type="button">APA 7th</button>
+        <button class="day-pill-btn citation-tab-btn" data-style="ieee" onclick="Notes.switchCitationStyle('ieee')"
+          type="button">IEEE</button>
+        <button class="day-pill-btn citation-tab-btn" data-style="mla" onclick="Notes.switchCitationStyle('mla')"
+          type="button">MLA 9th</button>
+        <button class="day-pill-btn citation-tab-btn" data-style="bibtex" onclick="Notes.switchCitationStyle('bibtex')"
+          type="button">BibTeX</button>
+        <button class="day-pill-btn citation-tab-btn" data-style="chicago"
+          onclick="Notes.switchCitationStyle('chicago')" type="button">Chicago</button>
+        <button class="day-pill-btn citation-tab-btn" data-style="harvard"
+          onclick="Notes.switchCitationStyle('harvard')" type="button">Harvard</button>
+      </div>
+      <!-- Citation Preview Box -->
+      <div class="citation-preview-container">
+        <div id="citation-preview-box">
+          <!-- Formatted Citation HTML injected by JS -->
+        </div>
+      </div>
+      <!-- Action Buttons -->
+      <div class="citation-actions-grid">
+        <button class="btn btn-primary btn-sm d-flex items-center justify-center gap-xs" onclick="Notes.copyCitation()"
+          type="button">
+          <svg fill="none" height="13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+            stroke-width="2.2" viewBox="0 0 24 24" width="13">
+            <rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          Copy Citation
+        </button>
+        <button class="btn btn-outline btn-sm d-flex items-center justify-center gap-xs"
+          onclick="Notes.insertCitationToNote()" type="button">
+          <svg fill="none" height="13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+            stroke-width="2.2" viewBox="0 0 24 24" width="13">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"></path>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+          </svg>
+          Insert to Note
+        </button>
+        <button class="btn btn-outline btn-sm d-flex items-center justify-center gap-xs" id="citation-bib-download-btn"
+          onclick="Notes.downloadBibtex()" type="button">
+          <svg fill="none" height="13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+            stroke-width="2.2" viewBox="0 0 24 24" width="13">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Download .bib
+        </button>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- TOAST NOTIFICATIONS -->
-  <div class="toast-container" id="toast-container"></div>
+<!-- ===================================================================== -->
+<!-- MODALS (Dialog Overlay Windows)                                       -->
+<!-- ===================================================================== -->
+<div class="modal-overlay hidden" id="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-drag-indicator-bar" onclick="UI.closeModal()" title="Click or pull down to close">
+      <span class="modal-drag-pill"></span>
+    </div>
+    <div class="modal-header">
+      <h3 id="modal-title">Create Item</h3>
+      <button aria-label="Close modal" class="btn-icon" id="modal-close-btn" type="button">×</button>
+    </div>
+    <div class="modal-body" id="modal-body">
+      <!-- Dynamic Form Content Injected by JS -->
+    </div>
+  </div>
+</div>
 
-  <!-- DEDICATED PRINT-ONLY FINANCIAL STATEMENT (Exports ONLY cashflow ledger) -->
-  <div class="print-only" id="financial-print-statement"></div>
+<!-- TOAST NOTIFICATIONS -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- DEDICATED PRINT-ONLY FINANCIAL STATEMENT (Exports ONLY cashflow ledger) -->
+<div class="print-only" id="financial-print-statement"></div>
 
 <!-- ===================================================================== -->
   <!-- JAVASCRIPT MODULES                                                    -->
   <!-- ===================================================================== -->
   <!-- Bundled scripts: one deferred file (parses in parallel, executes in
        dependency order after HTML parse). Regenerate via scripts/build.py. -->
-  <script defer src="/js/bundle.js?v=8.8"></script>
+  <script defer src="/js/bundle.js?v=8.9"></script>
 </body>
 
 </html>

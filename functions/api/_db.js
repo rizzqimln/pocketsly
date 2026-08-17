@@ -176,6 +176,15 @@ CREATE TABLE IF NOT EXISTS incomes (
     FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS rate_limits (
+    ip TEXT NOT NULL,
+    window_start INTEGER NOT NULL,
+    count INTEGER DEFAULT 0,
+    PRIMARY KEY(ip, window_start)
+);
+
+CREATE INDEX IF NOT EXISTS idx_rate_limits_window ON rate_limits(window_start);
+
 CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token);
@@ -208,7 +217,46 @@ export const DEFAULT_RESOURCES = [
   [null, "W3Schools: Fullstack Developer Roadmap", "W3Schools", "article", "general", "https://www.w3schools.com/whatis/", "Complete guide to web development technologies, system architecture, and fullstack tracks."]
 ];
 
+// Scratch schema for the Live SQL Playground. Lives in its OWN D1 database
+// (PLAYGROUND_DB binding) so a sandbox query can never touch production data.
+export const PLAYGROUND_SCHEMA_SQL = `
+CREATE TABLE IF NOT EXISTS students (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    major TEXT,
+    gpa REAL
+);
+CREATE TABLE IF NOT EXISTS courses (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    code TEXT,
+    title TEXT,
+    credits INTEGER
+);
+CREATE TABLE IF NOT EXISTS grades (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    student_id INTEGER,
+    course_id INTEGER,
+    grade TEXT,
+    FOREIGN KEY(student_id) REFERENCES students(id),
+    FOREIGN KEY(course_id) REFERENCES courses(id)
+);
+INSERT OR IGNORE INTO students (id, name, major, gpa) VALUES
+    (1, 'Budi', 'Informatika', 3.7),
+    (2, 'Sari', 'Sistem Informasi', 3.4),
+    (3, 'Dewi', 'Teknik Elektro', 3.9);
+INSERT OR IGNORE INTO courses (id, code, title, credits) VALUES
+    (1, 'IF-101', 'Pemrograman Dasar', 3),
+    (2, 'IF-201', 'Struktur Data', 4),
+    (3, 'SI-110', 'Basis Data', 3);
+INSERT OR IGNORE INTO grades (id, student_id, course_id, grade) VALUES
+    (1, 1, 1, 'A'),
+    (2, 2, 1, 'B'),
+    (3, 3, 2, 'A'),
+    (4, 1, 3, 'A');
+`;
+
 let _initialized = false;
+let _playgroundInitialized = false;
 
 /**
  * Initializes the database schema and default seeds. Idempotent.
@@ -239,6 +287,25 @@ export async function initDb(db) {
     _initialized = true;
   } catch (err) {
     console.error("D1 initDb error:", err);
+  }
+}
+
+/**
+ * Initializes the SQL Playground's scratch D1 database. Idempotent.
+ * @param {D1Database} db 
+ */
+export async function initPlaygroundDb(db) {
+  if (_playgroundInitialized || !db) return;
+  try {
+    const statements = PLAYGROUND_SCHEMA_SQL
+      .split(';')
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+
+    await db.batch(statements.map(sql => db.prepare(sql)));
+    _playgroundInitialized = true;
+  } catch (err) {
+    console.error("D1 initPlaygroundDb error:", err);
   }
 }
 
