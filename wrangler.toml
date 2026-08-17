@@ -9,10 +9,8 @@ database_name = "pocketsly-db"
 database_id = "73058aef-a22d-481f-b2eb-91e7d2646fc7"
 
 # The Live SQL Playground runs against its OWN scratch database so sandbox
-# queries can never read or write production data. Create a second D1 database
-# named `pocketsly-playground` in the dashboard and uncomment:
-#
-# [[d1_databases]]
-# binding = "PLAYGROUND_DB"
-# database_name = "pocketsly-playground"
-# database_id = "5d9b5a30-dba3-4dbc-a4bd-086b9c12a368"
+# queries can never read or write production data.
+[[d1_databases]]
+binding = "PLAYGROUND_DB"
+database_name = "pocketsly-playground"
+database_id = "5d9b5a30-dba3-4dbc-a4bd-086b9c12a368"
