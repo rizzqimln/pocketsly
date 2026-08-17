@@ -331,8 +331,8 @@ window.App = {
             if (otpInput) otpInput.focus();
           }
         } catch (err) {
-          if (String(err.message || '').includes('RESEND_API_KEY') || String(err.message || '').includes('Email delivery is not configured')) {
-            UI.toast('Password recovery email isn\'t enabled yet. Set RESEND_API_KEY and MAIL_FROM in your Pages project.', 'danger');
+          if (String(err.message || '').includes('BREVO_API_KEY') || String(err.message || '').includes('Email delivery is not configured')) {
+            UI.toast('Password recovery email isn\'t enabled yet. Set BREVO_API_KEY and MAIL_FROM in your Pages project.', 'danger');
           } else {
             UI.toast(err.message || 'Failed to send OTP.', 'danger');
           }

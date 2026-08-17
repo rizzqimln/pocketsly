@@ -40,7 +40,7 @@ The app is intentionally built with defense-in-depth:
 
 Deployment requirements (Cloudflare Pages):
 
-- **`RESEND_API_KEY` + `MAIL_FROM`** — required for password recovery. Without
+- **`BREVO_API_KEY` + `MAIL_FROM`** — required for password recovery. Without
   them, `/api/request-otp` fails closed (no code is returned or logged)
 - **`PLAYGROUND_DB` D1 binding** — required for the curriculum SQL sandbox. Until
   created, the playground endpoint refuses to run

@@ -20,8 +20,8 @@ paths were synced only for the critical security fixes.
 ## P0 — Critical (all done)
 
 1. **OTP must never be returned by the API.** `requestPasswordOtp`
-   (`functions/api/_auth.js`) now delivers the code by email via Resend
-   (`RESEND_API_KEY` + `MAIL_FROM`) and returns only a success message. Without
+   (`functions/api/_auth.js`) now delivers the code by email via Brevo
+   (`BREVO_API_KEY` + `MAIL_FROM`) and returns only a success message. Without
    the env vars it fails closed. Frontend OTP auto-fill removed in
    `static/js/auth.js` and `static/js/app.js`; mobile removed in
    `mobile/lib/views/auth/auth_profile_sheet.dart`.

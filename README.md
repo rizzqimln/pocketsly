@@ -44,7 +44,7 @@ Designed as a modern daily routine planner, weekly timetable, notes & academic l
 | **Local development** | `python3 server.py` (Postgres required) |
 | **Legacy deployments** | Netlify Functions adapter (`netlify/functions/api.py`) or a Python host |
 
-> Password recovery requires an email provider. On Cloudflare, set `RESEND_API_KEY`
+> Password recovery requires an email provider. On Cloudflare, set `BREVO_API_KEY`
 > and `MAIL_FROM` in the Pages project — the OTP is delivered by email and is
 > **never** returned by the API. See [`SECURITY.md`](SECURITY.md).
 

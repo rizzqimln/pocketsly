@@ -29,17 +29,42 @@ describe('OTP / account recovery', () => {
   });
 
   it('never returns otp_code in the response even when email delivery works', async () => {
-    vi.stubGlobal('fetch', async () => new Response('', { status: 200 }));
+    vi.stubGlobal('fetch', async () => new Response('', { status: 201 }));
     const db = createTestDb();
     await registerUser(db, { username: 'alice', password: 'secret123', email: 'alice@example.com' });
 
     const res = await requestPasswordOtp(db, 'alice', {
-      RESEND_API_KEY: 'test-key',
-      MAIL_FROM: 'noop@pocketsly.app',
+      BREVO_API_KEY: 'test-brevo-key',
+      MAIL_FROM: 'Pocketsly <noop@pocketsly.app>',
     });
 
     expect(res.otp_code).toBeUndefined();
     expect(res.success).toBe(true);
+  });
+
+  it('posts the OTP to Brevo with sender, recipient, and text content', async () => {
+    const calls = [];
+    vi.stubGlobal('fetch', async (url, init) => {
+      calls.push({ url, init });
+      return new Response('', { status: 201 });
+    });
+    const db = createTestDb();
+    await registerUser(db, { username: 'alice', password: 'secret123', email: 'alice@example.com' });
+
+    await requestPasswordOtp(db, 'alice', {
+      BREVO_API_KEY: 'test-brevo-key',
+      MAIL_FROM: 'Pocketsly <noop@pocketsly.app>',
+    });
+
+    expect(calls).toHaveLength(1);
+    expect(calls[0].url).toBe('https://api.brevo.com/v3/smtp/email');
+    expect(calls[0].init.headers['api-key']).toBe('test-brevo-key');
+    expect(calls[0].init.headers['Authorization']).toBeUndefined();
+    const payload = JSON.parse(calls[0].init.body);
+    expect(payload.sender).toEqual({ name: 'Pocketsly', email: 'noop@pocketsly.app' });
+    expect(payload.to).toEqual([{ email: 'alice@example.com' }]);
+    expect(payload.subject).toContain('password reset');
+    expect(payload.textContent).toContain('verification code');
   });
 });
 

@@ -1,6 +1,6 @@
 # Local env template for `wrangler pages dev`.
 # Copy to `.dev.vars` (gitignored) and fill in your real values — never commit
-# the actual RESEND_API_KEY. Production values live in the Cloudflare Pages
+# the actual BREVO_API_KEY. Production values live in the Cloudflare Pages
 # dashboard: Settings → Environment variables.
-RESEND_API_KEY = "re_your_resend_api_key"
-MAIL_FROM = "Pocketsly <no-reply@your-verified-domain.com>"
+BREVO_API_KEY = "your-brevo-smtp-api-key"
+MAIL_FROM = "Pocketsly <pocketslyapp@gmail.com>"

@@ -209,25 +209,31 @@ export async function logoutUser(db, token) {
 }
 
 /**
- * Sends the OTP by email via the Resend API when a provider is configured.
+ * Sends the OTP by email via the Brevo API when a provider is configured.
  * Returns true when the email was delivered.
  */
+function parseSender(from) {
+  const m = String(from || '').match(/^([^<]*)<([^>]+)>/);
+  if (m) return { name: m[1].trim() || 'Pocketsly', email: m[2].trim() };
+  return { name: 'Pocketsly', email: String(from || '').trim() };
+}
+
 async function sendOtpEmail(env, to, otpCode) {
-  const apiKey = env?.RESEND_API_KEY;
+  const apiKey = env?.BREVO_API_KEY;
   const from = env?.MAIL_FROM;
   if (!apiKey || !from || !to) return false;
 
-  const res = await fetch('https://api.resend.com/emails', {
+  const res = await fetch('https://api.brevo.com/v3/smtp/email', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`
+      'api-key': apiKey
     },
     body: JSON.stringify({
-      from,
-      to,
+      sender: parseSender(from),
+      to: [{ email: to }],
       subject: 'Pocketsly password reset code',
-      text: `Your Pocketsly verification code is ${otpCode}. It expires in 15 minutes.`
+      textContent: `Your Pocketsly verification code is ${otpCode}. It expires in 15 minutes.`
     })
   });
   return res.ok;
@@ -270,7 +276,7 @@ export async function requestPasswordOtp(db, usernameOrEmail, env = {}) {
   const sent = await sendOtpEmail(env, user.email, otpCode);
   if (!sent) {
     throw new Error(
-      'Email delivery is not configured. Set RESEND_API_KEY and MAIL_FROM in the Pages project to enable password recovery.'
+      'Email delivery is not configured. Set BREVO_API_KEY and MAIL_FROM in the Pages project to enable password recovery.'
     );
   }
 
