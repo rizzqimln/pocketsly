@@ -142,8 +142,8 @@ class _ScheduleViewState extends State<ScheduleView> {
                       final startTime = timeParts.isNotEmpty ? timeParts[0].trim() : '08:00';
                       final endTime = timeParts.length > 1 ? timeParts[1].trim() : '10:00';
                       final dayMap = {
-                        'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 'Wednesday': 3,
-                        'Thursday': 4, 'Friday': 5, 'Saturday': 6,
+                        'Monday': 0, 'Tuesday': 1, 'Wednesday': 2, 'Thursday': 3,
+                        'Friday': 4, 'Saturday': 5, 'Sunday': 6,
                       };
                       final dayIdx = dayMap[day] ?? 1;
 

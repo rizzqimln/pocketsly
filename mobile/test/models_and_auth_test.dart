@@ -27,7 +27,7 @@ void main() {
       final json = {
         'id': 10,
         'title': 'Operating Systems Lecture',
-        'content': 'Virtual memory paging and TLB caching concepts.',
+        'body': 'Virtual memory paging and TLB caching concepts.',
         'mood': 'productive',
         'tags': 'productive',
         'updated_at': '2026-08-16',
@@ -35,6 +35,7 @@ void main() {
       final note = NoteItem.fromJson(json);
       expect(note.id, 10);
       expect(note.title, 'Operating Systems Lecture');
+      expect(note.content, 'Virtual memory paging and TLB caching concepts.');
       expect(note.mood, 'productive');
       expect(note.updatedAt, '2026-08-16');
 
@@ -56,14 +57,33 @@ void main() {
 
       final habitJson = {
         'id': 3,
-        'name': 'Code 1 Hour',
-        'category': 'Deep Work',
-        'streak': 12,
-        'completed_today': true,
+        'title': 'Code 1 Hour',
+        'today_done': 1,
+        'week_logs': [
+          {'date': '2026-08-11', 'done': 0},
+          {'date': '2026-08-12', 'done': 0},
+          {'date': '2026-08-13', 'done': 1},
+          {'date': '2026-08-14', 'done': 1},
+          {'date': '2026-08-15', 'done': 1},
+          {'date': '2026-08-16', 'done': 1},
+          {'date': '2026-08-17', 'done': 1},
+        ],
       };
       final habit = HabitItem.fromJson(habitJson);
-      expect(habit.streak, 12);
+      expect(habit.name, 'Code 1 Hour');
+      expect(habit.streak, 5);
       expect(habit.completedToday, true);
+
+      final noStreak = HabitItem.fromJson({
+        'id': 4,
+        'title': 'Meditate',
+        'today_done': 0,
+        'week_logs': [
+          {'date': '2026-08-17', 'done': 1},
+        ],
+      });
+      expect(noStreak.completedToday, false);
+      expect(noStreak.streak, 1);
     });
 
     test('TransactionItem and BudgetLimitItem serialization', () {
@@ -83,10 +103,33 @@ void main() {
         'id': 1,
         'category': 'Food & Dining',
         'amount': 1500000,
-        'month': '2026-08',
+        'month_year': '2026-08',
       });
       expect(limit.amount, 1500000.0);
       expect(limit.category, 'Food & Dining');
+      expect(limit.month, '2026-08');
+    });
+
+    test('ScheduleItem day mapping matches backend (0=Monday)', () {
+      final monday = ScheduleItem.fromJson({
+        'id': 1,
+        'day_of_week': 0,
+        'time': '08:00 - 10:00',
+        'subject': 'Operating Systems',
+        'room': 'Lab 3',
+        'lecturer': 'Prof. Dewi',
+      });
+      expect(monday.day, 'Monday');
+
+      final sunday = ScheduleItem.fromJson({
+        'id': 2,
+        'day_of_week': 6,
+        'time': '13:00 - 15:00',
+        'subject': 'AI Ethics',
+        'room': 'R205',
+        'lecturer': 'Dr. Budi',
+      });
+      expect(sunday.day, 'Sunday');
     });
   });
 

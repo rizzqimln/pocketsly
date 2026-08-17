@@ -85,18 +85,28 @@ class HabitItem {
   });
 
   factory HabitItem.fromJson(Map<String, dynamic> json) {
+    final weekLogs = json['week_logs'] as List? ?? [];
+    var streak = 0;
+    for (final entry in weekLogs.reversed) {
+      final e = entry as Map<String, dynamic>;
+      if (e['done'] == 1 || e['done'] == true) {
+        streak++;
+      } else {
+        break;
+      }
+    }
     return HabitItem(
       id: json['id'] as int? ?? 0,
-      name: json['name'] as String? ?? '',
-      category: json['category'] as String? ?? 'Daily',
-      streak: json['streak'] as int? ?? 0,
-      completedToday: json['completed_today'] == true || json['completed_today'] == 1,
+      name: json['title'] as String? ?? (json['name'] as String? ?? ''),
+      category: json['category'] as String? ?? '',
+      streak: streak,
+      completedToday: json['today_done'] == 1 || json['today_done'] == true,
     );
   }
 
   Map<String, dynamic> toJson() => {
     'id': id,
-    'name': name,
+    'title': name,
     'category': category,
     'streak': streak,
     'completed_today': completedToday,
@@ -125,7 +135,7 @@ class ScheduleItem {
     String dayStr = 'Monday';
     final rawDay = json['day_of_week'] ?? json['day'];
     if (rawDay is int || rawDay is num) {
-      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
       final idx = (rawDay as num).toInt();
       if (idx >= 0 && idx < days.length) {
         dayStr = days[idx];
@@ -183,7 +193,7 @@ class NoteItem {
     return NoteItem(
       id: json['id'] as int? ?? 0,
       title: json['title'] as String? ?? '',
-      content: json['content'] as String? ?? '',
+      content: json['body'] as String? ?? (json['content'] as String? ?? ''),
       tags: json['tags'] as String? ?? '',
       mood: json['mood'] as String? ?? 'neutral',
       updatedAt: json['updated_at'] as String? ?? '',
@@ -225,10 +235,10 @@ class ResourceItem {
       id: json['id'] as int? ?? 0,
       title: json['title'] as String? ?? '',
       author: json['author'] as String? ?? '',
-      type: json['type'] as String? ?? 'article',
+      type: json['resource_type'] as String? ?? (json['type'] as String? ?? 'article'),
       category: json['category'] as String? ?? 'frontend',
-      url: json['url'] as String? ?? '',
-      summary: json['summary'] as String? ?? '',
+      url: json['url_or_path'] as String? ?? (json['url'] as String? ?? ''),
+      summary: json['notes'] as String? ?? (json['summary'] as String? ?? ''),
     );
   }
 
@@ -294,7 +304,7 @@ class BudgetLimitItem {
       id: json['id'] as int? ?? 0,
       category: json['category'] as String? ?? 'General',
       amount: (json['amount'] as num?)?.toDouble() ?? 0.0,
-      month: json['month'] as String? ?? '',
+      month: json['month_year'] as String? ?? (json['month'] as String? ?? ''),
     );
   }
 

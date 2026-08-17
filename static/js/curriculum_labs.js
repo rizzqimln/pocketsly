@@ -288,7 +288,7 @@
       resultsContainer.innerHTML = '<p class="text-muted text-center p-lg font-mono text-xs">Executing SQLite query on server...</p>';
 
       try {
-        const res = await API.post('/api/curriculum/query', { query });
+        const res = await API.post('/api/curriculum/playground', { query });
         if (res.error) {
           resultsContainer.innerHTML = `
             <div class="p-md text-danger font-mono text-xs">

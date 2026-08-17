@@ -14,7 +14,7 @@ import {
   formatUtcDateTime,
 } from '../api/_auth.js';
 import { handlePatchProfile, handlePostCurriculumPlayground } from '../api/_routes.js';
-import { isRateLimited } from '../api/[[path]].js';
+import { isRateLimited, onRequest } from '../api/[[path]].js';
 import { createTestDb, createPlaygroundDb } from './helpers.js';
 
 afterEach(() => {
@@ -137,5 +137,101 @@ describe('security_pin exposure', () => {
 describe('timestamp format', () => {
   it('matches the YYYY-MM-DD HH:MM:SS format used across the API', () => {
     expect(formatUtcDateTime(new Date('2026-01-02T03:04:05Z'))).toBe('2026-01-02 03:04:05');
+  });
+});
+
+// Client↔API contract regression tests: pin the exact routes and payload keys
+// every client (web + mobile) actually calls, so a future backend refactor
+// cannot silently break them again.
+describe('client/API endpoint contracts', () => {
+  const BASE = 'https://pocketsly.test';
+
+  function apiCall(db, playground, method, path, { cookie, body } = {}) {
+    const headers = {};
+    if (cookie) headers['Cookie'] = `session_id=${cookie}`;
+    if (body) headers['Content-Type'] = 'application/json';
+    return onRequest({
+      request: new Request(`${BASE}${path}`, {
+        method,
+        headers,
+        body: body ? JSON.stringify(body) : undefined,
+      }),
+      env: { DB: db, PLAYGROUND_DB: playground },
+    });
+  }
+
+  async function makeClient() {
+    const db = createTestDb();
+    const playground = createPlaygroundDb();
+    const res = await apiCall(db, playground, 'POST', '/api/register', {
+      body: { username: 'rizqi', password: 'secret123', email: 'rizqi@example.com' },
+    });
+    const cookie = (res.headers.get('Set-Cookie') || '').match(/session_id=([^;]+)/)?.[1];
+    expect(cookie).toBeDefined();
+    return { db, playground, cookie };
+  }
+
+  it('study logs live at /api/study-logs (hyphen) with course_name/activity_type/log_date', async () => {
+    const { db, playground, cookie } = await makeClient();
+
+    const created = await apiCall(db, playground, 'POST', '/api/study-logs', {
+      cookie,
+      body: { course_name: 'Operating Systems', hours: 2, activity_type: 'practice', log_date: '2026-08-18', notes: 'paging' },
+    });
+    expect(created.status).toBe(200);
+    const createdBody = await created.json();
+    expect(createdBody.success).toBe(true);
+
+    const list = await apiCall(db, playground, 'GET', '/api/study-logs', { cookie });
+    const listBody = await list.json();
+    expect(Array.isArray(listBody)).toBe(true);
+    expect(listBody.some(s => s.course_name === 'Operating Systems' && s.activity_type === 'practice' && s.log_date === '2026-08-18')).toBe(true);
+
+    const del = await apiCall(db, playground, 'DELETE', `/api/study-logs/${createdBody.id}`, { cookie });
+    expect(del.status).toBe(200);
+
+    const old = await apiCall(db, playground, 'GET', '/api/study_logs', { cookie });
+    expect(old.status).toBe(404);
+  });
+
+  it('habit toggle posts to /api/habits/:id/log and reflects in today_done', async () => {
+    const { db, playground, cookie } = await makeClient();
+
+    const h = await apiCall(db, playground, 'POST', '/api/habits', { cookie, body: { title: 'Code 1h' } });
+    const hb = await h.json();
+
+    const log = await apiCall(db, playground, 'POST', `/api/habits/${hb.id}/log`, { cookie, body: { done: 1 } });
+    expect(log.status).toBe(200);
+
+    const list = await apiCall(db, playground, 'GET', '/api/habits', { cookie });
+    const habits = await list.json();
+    expect(habits.find(x => x.id === hb.id).today_done).toBe(1);
+  });
+
+  it('task toggle patches /api/tasks/:id with done', async () => {
+    const { db, playground, cookie } = await makeClient();
+
+    const t = await apiCall(db, playground, 'POST', '/api/tasks', { cookie, body: { title: 'Submit lab' } });
+    const tb = await t.json();
+
+    const patch = await apiCall(db, playground, 'PATCH', `/api/tasks/${tb.id}`, { cookie, body: { done: 1 } });
+    expect(patch.status).toBe(200);
+
+    const list = await apiCall(db, playground, 'GET', '/api/tasks', { cookie });
+    const tasks = await list.json();
+    expect(tasks.find(x => x.id === tb.id).done).toBe(1);
+  });
+
+  it('SQL lab posts to /api/curriculum/playground, not /api/curriculum/query', async () => {
+    const { db, playground, cookie } = await makeClient();
+
+    const ok = await apiCall(db, playground, 'POST', '/api/curriculum/playground', {
+      cookie,
+      body: { query: 'SELECT * FROM students' },
+    });
+    expect(ok.status).toBe(200);
+
+    const dead = await apiCall(db, playground, 'POST', '/api/curriculum/query', { cookie, body: { query: 'SELECT 1' } });
+    expect(dead.status).toBe(404);
   });
 });

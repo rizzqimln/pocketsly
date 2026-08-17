@@ -44,7 +44,7 @@ class _HabitsViewState extends State<HabitsView> {
   }
 
   Future<void> _toggleHabit(HabitItem habit) async {
-    await ApiClient.instance.post(ApiEndpoints.habitToggle(habit.id), {});
+    await ApiClient.instance.post(ApiEndpoints.habitLog(habit.id), {'done': habit.completedToday ? 0 : 1});
     _loadData();
   }
 
@@ -54,7 +54,7 @@ class _HabitsViewState extends State<HabitsView> {
   }
 
   Future<void> _toggleTask(TaskItem task) async {
-    await ApiClient.instance.post(ApiEndpoints.taskToggle(task.id), {});
+    await ApiClient.instance.patch(ApiEndpoints.task(task.id), {'done': task.done ? 0 : 1});
     _loadData();
   }
 
@@ -147,12 +147,25 @@ class _HabitsViewState extends State<HabitsView> {
                     onPressed: () async {
                       final name = nameController.text.trim();
                       if (name.isEmpty) return;
+                      const iconMap = {
+                        'Morning Routine': '🌅',
+                        'Deep Work': '💻',
+                        'Study & Reading': '📚',
+                        'Health & Fitness': '💪',
+                        'Night Routine': '🌙',
+                      };
+                      const colorMap = {
+                        'Morning Routine': '#FF9F43',
+                        'Deep Work': '#4F6DF5',
+                        'Study & Reading': '#4F6DF5',
+                        'Health & Fitness': '#22C55E',
+                        'Night Routine': '#8B5CF6',
+                      };
                       Navigator.pop(ctx);
                       await ApiClient.instance.post(ApiEndpoints.habits, {
-                        'name': name,
-                        'category': selectedCategory,
-                        'frequency': 'daily',
-                        'target_days': 7,
+                        'title': name,
+                        'icon': iconMap[selectedCategory] ?? '✨',
+                        'color': colorMap[selectedCategory] ?? '#4F6DF5',
                       });
                       _loadData();
                     },
@@ -383,11 +396,13 @@ class _HabitsViewState extends State<HabitsView> {
                                 decoration: h.completedToday ? TextDecoration.lineThrough : null,
                               ),
                             ),
-                            const SizedBox(height: 2),
-                            Text(
-                              h.category,
-                              style: const TextStyle(color: AppColors.textSecondary, fontSize: 11),
-                            ),
+                            if (h.category.isNotEmpty) ...[
+                              const SizedBox(height: 2),
+                              Text(
+                                h.category,
+                                style: const TextStyle(color: AppColors.textSecondary, fontSize: 11),
+                              ),
+                            ],
                           ],
                         ),
                       ),

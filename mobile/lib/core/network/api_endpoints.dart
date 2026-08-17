@@ -59,11 +59,10 @@ class ApiEndpoints {
   // ── Tasks & Habits ────────────────────────────────────────────────────────
   static String get tasks => '$baseUrl/tasks';
   static String task(int id) => '$baseUrl/tasks/$id';
-  static String taskToggle(int id) => '$baseUrl/tasks/$id/toggle';
 
   static String get habits => '$baseUrl/habits';
   static String habit(int id) => '$baseUrl/habits/$id';
-  static String habitToggle(int id) => '$baseUrl/habits/$id/toggle';
+  static String habitLog(int id) => '$baseUrl/habits/$id/log';
 
   // ── Schedule & Notes ──────────────────────────────────────────────────────
   static String get schedules => '$baseUrl/schedules';
@@ -81,7 +80,7 @@ class ApiEndpoints {
   static String lecturer(int id) => '$baseUrl/lecturers/$id';
   static String get studyLogs => '$baseUrl/study-logs';
   static String get curriculumSchema => '$baseUrl/curriculum/schema';
-  static String get curriculumQuery => '$baseUrl/curriculum/query';
+  static String get curriculumQuery => '$baseUrl/curriculum/playground';
 
   // ── Monthly Budget & Cash Flow ────────────────────────────────────────────
   static String get incomes => '$baseUrl/incomes';

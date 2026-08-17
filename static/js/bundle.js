@@ -2766,7 +2766,7 @@ window.Curriculum = {
       const [courses, tasks, studyLogs] = await Promise.all([
         API.get('/api/courses'),
         API.get('/api/tasks'),
-        API.get('/api/study_logs')
+        API.get('/api/study-logs')
       ]);
 
       const courseListEl = document.getElementById('perf-course-progress-list');
@@ -2832,11 +2832,11 @@ window.Curriculum = {
 
     logs.forEach(log => {
       const hrs = Number(log.hours) || 0;
-      if (log.type === 'theory') totalTheory += hrs;
+      if (log.activity_type === 'theory') totalTheory += hrs;
       else totalPractice += hrs;
 
-      if (log.study_date && heatmapMap[log.study_date] !== undefined) {
-        heatmapMap[log.study_date] += hrs;
+      if (log.log_date && heatmapMap[log.log_date] !== undefined) {
+        heatmapMap[log.log_date] += hrs;
       }
     });
 
@@ -2875,10 +2875,10 @@ window.Curriculum = {
             ${logs.slice(0, 10).map(l => `
               <div class="task-item p-sm d-flex justify-between items-center">
                 <div class="d-flex items-center gap-sm">
-                  <span class="priority-badge ${l.type === 'practice' ? 'priority-high' : 'priority-medium'} text-xs">${l.type.toUpperCase()}</span>
+                  <span class="priority-badge ${l.activity_type === 'practice' ? 'priority-high' : 'priority-medium'} text-xs">${(l.activity_type || 'practice').toUpperCase()}</span>
                   <div>
-                    <div class="font-bold text-sm text-primary">${UI.esc(l.subject || 'Independent Study')}</div>
-                    <div class="text-muted text-xs">${UI.esc(l.study_date)} • ${UI.esc(l.notes || 'No description')}</div>
+                    <div class="font-bold text-sm text-primary">${UI.esc(l.course_name || 'Independent Study')}</div>
+                    <div class="text-muted text-xs">${UI.esc(l.log_date)} • ${UI.esc(l.notes || 'No description')}</div>
                   </div>
                 </div>
                 <div class="d-flex items-center gap-md">
@@ -2937,7 +2937,7 @@ window.Curriculum = {
         const notes = document.getElementById('modal-study-notes').value.trim();
 
         try {
-          const res = await API.post('/api/study_logs', { subject, hours, type, study_date, notes });
+          const res = await API.post('/api/study-logs', { course_name: subject, hours, activity_type: type, log_date: study_date, notes });
           if (res.error) { UI.toast(res.error, 'danger'); return; }
           UI.toast('Study session recorded!', 'success');
           UI.closeModal();
@@ -2951,7 +2951,7 @@ window.Curriculum = {
 
   async deleteStudyLog(id) {
     try {
-      const res = await API.delete(`/api/study_logs/${id}`);
+      const res = await API.delete(`/api/study-logs/${id}`);
       if (res.error) UI.toast(res.error, 'danger');
       else {
         UI.toast('Study log removed.', 'info');
@@ -3421,7 +3421,7 @@ document.addEventListener('DOMContentLoaded', () => {
       resultsContainer.innerHTML = '<p class="text-muted text-center p-lg font-mono text-xs">Executing SQLite query on server...</p>';
 
       try {
-        const res = await API.post('/api/curriculum/query', { query });
+        const res = await API.post('/api/curriculum/playground', { query });
         if (res.error) {
           resultsContainer.innerHTML = `
             <div class="p-md text-danger font-mono text-xs">

@@ -373,10 +373,10 @@ class _NotesViewState extends State<NotesView> with SingleTickerProviderStateMix
                       await ApiClient.instance.post(ApiEndpoints.resources, {
                         'title': title,
                         'author': authorController.text.trim(),
-                        'url': urlController.text.trim(),
-                        'summary': summaryController.text.trim(),
+                        'url_or_path': urlController.text.trim(),
+                        'notes': summaryController.text.trim(),
                         'category': currentCategory,
-                        'type': currentType,
+                        'resource_type': currentType,
                       });
                       _loadNotesAndLibrary();
                     },
