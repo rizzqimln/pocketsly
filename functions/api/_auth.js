@@ -277,7 +277,7 @@ export async function requestPasswordOtp(db, usernameOrEmail, env = {}) {
   const sent = await sendOtpEmail(env, user.email, otpCode);
   if (!sent.ok) {
     const detail = sent.reason === 'not-configured'
-      ? `Set BREVO_API_KEY and MAIL_FROM in the Pages project to enable password recovery. (vars: ${env?.BREVO_API_KEY ? 'BREVO_API_KEY=set' : 'BREVO_API_KEY=missing'}, ${env?.MAIL_FROM ? 'MAIL_FROM=set' : 'MAIL_FROM=missing'})`
+      ? 'Set BREVO_API_KEY and MAIL_FROM in the Pages project to enable password recovery.'
       : `Brevo rejected the send (${sent.reason}). Verify the key, sender, and recipient.`;
     throw new Error(`Email delivery is not configured. ${detail}`);
   }
