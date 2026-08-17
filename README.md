@@ -44,8 +44,10 @@ Designed as a modern daily routine planner, weekly timetable, notes & academic l
 | **Local development** | `python3 server.py` (Postgres required) |
 | **Legacy deployments** | Netlify Functions adapter (`netlify/functions/api.py`) or a Python host |
 
-> Password recovery requires an email provider. On Cloudflare, set `BREVO_API_KEY`
-> and `MAIL_FROM` in the Pages project — the OTP is delivered by email and is
+> Password recovery requires an email provider. On Cloudflare, bind `BREVO_API_KEY`
+> and `MAIL_FROM` with `wrangler pages secret put <NAME> --project-name pocketsly`
+> (dashboard env vars are NOT injected into Functions for this wrangler-managed
+> project) — the OTP is delivered by email and is
 > **never** returned by the API. See [`SECURITY.md`](SECURITY.md).
 
 ---
