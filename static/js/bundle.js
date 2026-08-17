@@ -3453,7 +3453,16 @@ document.addEventListener('DOMContentLoaded', () => {
           resultsContainer.innerHTML = '<p class="text-success text-center p-md font-mono text-xs">Query completed. 0 rows returned.</p>';
         }
       } catch (e) {
-        resultsContainer.innerHTML = `<div class="p-md text-danger font-mono text-xs">Network error: ${UI.esc(e.message)}</div>`;
+        if (String(e.message || '').includes('PLAYGROUND_DB')) {
+          resultsContainer.innerHTML = `
+            <div class="p-md text-muted font-mono text-xs">
+              The SQL Playground isn't connected yet. Add a D1 database binding named
+              <strong>PLAYGROUND_DB</strong> in your Cloudflare Pages project (Settings → Functions), then reload.
+            </div>
+          `;
+        } else {
+          resultsContainer.innerHTML = `<div class="p-md text-danger font-mono text-xs">Network error: ${UI.esc(e.message)}</div>`;
+        }
       }
     },
 
@@ -6049,7 +6058,11 @@ window.App = {
             if (otpInput) otpInput.focus();
           }
         } catch (err) {
-          UI.toast(err.message || 'Failed to send OTP.', 'danger');
+          if (String(err.message || '').includes('RESEND_API_KEY') || String(err.message || '').includes('Email delivery is not configured')) {
+            UI.toast('Password recovery email isn\'t enabled yet. Set RESEND_API_KEY and MAIL_FROM in your Pages project.', 'danger');
+          } else {
+            UI.toast(err.message || 'Failed to send OTP.', 'danger');
+          }
         }
       };
     }
@@ -6068,12 +6081,16 @@ window.App = {
             UI.toast('Please enter the 6-digit OTP code to change password.', 'danger');
             return;
           }
+          const resetUser = Auth.currentUser?.username || username;
           try {
             await API.post('/api/reset-password', {
-              username: Auth.currentUser?.username || username,
+              username: resetUser,
               otp_code,
               new_password: password
             });
+            // Reset purges every session (security); re-login so the profile
+            // PATCH below still runs with a live session.
+            await API.post('/api/login', { username: resetUser, password });
           } catch (err) {
             UI.toast(err.message, 'danger');
             return;

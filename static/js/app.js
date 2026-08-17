@@ -331,7 +331,11 @@ window.App = {
             if (otpInput) otpInput.focus();
           }
         } catch (err) {
-          UI.toast(err.message || 'Failed to send OTP.', 'danger');
+          if (String(err.message || '').includes('RESEND_API_KEY') || String(err.message || '').includes('Email delivery is not configured')) {
+            UI.toast('Password recovery email isn\'t enabled yet. Set RESEND_API_KEY and MAIL_FROM in your Pages project.', 'danger');
+          } else {
+            UI.toast(err.message || 'Failed to send OTP.', 'danger');
+          }
         }
       };
     }
@@ -350,12 +354,16 @@ window.App = {
             UI.toast('Please enter the 6-digit OTP code to change password.', 'danger');
             return;
           }
+          const resetUser = Auth.currentUser?.username || username;
           try {
             await API.post('/api/reset-password', {
-              username: Auth.currentUser?.username || username,
+              username: resetUser,
               otp_code,
               new_password: password
             });
+            // Reset purges every session (security); re-login so the profile
+            // PATCH below still runs with a live session.
+            await API.post('/api/login', { username: resetUser, password });
           } catch (err) {
             UI.toast(err.message, 'danger');
             return;

@@ -320,7 +320,16 @@
           resultsContainer.innerHTML = '<p class="text-success text-center p-md font-mono text-xs">Query completed. 0 rows returned.</p>';
         }
       } catch (e) {
-        resultsContainer.innerHTML = `<div class="p-md text-danger font-mono text-xs">Network error: ${UI.esc(e.message)}</div>`;
+        if (String(e.message || '').includes('PLAYGROUND_DB')) {
+          resultsContainer.innerHTML = `
+            <div class="p-md text-muted font-mono text-xs">
+              The SQL Playground isn't connected yet. Add a D1 database binding named
+              <strong>PLAYGROUND_DB</strong> in your Cloudflare Pages project (Settings → Functions), then reload.
+            </div>
+          `;
+        } else {
+          resultsContainer.innerHTML = `<div class="p-md text-danger font-mono text-xs">Network error: ${UI.esc(e.message)}</div>`;
+        }
       }
     },
 

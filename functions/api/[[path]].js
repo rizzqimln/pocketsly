@@ -56,7 +56,7 @@ function errorResponse(message, status = 400) {
 
 // ── Rate Limiting (D1-backed, keyed by the edge's trusted cf-connecting-ip) ───
 
-const RATE_LIMIT_PATHS = ['/api/login', '/api/register', '/api/request-otp', '/api/reset-password'];
+const RATE_LIMIT_PATHS = ['/api/login', '/api/register', '/api/request-otp', '/api/reset-password', '/api/receipt/scan'];
 const RATE_LIMIT_MAX = 20; // requests per 60s window
 const RATE_LIMIT_WINDOW_SECS = 60;
 

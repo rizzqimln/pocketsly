@@ -91,6 +91,18 @@ describe('rate limiting', () => {
       expect(await isRateLimited(db, '203.0.113.8', '/api/habits')).toBe(false);
     }
   });
+
+  it('rate limits the public receipt scan endpoint', async () => {
+    const db = createTestDb();
+    let blocked = false;
+    for (let i = 0; i < 25; i++) {
+      if (await isRateLimited(db, '203.0.113.9', '/api/receipt/scan')) {
+        blocked = true;
+        break;
+      }
+    }
+    expect(blocked).toBe(true);
+  });
 });
 
 describe('sessions', () => {

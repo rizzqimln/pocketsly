@@ -254,7 +254,14 @@ class ApiClient {
       'username': usernameOrEmail.trim(),
       'email': usernameOrEmail.trim(),
     });
-    return (res is Map<String, dynamic>) ? res : {'error': 'Failed to request OTP'};
+    if (res is Map<String, dynamic>) {
+      final err = res['error'] as String? ?? '';
+      if (err.contains('RESEND_API_KEY') || err.contains('Email delivery is not configured')) {
+        res['error'] = 'Password recovery email isn\'t enabled yet. Ask the admin to set RESEND_API_KEY and MAIL_FROM.';
+      }
+      return res;
+    }
+    return {'error': 'Failed to request OTP'};
   }
 
   /// Reset Password with OTP verification
