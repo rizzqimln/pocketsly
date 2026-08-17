@@ -19,6 +19,7 @@ ponytail/
 opencode.json
 .env
 .env.*
+.dev.vars
 .DS_Store
 
 # ── Node (Cloudflare functions test tooling) ─────────────────────────────────
