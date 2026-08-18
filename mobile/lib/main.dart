@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'core/theme/app_colors.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/design_system.dart';
 import 'core/network/api_client.dart';
 import 'core/models/models.dart';
 import 'widgets/bottom_nav_bar.dart';
@@ -22,7 +23,7 @@ void main() async {
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.light,
-      systemNavigationBarColor: AppColors.bgMain,
+      systemNavigationBarColor: AppSemanticColors.bgMain,
       systemNavigationBarIconBrightness: Brightness.light,
     ),
   );
@@ -96,9 +97,9 @@ class _MainShellScreenState extends State<MainShellScreen> {
     ];
 
     return Scaffold(
-      backgroundColor: AppColors.bgMain,
+      backgroundColor: AppSemanticColors.bgMain,
       appBar: AppBar(
-        titleSpacing: 10,
+        titleSpacing: AppSpacing.md,
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -118,18 +119,15 @@ class _MainShellScreenState extends State<MainShellScreen> {
               ),
             ),
             const SizedBox(width: 8),
-            const Text(
+            Text(
               'Pocketsly',
-              style: TextStyle(
-                color: AppColors.textPrimary,
-                fontWeight: FontWeight.w800,
-                fontSize: 17,
-                letterSpacing: -0.5,
+              style: AppTypography.h3.copyWith(
+                color: AppSemanticColors.textPrimary,
               ),
             ),
-            const SizedBox(width: 6),
+            const SizedBox(width: 8),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
                 color: AppColors.primary.withAlpha(40),
                 borderRadius: BorderRadius.circular(99),
@@ -137,11 +135,9 @@ class _MainShellScreenState extends State<MainShellScreen> {
               ),
               child: Text(
                 _viewTitles[_currentTabIndex].split(' ').first.toUpperCase(),
-                style: const TextStyle(
+                style: AppTypography.overline.copyWith(
                   color: AppColors.primaryLight,
-                  fontSize: 8,
                   fontWeight: FontWeight.w800,
-                  letterSpacing: 0.5,
                 ),
               ),
             ),
@@ -156,20 +152,20 @@ class _MainShellScreenState extends State<MainShellScreen> {
               onOpenProfile: _openAuthProfile,
               onOpenQuickEntry: () => BudgetEntrySheet.show(context, onSaved: _refreshAllViews),
             ),
-            padding: const EdgeInsets.all(6),
-            constraints: const BoxConstraints(minWidth: 34, minHeight: 34),
-            icon: const Icon(Icons.search_rounded, color: AppColors.textSecondary, size: 20),
+            padding: const EdgeInsets.all(AppSpacing.sm),
+            constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+            icon: const Icon(Icons.search_rounded, size: 20),
             tooltip: 'Global Quick Search',
           ),
           // Pomodoro Focus Timer Icon
           IconButton(
             onPressed: () => PomodoroTimerDialog.show(context),
-            padding: const EdgeInsets.all(6),
-            constraints: const BoxConstraints(minWidth: 34, minHeight: 34),
-            icon: const Icon(Icons.timer_outlined, color: AppColors.textSecondary, size: 19),
+            padding: const EdgeInsets.all(AppSpacing.sm),
+            constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+            icon: const Icon(Icons.timer_outlined, size: 20),
             tooltip: 'Pomodoro Focus Timer',
           ),
-          const SizedBox(width: 2),
+          const SizedBox(width: AppSpacing.xs),
           // User Profile & Login Button
           ValueListenableBuilder<UserModel?>(
             valueListenable: ApiClient.instance.currentUserNotifier,
@@ -178,25 +174,35 @@ class _MainShellScreenState extends State<MainShellScreen> {
               final isDemo = user?.id == 999;
               return InkWell(
                 onTap: _openAuthProfile,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.sm,
+                    vertical: AppSpacing.xs,
+                  ),
                   child: Row(
                     children: [
                       Container(
-                        width: 30,
-                        height: 30,
+                        width: 32,
+                        height: 32,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: isAuth ? (isDemo ? AppColors.warning : AppColors.primary) : AppColors.bgSurfaceAlt,
+                          color: isAuth
+                              ? (isDemo ? AppSemanticColors.warning : AppSemanticColors.primary)
+                              : AppSemanticColors.bgSurfaceAlt,
                           border: Border.all(
-                            color: isAuth ? (isDemo ? AppColors.warning : AppColors.primaryLight) : AppColors.border,
+                            color: isAuth
+                                ? (isDemo ? AppSemanticColors.warning : AppSemanticColors.primaryLight)
+                                : AppSemanticColors.border,
                             width: 1.5,
                           ),
                           boxShadow: isAuth
                               ? [
                                   BoxShadow(
-                                    color: (isDemo ? AppColors.warning : AppColors.primaryLight).withAlpha(100),
+                                    color: (isDemo
+                                            ? AppSemanticColors.warning
+                                            : AppSemanticColors.primaryLight)
+                                        .withAlpha(100),
                                     blurRadius: 8,
                                     spreadRadius: 1,
                                   ),
@@ -205,19 +211,25 @@ class _MainShellScreenState extends State<MainShellScreen> {
                         ),
                         alignment: Alignment.center,
                         child: Text(
-                          isAuth ? (user.username.isNotEmpty ? user.username[0].toUpperCase() : 'U') : '?',
-                          style: TextStyle(
-                            color: isAuth ? Colors.white : AppColors.textSecondary,
+                          isAuth
+                              ? (user.username.isNotEmpty
+                                  ? user.username[0].toUpperCase()
+                                  : 'U')
+                              : '?',
+                          style: AppTypography.caption.copyWith(
+                            color: isAuth ? Colors.white : AppSemanticColors.textSecondary,
                             fontWeight: FontWeight.w800,
-                            fontSize: 12,
                           ),
                         ),
                       ),
                       if (!isAuth) ...[
-                        const SizedBox(width: 4),
-                        const Text(
+                        const SizedBox(width: AppSpacing.xs),
+                        Text(
                           'Sign In',
-                          style: TextStyle(color: AppColors.primaryLight, fontSize: 11, fontWeight: FontWeight.w800),
+                          style: AppTypography.caption.copyWith(
+                            color: AppColors.primaryLight,
+                            fontWeight: FontWeight.w800,
+                          ),
                         ),
                       ],
                     ],
@@ -226,7 +238,7 @@ class _MainShellScreenState extends State<MainShellScreen> {
               );
             },
           ),
-          const SizedBox(width: 6),
+          const SizedBox(width: AppSpacing.sm),
         ],
       ),
       body: IndexedStack(

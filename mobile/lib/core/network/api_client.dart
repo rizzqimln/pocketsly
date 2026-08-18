@@ -293,6 +293,21 @@ class ApiClient {
     return {'success': false, 'error': res['error'] ?? 'Failed to update profile'};
   }
 
+  /// Restore user data from backup
+  Future<Map<String, dynamic>> restoreData(String jsonText) async {
+    final res = await post(ApiEndpoints.backupRestore, {'json': jsonText});
+    if (res is Map<String, dynamic> && res['success'] == true) {
+      if (res['user'] != null) {
+        _currentUser = UserModel.fromJson(res['user']);
+        currentUserNotifier.value = _currentUser;
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('pocketsly_user_data', jsonEncode(res['user']));
+      }
+      return {'success': true};
+    }
+    return {'success': false, 'error': res['error'] ?? 'Failed to restore data'};
+  }
+
   /// Logout and clear cached session
   Future<void> logout() async {
     try {

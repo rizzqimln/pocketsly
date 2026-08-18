@@ -31,6 +31,9 @@ class UserModel {
     'phone': phone,
     'currency': currency,
   };
+
+  /// Whether this user is the offline demo user
+  bool get isDemo => id == 999;
 }
 
 /// Task Item Model

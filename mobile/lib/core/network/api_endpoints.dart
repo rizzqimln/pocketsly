@@ -96,4 +96,5 @@ class ApiEndpoints {
   static String get backupExport => '$baseUrl/backup/export';
   static String get backupRestore => '$baseUrl/backup/restore';
   static String get backupImport => '$baseUrl/backup/restore';
+  static String get exportData => '$baseUrl/backup/export';
 }

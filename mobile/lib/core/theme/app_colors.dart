@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
-/// Central Design System Color Tokens matching Modern UI/UX References
+/// Central Design System Color Palette
+/// Based on modern violet/indigo spectrum with deep space background
+/// All colors defined here are RAW tokens - use AppSemanticColors for semantic roles
 class AppColors {
   AppColors._();
 
@@ -11,6 +13,13 @@ class AppColors {
   static const Color bgSurfaceAlt = Color(0xFF1F293D);
   static const Color bgSurfaceHover = Color(0xFF28354E);
   static const Color bgCardGlass = Color(0xCC111827);
+
+  // ── Glassmorphic Gradients ────────────────────────────────────────────────
+  static const LinearGradient glassGradient = LinearGradient(
+    colors: [Color(0x44FFFFFF), Color(0x11FFFFFF)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
 
   // ── Text & Content ────────────────────────────────────────────────────────
   static const Color textPrimary = Color(0xFFF9FAFB);
@@ -24,7 +33,7 @@ class AppColors {
   static const Color primaryDark = Color(0xFF5B21B6);
   static const Color primaryGlow = Color(0x667C3AED);
 
-  // ── Soft Modern Pastel Tokens (Reference 2: Learning Tracker) ──────────────
+  // ── Soft Modern Pastel Tokens (Reference: Learning Tracker) ──────────────
   static const Color pastelLavender = Color(0xFFEDE9FE);
   static const Color pastelLavenderText = Color(0xFF6D28D9);
   static const Color pastelMint = Color(0xFFD1FAE5);
@@ -78,25 +87,13 @@ class AppColors {
   );
 
   static const LinearGradient expenseGradient = LinearGradient(
-    colors: [Color(0xFFEF4444), Color(0xFFDC2626)],
+    colors: [Color(0xFFEF4444), Color(0xFFF97316)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   static const LinearGradient incomeGradient = LinearGradient(
     colors: [Color(0xFF10B981), Color(0xFF059669)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
-
-  static const LinearGradient glassGradient = LinearGradient(
-    colors: [Color(0xCC1A2234), Color(0x99111827)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
-
-  static const LinearGradient orangeFlameGradient = LinearGradient(
-    colors: [Color(0xFFF97316), Color(0xFFEA580C)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
