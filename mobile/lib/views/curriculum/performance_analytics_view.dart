@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/design_system.dart';
 import '../../widgets/glass_card.dart';
 import '../../widgets/kpi_card.dart';
 
@@ -25,15 +26,19 @@ class _PerformanceAnalyticsViewState extends State<PerformanceAnalyticsView> {
 
   @override
   Widget build(BuildContext context) {
+    final canAchieve = _requiredNextGpa <= 4.0;
+    final statusColor = canAchieve ? AppSemanticColors.success : AppSemanticColors.danger;
+
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.screenPadding),
       children: [
-        const Text(
+        Text(
           'STUDY VELOCITY & ACADEMIC KPIS',
-          style: TextStyle(color: AppColors.textMuted, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 0.8),
+          style: AppTypography.overline.copyWith(color: AppSemanticColors.textMuted),
         ),
-        const SizedBox(height: 8),
-        const Row(
+        const SizedBox(height: AppSpacing.md),
+
+        Row(
           children: [
             Expanded(
               child: KpiCard(
@@ -44,64 +49,74 @@ class _PerformanceAnalyticsViewState extends State<PerformanceAnalyticsView> {
                 iconColor: AppColors.primaryLight,
               ),
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: AppSpacing.md),
             Expanded(
               child: KpiCard(
                 title: 'Cumulative GPA',
                 value: '3.75 / 4.0',
                 subtitle: "Dean's Honor List",
                 icon: Icons.school_outlined,
-                iconColor: AppColors.success,
+                iconColor: AppSemanticColors.success,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.xl),
 
         // ── GPA Target Simulator ─────────────────────────────────────────────
         GlassCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.calculate_outlined, color: AppColors.warning, size: 20),
-                  SizedBox(width: 8),
+                  Icon(Icons.calculate_outlined, color: AppSemanticColors.warning, size: 20),
+                  const SizedBox(width: AppSpacing.sm),
                   Text(
                     'GPA Target Simulator',
-                    style: TextStyle(fontWeight: FontWeight.w700, color: AppColors.textPrimary, fontSize: 15),
+                    style: AppTypography.subheading.copyWith(color: AppSemanticColors.textPrimary),
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpacing.md),
               Text(
                 'Current GPA: ${_currentGpa.toStringAsFixed(2)} (${_currentCredits.toInt()} Credits earned)',
-                style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                style: AppTypography.bodySmall.copyWith(color: AppSemanticColors.textSecondary),
               ),
+              const SizedBox(height: AppSpacing.md),
               Slider(
                 value: _targetGpa,
                 min: 3.0,
                 max: 4.0,
                 divisions: 20,
-                activeColor: AppColors.primary,
+                activeColor: AppSemanticColors.primary,
                 label: _targetGpa.toStringAsFixed(2),
                 onChanged: (val) => setState(() => _targetGpa = val),
               ),
+              const SizedBox(height: AppSpacing.sm),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Target GPA: ${_targetGpa.toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                  Text(
+                    'Target GPA: ${_targetGpa.toStringAsFixed(2)}',
+                    style: AppTypography.bodyLarge.copyWith(
+                      color: AppSemanticColors.textPrimary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                      vertical: AppSpacing.xs,
+                    ),
                     decoration: BoxDecoration(
-                      color: _requiredNextGpa <= 4.0 ? AppColors.success.withAlpha(35) : AppColors.danger.withAlpha(35),
-                      borderRadius: BorderRadius.circular(6),
+                      color: statusColor.withAlpha(35),
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                     ),
                     child: Text(
                       'Need ${_requiredNextGpa.toStringAsFixed(2)} GPA next semester',
-                      style: TextStyle(
-                        color: _requiredNextGpa <= 4.0 ? AppColors.success : AppColors.danger,
-                        fontSize: 11,
+                      style: AppTypography.caption.copyWith(
+                        color: statusColor,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
