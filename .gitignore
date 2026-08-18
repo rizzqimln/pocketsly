@@ -21,8 +21,11 @@ opencode.json
 .env.*
 .dev.vars
 .DS_Store
+pocketsly.md
+session-*.md
 
 # ── Node (Cloudflare functions test tooling) ─────────────────────────────────
+node_modules/
 functions/node_modules/
 
 # ── Editor-local config ──────────────────────────────────────────────────────

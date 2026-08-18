@@ -945,8 +945,8 @@ class _AuthProfileSheetState extends State<AuthProfileSheet> {
           TextField(
             controller: _loginUsernameController,
             decoration: const InputDecoration(
-              labelText: 'Username',
-              hintText: 'e.g. alex_student',
+              labelText: 'Username or Email',
+              hintText: 'e.g. alex_student or email',
               prefixIcon: Icon(Icons.person_outline_rounded, size: 20),
             ),
           ),
