@@ -68,6 +68,19 @@ describe('OTP / account recovery', () => {
   });
 });
 
+describe('sign in with registered email', () => {
+  it('logs in a user by email address, not just username', async () => {
+    const db = createTestDb();
+    await registerUser(db, { username: 'alice', password: 'secret123', email: 'alice@example.com' });
+
+    const session = await loginUser(db, 'alice@example.com', 'secret123');
+    expect(session.user.email).toBe('alice@example.com');
+    expect(session.token).toBeTruthy();
+
+    await expect(loginUser(db, 'nobody@example.com', 'secret123')).rejects.toThrow(/invalid/i);
+  });
+});
+
 describe('SQL playground isolation', () => {
   it('runs only against its own scratch database, never production data', async () => {
     const playground = createPlaygroundDb();

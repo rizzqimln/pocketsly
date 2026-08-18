@@ -129,7 +129,12 @@ export async function registerUser(db, { username, password, email, phone, secur
  */
 export async function loginUser(db, username, password) {
   username = (username || '').trim().toLowerCase();
-  const user = await queryOne(db, 'SELECT * FROM users WHERE username = ?1', [username]);
+  // Username takes precedence; fall back to email so accounts that registered
+  // (or reset) via their email can sign in the same way the forgot flow accepts them.
+  let user = await queryOne(db, 'SELECT * FROM users WHERE username = ?1', [username]);
+  if (!user) {
+    user = await queryOne(db, 'SELECT * FROM users WHERE email = ?1', [username]);
+  }
   if (!user) {
     throw new Error('Invalid username or password.');
   }
