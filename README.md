@@ -1,109 +1,63 @@
-# Pocketsly — Daily Routine & Student Productivity Suite
+# Pocketsly — Student Productivity Suite
 
-A high-performance full-stack productivity suite built with **Pure HTML5, Vanilla CSS3, Modern JavaScript (ES6+)** — with **zero frontend frameworks**. The canonical production backend is **Cloudflare Pages Functions + D1** (the `functions/` directory); the original **Python 3** backend (`server.py`) is kept for local development and legacy deployments only.
+A full-stack productivity app for students. Built with plain HTML, CSS, and vanilla JavaScript — no frontend frameworks. The production backend runs on Cloudflare Pages Functions with D1 (serverless SQLite). The original Python backend (`server.py`) stays for local development.
 
-Designed as a modern daily routine planner, weekly timetable, notes & academic library manager, curriculum GPA simulator, monthly budget tracker, and offline-capable installable PWA.
+What it does: daily planner with habit streaks, weekly timetable, journal and notes with mood tags, curriculum manager with GPA simulator, budget tracker with receipt OCR, Pomodoro timer, and a command palette. Installable PWA with offline support.
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![CI](https://github.com/<YOUR-USERNAME>/pocketsly/actions/workflows/ci.yml/badge.svg)](https://github.com/<YOUR-USERNAME>/pocketsly/actions/workflows/ci.yml)
-
-> Replace `<YOUR-USERNAME>` in the CI badge URL after your first push — it links
-> to your fork's Actions page.
-
----
-
-## ✨ Features
-
-- **Daily Planner** — habit streaks with a 7-day matrix, priority tasks, one-time todos, and overdue deadlines
-- **Weekly Timetable** — block-based schedule grid (Mon–Sun) for classes, focus work, and routines
-- **Journal & Notes** — mood-tagged reflections, rich text notes, and an academic library with citation generator
-- **Curriculum Lab** — GPA simulator, live SQL sandbox, and a 3D flashcard quizzer
-- **Budget Tracker** — multi-currency (IDR/USD/EUR/…), monthly budgets, CSV export, and receipt OCR
-- **Focus Timer** — built-in Pomodoro-style timer
-- **Command Palette** — global ⌘K / Ctrl+K spotlight for navigation and actions
-- **PWA & Offline** — installable, offline-capable via service worker caching
-- **Security-first** — PBKDF2 password hashing, HttpOnly session cookies, D1-backed IP rate limiting, OTP recovery by email (never echoed to clients), isolated SQL playground, CSP, and XSS escaping
-- **Minimal dependencies** — production backend runs on the Cloudflare edge (no servers to run); the local Python backend needs one driver (`psycopg`)
-
-## 🧰 Tech Stack
+## Tech Stack
 
 | Layer | Technology |
-|---|---|
-| Backend | **Cloudflare Pages Functions (edge JS) + D1 SQLite** — canonical; Python 3 (`server.py`) kept for local dev / legacy deploys |
-| Database | Cloudflare D1 (production), PostgreSQL 14+ (local dev + legacy deploys) |
-| Frontend | Pure HTML5, CSS3, Vanilla JavaScript (ES6+) |
+|-------|------------|
+| Backend | Cloudflare Pages Functions + D1 (production), Python 3 (`server.py`) for local dev |
+| Database | Cloudflare D1 (production), PostgreSQL 14+ (local) |
+| Frontend | HTML5, CSS3, Vanilla JS (ES6+) |
 | PWA | Web App Manifest, Service Worker, offline caching |
-| Deploy | Cloudflare Pages (canonical) or Netlify / Render / VPS (legacy) |
-| CI | GitHub Actions (edge API, Python API, security, and E2E suites) |
+| Deploy | Cloudflare Pages (recommended), or any Python host |
+| CI | GitHub Actions (API, security, E2E) |
 
-## 🧭 Which backend am I using?
+## Which backend am I using?
 
 | Use case | Backend |
-|---|---|
-| **Production deployment** | [`functions/`](functions/) — Cloudflare Pages Functions + D1. See [`docs/DEPLOY_CLOUDFLARE_PAGES_D1.md`](docs/DEPLOY_CLOUDFLARE_PAGES_D1.md) |
-| **Local development** | `python3 server.py` (Postgres required) |
-| **Legacy deployments** | Netlify Functions adapter (`netlify/functions/api.py`) or a Python host |
+|----------|---------|
+| Production | `functions/` — Cloudflare Pages Functions + D1. See `docs/DEPLOY_CLOUDFLARE_PAGES_D1.md` |
+| Local development | `python3 server.py` (Postgres required) |
+| Legacy deployments | Netlify Functions adapter or any Python host |
 
-> Password recovery requires an email provider. On Cloudflare, bind `BREVO_API_KEY`
-> and `MAIL_FROM` with `wrangler pages secret put <NAME> --project-name pocketsly`
-> (dashboard env vars are NOT injected into Functions for this wrangler-managed
-> project) — the OTP is delivered by email and is
-> **never** returned by the API. See [`SECURITY.md`](SECURITY.md).
+Password recovery needs an email provider. On Cloudflare, bind `BREVO_API_KEY` and `MAIL_FROM` with `wrangler pages secret put <NAME> --project-name pocketsly` (dashboard env vars don't inject into Functions for this wrangler-managed project). The OTP is delivered by email and never returned by the API. See `SECURITY.md`.
 
----
+## Developer & AI-Agent Guide
 
-## 📖 Comprehensive Developer & AI-Agent Guide
+Full architecture, database schema, 30+ REST API endpoints, security model, and bug-fixing protocol: **`docs/LEARNING_GUIDE.md`**
 
-For the full architectural blueprint, database schema, 30+ REST API reference, security model, and step-by-step bug-fixing protocol, see:
-👉 [**`docs/LEARNING_GUIDE.md`**](docs/LEARNING_GUIDE.md)
+Contributing or reporting a security issue? See **`CONTRIBUTING.md`** and **`SECURITY.md`**
 
-Want to contribute or report a security issue? See
-👉 [**`CONTRIBUTING.md`**](CONTRIBUTING.md) and
-👉 [**`SECURITY.md`**](SECURITY.md)
-
----
-
-## 🚀 Quick Start
+## Quick Start (Local Python Backend)
 
 ```bash
-# 1. Install the single backend dependency (psycopg — the PostgreSQL driver)
+# 1. Install the single backend dependency
 pip install -r requirements.txt
 
-# 2. Point at a database (defaults to a local Postgres; use your Supabase URL in production)
-export DATABASE_URL="postgresql://postgres:postgres@localhost:5432/pocketsly"
+# 2. Point at a database (defaults to local Postgres; use your Supabase URL in production)
+export DATABASE_URL="postgresql://postgres:***@localhost:5432/pocketsly"
 
-# 3. Start the application server (applies schema.sql automatically on boot)
+# 3. Start the server (applies schema.sql automatically on boot)
 python3 server.py
 
-# 4. Open your browser and visit:
-http://localhost:8000
+# 4. Open http://localhost:8000
 ```
 
-> **Frontend bundling:** the app ships one `bundle.css` + one `bundle.js` (fewer
-> render-blocking round-trips over HTTP/1.1). The modular sources under
-> `static/css/` and `static/js/` are the source of truth — after editing any
-> module, regenerate the bundles and bump the `?v=` version in `index.html` and
-> `sw.js`:
->
-> ```bash
-> python3 scripts/build.py
-> ```
+Frontend bundling: the app ships one `bundle.css` + one `bundle.js` (fewer render-blocking round-trips). The modular sources under `static/css/` and `static/js/` are the source of truth. After editing any module, regenerate the bundles and bump the `?v=` version in `index.html` and `sw.js`:
 
----
+```bash
+python3 scripts/build.py
+```
 
-## 🚢 Deployment
+## Deployment
 
-The repo is deploy-ready for **GitHub**, **Cloudflare Pages**, and any Python
-host. Two facts shape every option:
+Two facts shape every option:
 
-1. **The frontend is static; the API is Python** — `static/` (landing page,
-   PWA, installable shell) can be served by any static host, but the Python
-   API (`server.py`) needs a process that can run Python and reach your
-   database. The two are glued together by the Cloudflare proxy function.
-2. **Data lives in PostgreSQL, not in a file** — the app reads its connection
-   string from `DATABASE_URL` (Supabase managed Postgres in production).
-   Because the database is external, even hosts with ephemeral filesystems
-   keep your data permanently.
+1. **Frontend is static; API is Python** — `static/` can be served by any static host, but the Python API (`server.py`) needs a process that can run Python and reach your database. Cloudflare Pages glues them together.
+2. **Data lives in PostgreSQL, not in a file** — the app reads its connection string from `DATABASE_URL` (Supabase managed Postgres in production). Because the database is external, even hosts with ephemeral filesystems keep your data permanently.
 
 ### Push to GitHub
 
@@ -116,61 +70,46 @@ git remote add origin https://github.com/<you>/pocketsly.git
 git push -u origin main
 ```
 
-The repo already ships `.gitignore` (databases, caches, local tooling),
-`wrangler.toml` + `functions/` (Cloudflare Pages), and `static/_redirects`.
+The repo already ships `.gitignore` (databases, caches, local tooling), `wrangler.toml` + `functions/` (Cloudflare Pages), and `static/_redirects`.
 
-### Option A — Cloudflare Pages + Cloudflare D1 (Recommended — 100% Free, All-in-One)
+### Option A — Cloudflare Pages + Cloudflare D1 (Recommended)
 
-The entire application (**Frontend + Serverless API + Database**) runs natively inside **Cloudflare Pages** using **Cloudflare D1** (Serverless SQLite) and the Web Crypto API. **Zero external backend hosts, zero credit cards, and zero cold-start sleeps.**
+The entire application (frontend + serverless API + database) runs inside Cloudflare Pages using D1. Zero external backend hosts, zero credit cards.
 
 1. Push to GitHub.
-2. In the [Cloudflare Dashboard](https://dash.cloudflare.com):
-   - **Storage & Databases → D1 SQL Database → Create database** named `pocketsly-db`.
-   - **Workers & Pages → Create → Pages → Connect to Git** → select your `pocketsly` repo.
+2. In the Cloudflare Dashboard:
+   - Storage & Databases → D1 SQL Database → Create database named `pocketsly-db`.
+   - Workers & Pages → Create → Pages → Connect to Git → select your `pocketsly` repo.
    - Build output directory: `static` (leave build command empty).
-   - Click **Save and Deploy**.
-3. In your Pages project: **Settings → Functions → D1 database bindings → Add binding**:
+   - Save and Deploy.
+3. In your Pages project: Settings → Functions → D1 database bindings → Add binding:
    - Variable name: `DB`
    - D1 database: select `pocketsly-db`
-4. Deploy! Your app is live at `https://<your-project>.pages.dev` with full authentication and offline sync. See [`docs/DEPLOY_CLOUDFLARE_PAGES_D1.md`](docs/DEPLOY_CLOUDFLARE_PAGES_D1.md) for the full guide.
+4. Deploy. Your app is live at `https://<your-project>.pages.dev` with full auth and offline sync. See `docs/DEPLOY_CLOUDFLARE_PAGES_D1.md` for the full guide.
 
 ### Option B — Traditional Python Server + External PostgreSQL
 
-If you prefer to run the standalone Python server (`server.py` + PostgreSQL):
+If you prefer the standalone Python server:
 
-1. Set `DATABASE_URL` to your PostgreSQL database (e.g. Supabase or local Postgres).
+1. Set `DATABASE_URL` to your PostgreSQL database (Supabase or local Postgres).
 2. Run `python3 server.py`.
-3. Deploy to any independent Linux host (e.g. Alwaysdata, DomCloud, Serv00, or a VPS).
+3. Deploy to any Linux host that can run Python and reach your database.
 
 ### Option B′ — Where the Python API actually runs
 
-`server.py` is a full HTTP server; it needs a host that can run Python and
-reach your PostgreSQL database. `DATABASE_URL` is the only variable it needs:
+`server.py` is a full HTTP server. It needs a host that runs Python and reaches your PostgreSQL database. `DATABASE_URL` is the only variable it needs.
 
-- **Your own machine + Cloudflare Tunnel** — free, no card; the app is public
-  at a `trycloudflare.com` URL while your PC is on.
-- **Render free** — asks for card *verification* when creating a service (a
-  temporary $1 hold, refunded; you're never charged on the free tier) and
-  sleeps after ~15 min idle.
-- **Student cloud (Azure for Students, GitHub Student Pack)** — a real
-  always-on VM using only your `.edu` email, no card.
+- **Your own machine + Cloudflare Tunnel** — free, no card; the app is public at a `trycloudflare.com` URL while your PC is on.
+- **Render free** — asks for card verification when creating a service (temporary $1 hold, refunded; never charged on free tier) and sleeps after ~15 min idle.
+- **Student cloud (Azure for Students, GitHub Student Pack)** — a real always-on VM using only your `.edu` email, no card.
 
 ### Local preview without GitHub
 
-You can also drag-and-drop the `static/` folder onto Cloudflare Pages (or Netlify) for a static preview, or run everything locally with `python3 server.py`.
+Drag-and-drop the `static/` folder onto Cloudflare Pages (or Netlify) for a static preview, or run everything locally with `python3 server.py`.
 
----
+## Automated Testing
 
-## 🧪 Automated Testing
-
-The **API suite** needs a reachable PostgreSQL database: it uses
-`TEST_DATABASE_URL` (falls back to `DATABASE_URL`, then to a local Postgres on
-`localhost:5432`) and skips with a clear message if none is reachable. The
-**performance/security** and **E2E** suites need a running server
-(`python3 server.py` with `DATABASE_URL` set) — and the E2E suites need
-Playwright (`pip install playwright && python -m playwright install chromium`).
-GitHub Actions runs all of these on every push and pull request (with a
-PostgreSQL service container) — see [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
+The API suite needs a reachable PostgreSQL database. It uses `TEST_DATABASE_URL` (falls back to `DATABASE_URL`, then to local Postgres on `localhost:5432`) and skips with a clear message if none is reachable. The performance/security and E2E suites need a running server (`python3 server.py` with `DATABASE_URL` set). The E2E suites need Playwright (`pip install playwright && python -m playwright install chromium`). GitHub Actions runs all of these on every push and PR — see `.github/workflows/ci.yml`.
 
 ```bash
 # 0. JS static analysis — dead code, unused globals, orphan DOM ids (stdlib only)
@@ -192,11 +131,7 @@ python3 tests/test_e2e_mobile_redesign.py
 python3 tests/test_e2e_new_features.py
 ```
 
----
-
----
-
-## 📁 Project Structure
+## Project Structure
 
 ```
 pocketsly/
@@ -207,35 +142,37 @@ pocketsly/
 ├── schema.sql              # PostgreSQL DDL (14 Tables, 21 Performance Indexes)
 ├── requirements.txt        # Single runtime dependency: psycopg (PostgreSQL driver)
 ├── netlify.toml            # Netlify config: publish static/, immutable cache headers
-├── README.md               # Quickstart and project introduction
+├── README.md               # This file
 ├── CONTRIBUTING.md         # Contributor guide: setup, tests, conventions, PR process
 ├── SECURITY.md             # Security policy & vulnerability reporting
 ├── LICENSE                 # MIT License
 ├── .editorconfig           # Consistent editor formatting
 ├── .github/workflows/ci.yml# GitHub Actions: API + perf/security + E2E on every push
 ├── docs/                   # Developer guides (LEARNING_GUIDE.md, build guides)
-│
-├── static/                 # Client-Side Assets (published to Netlify in Setup B)
+├── static/                 # Client-Side Assets
 │   ├── index.html          # Semantic HTML5 Single Page Application Layout
 │   ├── manifest.json       # PWA Web App Manifest (Standalone mode, App Icons, Shortcuts)
 │   ├── sw.js               # Service Worker (Offline cache, Stale-While-Revalidate)
 │   ├── _redirects          # Netlify SPA fallback + optional /api/* proxy
 │   ├── bundle.css          # Bundled CSS (regenerate via scripts/build.py)
 │   ├── bundle.js           # Bundled JS (regenerate via scripts/build.py)
-│   ├── css/                # Modular Vanilla CSS (Variables, Base, Layout, Components...)
-│   ├── js/                 # Modular Vanilla JS (App, API, Auth, UI, Features...)
+│   ├── css/                # Modular Vanilla CSS
+│   ├── js/                 # Modular Vanilla JS
 │   └── img/                # High-Res Icons (192px, 512px, Favicon)
-│
 ├── scripts/build.py        # Stdlib bundler for bundle.css / bundle.js
 └── tests/                  # Automated Test Suites
-    ├── test_api.py                         # REST API suite (pytest)
-    ├── test_perf_security.py               # Gzip/CSP/rate-limiter suite (pytest)
-    ├── test_e2e_quiz.py                    # 3D quiz + landing E2E (pytest, Playwright)
-    ├── test_e2e_budget_mobile.py           # Budget mobile UX E2E (pytest, Playwright)
-    ├── test_e2e_budget.py                  # Budget flow E2E (script, Playwright)
-    ├── test_e2e_reset.py                   # Password reset E2E (script, Playwright)
-    ├── test_e2e_features.py                # Feature tour E2E (script, Playwright)
-    ├── test_e2e_mobile_profile_dashboard.py# Mobile profile/dashboard E2E (script)
-    ├── test_e2e_mobile_redesign.py         # Mobile & desktop responsive E2E (script)
-    └── test_e2e_new_features.py            # New features E2E (script, Playwright)
+    ├── test_api.py
+    ├── test_perf_security.py
+    ├── test_e2e_quiz.py
+    ├── test_e2e_budget_mobile.py
+    ├── test_e2e_budget.py
+    ├── test_e2e_reset.py
+    ├── test_e2e_features.py
+    ├── test_e2e_mobile_profile_dashboard.py
+    ├── test_e2e_mobile_redesign.py
+    └── test_e2e_new_features.py
 ```
+
+## License
+
+MIT — see `LICENSE` for details.
